@@ -1,4 +1,5 @@
-system
+Gratis
+
 ======
 
-All internal components necessary to build our repaper.org, excluding source codes and documentation.
+Gratis is a Repaper.org repository, initiated by E Ink and PDI for the purpose of making sure ePaper can go everywhere.
