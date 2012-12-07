@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- 由 Microsoft Visio 11.0, SVG Export, v1.0 產生 6 - Power off COG Driver.svg 頁-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="6.861in" height="10.6496in"
+		viewBox="0 0 493.992 766.772" xml:space="preserve" color-interpolation-filters="sRGB" class="st15">
+	<v:documentProperties v:langID="1028" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.24}
+		.st2 {fill:#000000;font-family:Arial Unicode MS;font-size:0.833336em}
+		.st3 {font-size:1em}
+		.st4 {marker-end:url(#mrkr4-64);stroke:#4677bf;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.2}
+		.st5 {fill:#4677bf;fill-opacity:1;stroke:#4677bf;stroke-opacity:1;stroke-width:0.32258064516129}
+		.st6 {baseline-shift:33.3489%;font-size:0.666978em}
+		.st7 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st8 {fill:#000000;font-family:Arial Unicode MS;font-size:0.666664em}
+		.st9 {font-family:Tempus Sans ITC;font-size:1em}
+		.st10 {font-size:0.799995em}
+		.st11 {font-size:0.599989em}
+		.st12 {baseline-shift:-20.0088%;font-size:0.400176em}
+		.st13 {baseline-shift:50%;font-size:1em}
+		.st14 {fill:#ffffff;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.24}
+		.st15 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-64" class="st5" v:arrowType="4" v:arrowSize="2" v:setback="6.2" refX="-6.2" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.1,-3.1) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>頁-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="流程圖" v:index="0"/>
+		<v:layer v:name="連接器" v:index="1"/>
+		<g id="shape1-1" v:mID="1" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-656.743)">
+			<title>程序.1</title>
+			<desc>Turn off osc SPI(0x07,0x0D)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="23.21" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Turn off osc <tspan
+						x="14.31" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">07</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan class="st3"
+						v:langID="1028">D</tspan><tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape2-15" v:mID="2" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-231.547)">
+			<title>程序.2</title>
+			<desc>Power off chargepump Vcom SPI(0x05,0x0E)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="28.49" y="736.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Power off <tspan
+						x="7.64" dy="1.2em" class="st3">chargepump Vcom </tspan><tspan x="14.59" dy="1.2em" class="st3"
+						v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">05</tspan><tspan class="st3"
+						v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan
+						class="st3" v:langID="1028">0</tspan>E<tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape3-29" v:mID="3" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-371.153)">
+			<title>程序.6</title>
+			<desc>Latch reset turn on SPI(0x03,0x01)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="7.91" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Latch reset turn on <v:newlineChar/><tspan
+						x="15.14" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">3</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">1</tspan><tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape4-44" v:mID="4" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-302.413)">
+			<title>程序.7</title>
+			<desc>Output enable off SPI(0x02,0x05)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="11.24" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Output enable off <tspan
+						x="15.14" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">2</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">5</tspan><tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape5-59" v:mID="5" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-302.413)">
+			<title>動態連接器.5</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 787.68" class="st4"/>
+		</g>
+		<g id="shape6-65" v:mID="6" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-371.153)">
+			<title>Dynamic connector.21</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 785.55" class="st4"/>
+		</g>
+		<g id="shape7-70" v:mID="7" v:groupContext="shape" v:layerMember="0" transform="translate(281.323,-727.61)">
+			<title>終端子</title>
+			<desc>Input Display Data</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="35.4331" cy="752.599" width="70.87" height="28.3465"/>
+			<path d="M14.17 766.77 L56.69 766.77 A14.1732 14.1732 -180 0 0 56.69 738.43 L14.17 738.43 A14.1732 14.1732 -180 1 0 14.17
+						 766.77 Z" class="st1"/>
+			<text x="6.53" y="749.6" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Input Display <tspan
+						x="24.87" dy="1.2em" class="st3">Data</tspan></text>		</g>
+		<g id="shape8-74" v:mID="8" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-656.743)">
+			<title>程序</title>
+			<desc>Write a Nothing Frame*1</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="33.77" y="742.51" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Write a <v:newlineChar/><tspan
+						x="12.74" dy="1.2em" class="st3">Nothing Frame</tspan>*<tspan dy="0.049em" class="st6" v:langID="1033"
+						v:baseFontSize="10">1</tspan></text>		</g>
+		<g id="shape9-79" v:mID="9" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-727.61)">
+			<title>動態連接器.6</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 787.68" class="st4"/>
+		</g>
+		<g id="shape10-84" v:mID="10" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-656.743)">
+			<title>動態連接器.14</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 787.68" class="st4"/>
+		</g>
+		<g id="shape11-89" v:mID="11" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-585.877)">
+			<title>程序.11</title>
+			<desc>Write a Dummy Line*2</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="33.77" y="742.51" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Write a <v:newlineChar/><tspan
+						x="17.74" dy="1.2em" class="st3">Dummy Line</tspan>*<tspan dy="0.049em" class="st6" v:baseFontSize="10">2</tspan></text>		</g>
+		<g id="shape12-94" v:mID="12" v:groupContext="shape" v:layerMember="1" transform="translate(323.843,-585.877)">
+			<title>Dynamic connector.27</title>
+			<desc>Delay ≥ 25ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-7.08661" cy="780.237" width="61.83" height="17.711"/>
+			<path d="M-7.09 766.77 L-7.09 786.26" class="st4"/>
+			<rect v:rectContext="textBkgnd" x="-31.4207" y="775.305" width="48.6681" height="9.86325" class="st7"/>
+			<text x="-31.42" y="782.7" class="st8" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay <tspan
+						class="st9">≥</tspan><tspan class="st9" v:langID="1033"> </tspan>25ms</text>		</g>
+		<g id="shape13-103" v:mID="13" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-516.428)">
+			<title>程序.23</title>
+			<desc>Discharge internal SPI(0x04,0xA0)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="9.31" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Discharge internal <tspan
+						x="14.59" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">04</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan>A0<tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape14-115" v:mID="14" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-444.145)">
+			<title>程序.22</title>
+			<desc>Discharge internal SPI(0x04,0x00)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="9.31" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Discharge internal <tspan
+						x="15.14" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">04</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">00</tspan><tspan class="st3"
+						v:langID="1028">)</tspan></text>		</g>
+		<g id="shape15-128" v:mID="15" v:groupContext="shape" v:layerMember="1" transform="translate(437.059,-516.428)">
+			<title>動態連接器.15</title>
+			<desc>Delay ≥ 40 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="781.654" width="64.05" height="17.711"/>
+			<path d="M7.09 766.77 L7.09 789.1" class="st4"/>
+			<rect v:rectContext="textBkgnd" x="-18.3587" y="776.723" width="50.8906" height="9.86325" class="st7"/>
+			<text x="-18.36" y="784.12" class="st8" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay<tspan
+						class="st3" v:langID="1033"> </tspan><tspan class="st9" v:langID="1033">≥</tspan><tspan class="st9"
+						v:langID="1033"> </tspan><tspan class="st3" v:langID="1033">4</tspan>0 ms</text>		</g>
+		<g id="shape16-139" v:mID="16" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-371.153)">
+			<title>程序.16</title>
+			<desc>Set Powers and Signals = 0 (VCC, VDD, /RESET, /CS, SI, SCLK, ...</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="14.31" y="732.91" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Set Powers and <tspan
+						x="9.72" dy="1.2em" class="st3">Signals </tspan>= 0 <tspan class="st10">(</tspan><tspan class="st11">V</tspan><tspan
+						dy="-0.289em" class="st12" v:baseFontSize="6">CC</tspan><tspan dy="0.193em" class="st11">, </tspan><tspan
+						class="st11">V</tspan><tspan dy="-0.289em" class="st12" v:baseFontSize="6">DD</tspan><tspan dy="0.193em"
+						class="st11">, </tspan><tspan x="17.27" dy="1.4em" class="st11">/</tspan><tspan class="st11">RESET</tspan><tspan
+						class="st11">, </tspan><tspan class="st11">/</tspan><tspan class="st11">CS</tspan><tspan class="st11">, </tspan><tspan
+						class="st11">SI</tspan><tspan class="st11">, </tspan><tspan class="st11">SCLK</tspan><tspan class="st11"
+						v:langID="1033">, <v:newlineChar/></tspan><tspan x="27.93" dy="1.8em" class="st11" v:langID="1033">/</tspan><tspan
+						class="st11" v:langID="1033">Border Control</tspan><tspan class="st10">)</tspan></text>		</g>
+		<g id="shape17-163" v:mID="17" v:groupContext="shape" v:layerMember="1" transform="translate(451.232,-444.145)">
+			<title>動態連接器.25</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M-7.09 766.77 L-7.09 789.8" class="st4"/>
+		</g>
+		<g id="shape18-168" v:mID="18" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-302.413)">
+			<title>程序.18</title>
+			<desc>External Discharge*4 = 1</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="3.56" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>External <tspan
+						class="st3" v:langID="1028">Discharge</tspan><tspan class="st3" v:langID="1028">*</tspan><tspan
+						dy="0.049em" class="st6" v:baseFontSize="10">4</tspan><tspan dy="0.466em" class="st13" v:langID="1028"
+						v:baseFontSize="10"> </tspan><tspan x="42.52" dy="0.701em" class="st3" v:langID="1028">= </tspan><tspan
+						class="st3" v:langID="1028">1</tspan></text>		</g>
+		<g id="shape19-177" v:mID="19" v:groupContext="shape" v:layerMember="1" transform="translate(437.059,-371.153)">
+			<title>動態連接器.39</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 785.55" class="st4"/>
+		</g>
+		<g id="shape20-182" v:mID="20" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-231.547)">
+			<title>程序.20</title>
+			<desc>External Discharge*4*5 = 0</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="31.26" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>External <tspan
+						x="11.66" dy="1.2em" class="st3" v:langID="1028">Discharge</tspan><tspan class="st3" v:langID="1028">*</tspan><tspan
+						dy="0.049em" class="st6" v:baseFontSize="10">4</tspan><tspan class="st6" v:langID="1028"
+						v:baseFontSize="10">*</tspan><tspan class="st6" v:langID="1028" v:baseFontSize="10">5</tspan><tspan
+						dy="-0.033em" class="st3" v:langID="1028"> </tspan><tspan class="st3" v:langID="1028">= </tspan><tspan
+						class="st3" v:langID="1028">0</tspan></text>		</g>
+		<g id="shape21-193" v:mID="21" v:groupContext="shape" v:layerMember="1" transform="translate(437.059,-302.413)">
+			<title>動態連接器.21</title>
+			<desc>Delay ≥ 150 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="780.945" width="68.5" height="17.711"/>
+			<path d="M7.09 766.77 L7.09 787.68" class="st4"/>
+			<rect v:rectContext="textBkgnd" x="-20.5833" y="776.014" width="55.3398" height="9.86325" class="st7"/>
+			<text x="-20.58" y="783.41" class="st8" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay <tspan
+						class="st9">≥</tspan><tspan class="st9" v:langID="1033"> </tspan>150 ms</text>		</g>
+		<g id="shape22-202" v:mID="22" v:groupContext="shape" v:layerMember="0" transform="translate(408.712,-167.767)">
+			<title>終端子.42</title>
+			<desc>Finish</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="35.4331" cy="752.599" width="70.87" height="28.3465"/>
+			<path d="M14.17 766.77 L56.69 766.77 A14.1732 14.1732 -180 0 0 56.69 738.43 L14.17 738.43 A14.1732 14.1732 -180 1 0 14.17
+						 766.77 Z" class="st1"/>
+			<text x="22.1" y="755.6" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Finish</text>		</g>
+		<g id="shape23-205" v:mID="23" v:groupContext="shape" v:layerMember="1" transform="translate(437.059,-231.547)">
+			<title>動態連接器.43</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 794.77" class="st4"/>
+		</g>
+		<g id="shape24-210" v:mID="24" v:groupContext="shape" v:layerMember="0" transform="translate(0.24,-411.024)">
+			<title>程序.29</title>
+			<desc>1. Nothing Frame : A frame, 96 lines/1.44&#34;&#38;2&#34;, 176 lines/2.7&#34;...</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="124.604" cy="591.024" width="249.21" height="351.496"/>
+			<rect x="0" y="415.276" width="249.209" height="351.496" class="st14"/>
+			<text x="2" y="420.02" class="st2" v:langID="1033"><v:paragraph/><v:tabList/>1. <tspan class="st3" v:langID="1028">Nothing Frame</tspan> :<tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan><tspan class="st3" v:langID="1028">A frame</tspan><tspan
+						class="st3" v:langID="1028">, </tspan><tspan class="st3" v:langID="1028">96 </tspan><tspan class="st3"
+						v:langID="1028">lines</tspan><tspan class="st3" v:langID="1028">/</tspan><tspan class="st3" v:langID="1028">1</tspan><tspan
+						class="st3" v:langID="1028">.</tspan><tspan class="st3" v:langID="1028">44</tspan><tspan class="st3"
+						v:langID="1028">&#34;</tspan><tspan class="st3" v:langID="1028">&#38;</tspan><tspan class="st3"
+						v:langID="1028">2</tspan><tspan class="st3" v:langID="1028">&#34;</tspan><tspan class="st3" v:langID="1028">, </tspan><tspan
+						class="st3" v:langID="1028">176 </tspan><tspan class="st3" v:langID="1028">lines</tspan><tspan class="st3"
+						v:langID="1028">/</tspan><tspan class="st3" v:langID="1028">2</tspan><tspan class="st3" v:langID="1028">.</tspan><tspan
+						class="st3" v:langID="1028">7</tspan><tspan class="st3" v:langID="1028">&#34;</tspan><tspan class="st3"
+						v:langID="1028">, </tspan><tspan class="st3" v:langID="1028">whose all</tspan><tspan x="2" dy="1.2em"
+						class="st3" v:langID="1028">    </tspan><tspan class="st3" v:langID="1028">D</tspan><tspan class="st3"
+						v:langID="1028">(</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan
+						class="st3" v:langID="1028">y</tspan><tspan class="st3" v:langID="1028">) </tspan><tspan class="st3"
+						v:langID="1028">are N</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan class="st3" v:langID="1028">0</tspan>1<tspan
+						class="st3" v:langID="1028">). </tspan><tspan class="st3" v:langID="1028">Scan Bytes operate normally</tspan><tspan
+						class="st3" v:langID="1028">.<v:newlineChar/></tspan><tspan x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan><tspan
+						class="st3" v:langID="1028">Scan lines are still turned on</tspan> sequentially<tspan class="st3"
+						v:langID="1028">. </tspan> This<v:newlineChar/><tspan x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan>frame will make the image more uniform.<v:newlineChar/><v:newlineChar/><tspan
+						x="2" dy="2.4em" class="st3">2</tspan>. <tspan class="st3" v:langID="1028">Dummy Line</tspan> :<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan><tspan class="st3" v:langID="1028">A line whose all Data Bytes </tspan>are 0x55 <tspan
+						class="st3" v:langID="1028">and Scan<v:newlineChar/></tspan><tspan x="2" dy="1.2em" class="st3">    </tspan><tspan
+						class="st3" v:langID="1028">Bytes are</tspan> <tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan>00<tspan class="st3" v:langID="1028">.</tspan> Clear the register data before power<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>off.<v:newlineChar/><v:newlineChar/><tspan x="2" dy="2.4em"
+						class="st3">3</tspan>. B<tspan class="st3" v:langID="1028">ORDER</tspan> :<v:newlineChar/><tspan x="2"
+						dy="1.2em" class="st3" v:langID="1028">    </tspan>For implement this function, users need to use a pin<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan>to control from Microcontroller. When = 0, the<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>BORDER is ON and write to white. When = 1,the<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>BORDER is OFF. The reason for using BORDER is<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>to keep a sharp border and not have a charge on the<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>Eink particles .  Voltage too long on these will<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>produce a gray effect which is the optimal for long<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>term <tspan class="st3" v:langID="1028">o</tspan>peration.  BORDER is needed in V220 FPL<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3">    </tspan>and V110 FPL. <v:newlineChar/><v:newlineChar/><tspan x="2"
+						dy="2.4em" class="st3">4</tspan>. External Discharge :<v:newlineChar/><tspan x="2" dy="1.2em" class="st3"
+						v:langID="1028">    </tspan>For implement this function, users need to use a pin<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan>from Microcontroller<tspan class="st3"
+						v:langID="1028"> </tspan><tspan class="st3" v:langID="1028">to</tspan> control. This is important to<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">    </tspan>avoid vertical lines.<v:newlineChar/><v:newlineChar/><tspan
+						x="2" dy="2.4em" class="st3" v:langID="1028">5</tspan><tspan class="st3" v:langID="1028">.</tspan>If you use the Flash memory for pattern store, please<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">   </tspan><tspan class="st3" v:langID="1028">r</tspan>echeck flash in this phase and verify the old image<v:newlineChar/><tspan
+						x="2" dy="1.2em" class="st3" v:langID="1028">   </tspan>flash is erased<tspan class="st3" v:langID="1028">.</tspan></text>		</g>
+		<g id="shape25-289" v:mID="25" v:groupContext="shape" v:layerMember="0" transform="translate(261.071,-160.68)">
+			<title>程序.37</title>
+			<desc>Power off chargepump neg voltage SPI(0x05,0x02)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="55.4805" cy="742.995" width="110.97" height="47.5547"/>
+			<rect x="0" y="719.218" width="110.961" height="47.5547" class="st1"/>
+			<text x="5.17" y="733.99" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Power off chargepump <tspan
+						x="29.63" dy="1.2em" class="st3">neg voltage </tspan><tspan x="21.02" dy="1.2em" class="st3"
+						v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">05</tspan><tspan class="st3"
+						v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan
+						class="st3" v:langID="1028">0</tspan>2<tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape26-303" v:mID="26" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-89.8142)">
+			<title>Process.38</title>
+			<desc>Discharge SPI(0x04,0x0C)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="27.1" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Discharge <tspan
+						x="14.31" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">0</tspan>4<tspan class="st3" v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">0</tspan>C<tspan class="st3"
+						v:langID="1028">)</tspan></text>		</g>
+		<g id="shape27-316" v:mID="27" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-18.9481)">
+			<title>程序.27</title>
+			<desc>Turn off all chargepumps SPI(0x05,0x00)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="25.99" y="736.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Turn off all <tspan
+						x="19.31" dy="1.2em" class="st3">chargepumps </tspan><tspan x="15.14" dy="1.2em" class="st3"
+						v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan><tspan class="st3" v:langID="1028">05</tspan><tspan class="st3"
+						v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan
+						class="st3" v:langID="1028">00</tspan><tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape28-330" v:mID="28" v:groupContext="shape" v:layerMember="1" transform="translate(323.74,-231.547)">
+			<title>動態連接器.3</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M-6.98 766.77 L-6.98 780.38 L-7.19 780.38 L-7.19 782.64" class="st4"/>
+		</g>
+		<g id="shape29-335" v:mID="29" v:groupContext="shape" v:layerMember="1" transform="translate(309.567,-160.68)">
+			<title>動態連接器.40</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M6.98 766.77 L6.98 783.78 L7.19 783.78 L7.19 787.68" class="st4"/>
+		</g>
+		<g id="shape30-340" v:mID="30" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-89.8142)">
+			<title>動態連接器.30</title>
+			<desc>Delay ≥ 120 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="780.945" width="68.5" height="17.711"/>
+			<path d="M7.09 766.77 L7.09 787.68" class="st4"/>
+			<rect v:rectContext="textBkgnd" x="-20.5833" y="776.014" width="55.3398" height="9.86325" class="st7"/>
+			<text x="-20.58" y="783.41" class="st8" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay <tspan
+						class="st9">≥</tspan><tspan class="st9"> </tspan>120 ms</text>		</g>
+		<g id="shape31-349" v:mID="31" v:groupContext="shape" v:layerMember="0" transform="translate(394.539,-585.877)">
+			<title>程序.4</title>
+			<desc>Discharge internal SPI(0x04,0x50)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="9.31" y="742.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Discharge internal <tspan
+						x="15.14" dy="1.2em" class="st3" v:langID="1028">SPI</tspan><tspan class="st3" v:langID="1028">(</tspan><tspan
+						class="st3" v:langID="1028">0</tspan><tspan class="st3" v:langID="1028">x</tspan><tspan class="st3"
+						v:langID="1028">04</tspan><tspan class="st3" v:langID="1028">,</tspan><tspan class="st3" v:langID="1028">0</tspan><tspan
+						class="st3" v:langID="1028">x</tspan>50<tspan class="st3" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape32-361" v:mID="32" v:groupContext="shape" v:layerMember="1" transform="translate(437.059,-585.877)">
+			<title>Dynamic connector.41</title>
+			<desc>Delay ≥ 40 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="780.237" width="64.05" height="17.711"/>
+			<path d="M7.09 766.77 L7.09 786.26" class="st4"/>
+			<rect v:rectContext="textBkgnd" x="-18.3587" y="775.305" width="50.8906" height="9.86325" class="st7"/>
+			<text x="-18.36" y="782.7" class="st8" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay <tspan
+						class="st9">≥</tspan><tspan class="st9"> </tspan>40 ms</text>		</g>
+		<g id="shape33-370" v:mID="33" v:groupContext="shape" v:layerMember="1" transform="translate(316.756,-18.9481)">
+			<title>動態連接器.8</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M0 766.77 L0 777.4 L61.99 777.4 L61.99 75.83 L127.39 75.83 L127.39 79.02" class="st4"/>
+		</g>
+		<g id="shape34-375" v:mID="34" v:groupContext="shape" v:layerMember="1" transform="translate(437.059,-656.743)">
+			<title>動態連接器.17</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 787.68" class="st4"/>
+		</g>
+		<g id="shape35-380" v:mID="35" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-516.428)">
+			<title>程序.33</title>
+			<desc>BORDER*3 = 0</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="15.93" y="748.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>B<tspan class="st3"
+						v:langID="1028">ORDER</tspan><tspan class="st3" v:langID="1028">*</tspan><tspan dy="0.049em" class="st6"
+						v:baseFontSize="10">3</tspan><tspan dy="-0.033em" class="st3" v:langID="1028"> </tspan><tspan class="st3"
+						v:langID="1028">= </tspan>0</text>		</g>
+		<g id="shape36-388" v:mID="36" v:groupContext="shape" v:layerMember="0" transform="translate(267.15,-444.145)">
+			<title>程序.40</title>
+			<desc>BORDER*3 = 1</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="745.512" width="99.22" height="42.5197"/>
+			<rect x="0" y="724.253" width="99.2126" height="42.5197" class="st1"/>
+			<text x="15.93" y="748.51" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>B<tspan class="st3"
+						v:langID="1028">ORDER</tspan><tspan class="st3" v:langID="1028">*</tspan><tspan dy="0.049em" class="st6"
+						v:baseFontSize="10">3</tspan><tspan dy="-0.033em" class="st3" v:langID="1028"> </tspan><tspan class="st3"
+						v:langID="1028">= </tspan>1</text>		</g>
+		<g id="shape37-396" v:mID="37" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-516.428)">
+			<title>Dynamic connector.36</title>
+			<desc>Delay 200~300ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="781.654" width="74.94" height="17.6036"/>
+			<path d="M7.09 766.77 L7.09 789.1" class="st4"/>
+			<rect v:rectContext="textBkgnd" x="-25.2669" y="776.854" width="64.707" height="9.59985" class="st7"/>
+			<text x="-25.27" y="784.05" class="st8" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay 2<tspan
+						class="st3" v:langID="1033">00</tspan><tspan class="st3" v:langID="1033">~</tspan><tspan class="st3"
+						v:langID="1033">300</tspan>ms</text>		</g>
+		<g id="shape38-406" v:mID="38" v:groupContext="shape" v:layerMember="1" transform="translate(309.67,-444.145)">
+			<title>Dynamic connector.42</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 766.77 L7.09 789.8" class="st4"/>
+		</g>
+	</g>
+</svg>

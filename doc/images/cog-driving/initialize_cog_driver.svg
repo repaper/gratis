@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- 由 Microsoft Visio 11.0, SVG Export, v1.0 產生 4 - Initialize COG Driver.svg 頁-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="7.1315in" height="8.01256in"
+		viewBox="0 0 513.468 576.905" xml:space="preserve" color-interpolation-filters="sRGB" class="st15">
+	<v:documentProperties v:langID="1028" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.24}
+		.st2 {fill:#000000;font-family:TechnicLite;font-size:0.833336em;font-weight:bold}
+		.st3 {font-size:1em;font-weight:normal}
+		.st4 {fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.24}
+		.st5 {fill:#000000;font-family:TechnicLite;font-size:0.833336em}
+		.st6 {font-size:1em}
+		.st7 {baseline-shift:32.4988%;font-size:0.649977em}
+		.st8 {marker-end:url(#mrkr4-52);stroke:#4677bf;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.2}
+		.st9 {fill:#4677bf;fill-opacity:1;stroke:#4677bf;stroke-opacity:1;stroke-width:0.32258064516129}
+		.st10 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st11 {fill:#000000;font-family:TechnicLite;font-size:0.666664em}
+		.st12 {font-size:1em;text-decoration:underline}
+		.st13 {baseline-shift:32.4988%;font-size:0.649977em;text-decoration:underline}
+		.st14 {stroke:#4677bf;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.2}
+		.st15 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-52" class="st9" v:arrowType="4" v:arrowSize="2" v:setback="6.2" refX="-6.2" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.1,-3.1) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>頁-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="流程圖" v:index="0"/>
+		<v:layer v:name="連接器" v:index="1"/>
+		<g id="shape1-1" v:mID="1" v:groupContext="shape" v:layerMember="0" transform="translate(36.8079,-542.103)">
+			<title>終端子</title>
+			<desc>Section 3 Power On</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="51.6278" cy="559.624" width="103.26" height="34.5616"/>
+			<path d="M17.28 576.9 L85.97 576.9 A17.2808 17.2808 -180 0 0 85.97 542.34 L17.28 542.34 A17.2808 17.2808 -180 1 0 17.28
+						 576.9 Z" class="st1"/>
+			<text x="29.94" y="556.62" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 3<v:newlineChar/><tspan
+						x="30.38" dy="1.2em" class="st3">Power On</tspan></text>		</g>
+		<g id="shape2-5" v:mID="2" v:groupContext="shape" v:layerMember="0" transform="translate(38.6929,-379.988)">
+			<title>程序</title>
+			<desc>Channel Select SPI(0x01, Data) *1*2</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="552.919" width="99.22" height="47.9709"/>
+			<rect x="0" y="528.934" width="99.2126" height="47.9709" class="st4"/>
+			<text x="14.01" y="549.92" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Channel Select <tspan
+						x="4.6" dy="1.2em" class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan
+						class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6"
+						v:langID="1028">01</tspan><tspan class="st6" v:langID="1028">, </tspan><tspan class="st6" v:langID="1028">Data</tspan><tspan
+						class="st6" v:langID="1028">) *</tspan><tspan dy="-0.198em" class="st7" v:langID="1028" v:baseFontSize="10">1</tspan><tspan
+						dy="0.128em" class="st6" v:langID="1028">*</tspan><tspan dy="-0.198em" class="st7" v:langID="1028"
+						v:baseFontSize="10">2</tspan></text>		</g>
+		<g id="shape3-19" v:mID="3" v:groupContext="shape" v:layerMember="0" transform="translate(38.7578,-243.707)">
+			<title>程序.3</title>
+			<desc>High Power Mode Osc Setting SPI(0x07,0x9D)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.645" width="99.22" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.2126" height="42.5197" class="st1"/>
+			<text x="11.49" y="546.64" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>High Power Mode <tspan
+						x="22.56" dy="1.2em" class="st6">Osc Setting </tspan><tspan x="15.45" dy="1.2em" class="st6"
+						v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">07</tspan><tspan class="st6"
+						v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan
+						class="st6" v:langID="1028">9</tspan><tspan class="st6" v:langID="1028">D</tspan><tspan class="st6"
+						v:langID="1028">)</tspan></text>		</g>
+		<g id="shape4-34" v:mID="4" v:groupContext="shape" v:layerMember="0" transform="translate(38.7578,-314.573)">
+			<title>程序.4</title>
+			<desc>DC/DC Frequency Setting SPI(0x06, 0xFF)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.5739" cy="555.645" width="99.15" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.1478" height="42.5197" class="st1"/>
+			<text x="10.11" y="546.64" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>DC/DC Frequency <tspan
+						x="32.5" dy="1.2em" class="st6">Setting<v:newlineChar/></tspan><tspan x="13.34" dy="1.2em" class="st6"
+						v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">06</tspan><tspan class="st6"
+						v:langID="1028">, </tspan><tspan class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">xFF</tspan><tspan
+						class="st6" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape5-47" v:mID="5" v:groupContext="shape" v:layerMember="1" transform="translate(81.2288,-379.988)">
+			<title>動態連接器.3</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.07 576.9 L7.07 587.53 L7.1 587.53 L7.1 592.36" class="st8"/>
+		</g>
+		<g id="shape6-53" v:mID="6" v:groupContext="shape" v:layerMember="1" transform="translate(81.2612,-314.573)">
+			<title>動態連接器.6</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.07 576.9 L7.07 587.53 L7.1 587.53 L7.1 597.81" class="st8"/>
+		</g>
+		<g id="shape7-58" v:mID="7" v:groupContext="shape" v:layerMember="0" transform="translate(38.7578,-172.841)">
+			<title>程序.7</title>
+			<desc>Disable ADC SPI(0x08,0x00)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.645" width="99.22" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.2126" height="42.5197" class="st1"/>
+			<text x="21.8" y="552.64" class="st5" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Disable ADC<v:newlineChar/><tspan
+						x="16.02" dy="1.2em" class="st6">SPI</tspan>(0x08,0x00)</text>		</g>
+		<g id="shape8-62" v:mID="8" v:groupContext="shape" v:layerMember="1" transform="translate(81.2774,-243.707)">
+			<title>動態連接器.8</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 576.9 L7.09 597.81" class="st8"/>
+		</g>
+		<g id="shape9-67" v:mID="9" v:groupContext="shape" v:layerMember="0" transform="translate(38.7578,-101.975)">
+			<title>程序.5</title>
+			<desc>Set Vcom level SPI(0x09,0xD000)*2</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.645" width="99.22" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.2126" height="42.5197" class="st4"/>
+			<text x="15.04" y="552.64" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Set Vcom level <tspan
+						x="5.56" dy="1.2em" class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan
+						class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6"
+						v:langID="1028">09</tspan><tspan class="st6" v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan>D<tspan class="st6" v:langID="1028">0</tspan><tspan class="st6"
+						v:langID="1028">00</tspan><tspan class="st6" v:langID="1028">)</tspan><tspan class="st6" v:langID="1028">*</tspan><tspan
+						dy="-0.198em" class="st7" v:langID="1028" v:baseFontSize="10">2</tspan></text>		</g>
+		<g id="shape10-83" v:mID="10" v:groupContext="shape" v:layerMember="1" transform="translate(95.4507,-172.841)">
+			<title>動態連接器.10</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M-7.09 576.9 L-7.09 597.81" class="st8"/>
+		</g>
+		<g id="shape11-88" v:mID="11" v:groupContext="shape" v:layerMember="0" transform="translate(38.7578,-31.1085)">
+			<title>程序.11</title>
+			<desc>Gate and Source Voltage Level SPI(0x04,Data)*6</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.645" width="99.22" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.2126" height="42.5197" class="st4"/>
+			<text x="11.17" y="546.64" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Gate and Source <tspan
+						x="16.87" dy="1.2em" class="st6">Voltage Level </tspan><tspan x="11.52" dy="1.2em" class="st6"
+						v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">04</tspan><tspan class="st6"
+						v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">Data</tspan><tspan class="st6" v:langID="1028">)</tspan><tspan
+						dy="-0.198em" class="st7" v:langID="1028" v:baseFontSize="10">*</tspan><tspan class="st7" v:langID="1028"
+						v:baseFontSize="10">6</tspan></text>		</g>
+		<g id="shape12-102" v:mID="12" v:groupContext="shape" v:layerMember="1" transform="translate(81.2774,-101.975)">
+			<title>動態連接器.15</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 576.9 L7.09 597.81" class="st8"/>
+		</g>
+		<g id="shape13-107" v:mID="13" v:groupContext="shape" v:layerMember="1" transform="translate(88.3641,-31.1085)">
+			<title>動態連接器.13</title>
+			<desc>PWM toggle ≥ 5 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="96.0702" cy="343.442" width="90.07" height="17.6036"/>
+			<path d="M0 576.9 L0 598.28 L96.07 598.28 L96.07 123.47 L191.69 123.47 L191.69 172.73" class="st8"/>
+			<rect v:rectContext="textBkgnd" x="60.93" y="338.642" width="70.2804" height="9.59985" class="st10"/>
+			<text x="60.93" y="345.84" class="st11" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>PWM toggle<tspan
+						class="st6" v:langID="1028"> </tspan><tspan class="st6" v:langID="1028">≥</tspan> <tspan class="st6"
+						v:langID="1028">5 </tspan><tspan class="st6" v:langID="1028">ms</tspan></text>		</g>
+		<g id="shape14-118" v:mID="14" v:groupContext="shape" v:layerMember="0" transform="translate(231.155,-377.457)">
+			<title>程序.6</title>
+			<desc>Driver latch on (cancel register noise) SPI(0x03,0x01)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="48.8976" cy="551.71" width="97.8" height="50.3884"/>
+			<rect x="0" y="526.516" width="97.7953" height="50.3884" class="st1"/>
+			<text x="12.99" y="536.71" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Driver latch on <tspan
+						x="11.16" dy="1.2em" class="st6">(</tspan>cancel register <tspan x="35.85" dy="1.2em" class="st6">noise</tspan>) <tspan
+						x="16.35" dy="1.2em" class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan
+						class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6"
+						v:langID="1028">03</tspan><tspan class="st6" v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">01</tspan><tspan class="st6"
+						v:langID="1028">)</tspan></text>		</g>
+		<g id="shape15-133" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(224.101,-99.4893)">
+			<title>程序.51</title>
+			<desc>Start chargepump neg voltage VGL &#38; VDL on*5 SPI(0x05,0x03)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.0167" cy="553.273" width="112.04" height="47.2641"/>
+			<rect x="0" y="529.641" width="112.033" height="47.2641" class="st1"/>
+			<text x="5.46" y="538.27" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st12">Start chargepump neg </tspan><tspan
+						x="38.19" dy="1.2em" class="st12">voltage <v:newlineChar/></tspan><tspan x="20.31" dy="1.2em" class="st12"
+						v:langID="1028">VGL </tspan><tspan class="st12" v:langID="1028">&#38; </tspan><tspan class="st12"
+						v:langID="1028">VDL on</tspan><tspan dy="-0.198em" class="st13" v:langID="1028" v:baseFontSize="10">*</tspan><tspan
+						class="st13" v:langID="1028" v:baseFontSize="10">5<v:newlineChar/></tspan><tspan x="22.17" dy="1.328em"
+						class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan class="st6"
+						v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">05</tspan><tspan
+						class="st6" v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan class="st6"
+						v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">03</tspan><tspan class="st6" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape16-153" v:mID="16" v:groupContext="shape" v:layerMember="1" transform="translate(287.204,-99.4893)">
+			<title>Dynamic connector.52</title>
+			<desc>Delay ≥ 30 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-7.08661" cy="588.937" width="70.59" height="17.6036"/>
+			<path d="M-7.09 576.9 L-7.09 593.53" class="st8"/>
+			<rect v:rectContext="textBkgnd" x="-33.0546" y="584.137" width="51.9362" height="9.59985" class="st10"/>
+			<text x="-33.05" y="591.34" class="st11" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay<tspan
+						class="st6" v:langID="1033"> </tspan><tspan class="st6" v:langID="1033">≥</tspan> 30 ms</text>		</g>
+		<g id="shape17-162" v:mID="17" v:groupContext="shape" v:layerMember="0" transform="translate(224.101,-28.1607)">
+			<title>程序.53</title>
+			<desc>Set chargepump Vcom_Driver to ON Vcom_Driver on SPI(0x05,0x0F)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.0167" cy="553.273" width="112.04" height="47.2641"/>
+			<rect x="0" y="529.641" width="112.033" height="47.2641" class="st1"/>
+			<text x="20.63" y="538.27" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/><tspan class="st12">Set chargepump </tspan><tspan
+						x="12.9" dy="1.2em" class="st12">Vcom</tspan><tspan class="st12">_</tspan><tspan class="st12">Driver to ON<v:newlineChar/></tspan><tspan
+						x="21.19" dy="1.2em" class="st12" v:langID="1028">Vcom</tspan><tspan class="st12">_</tspan><tspan
+						class="st12">Driver</tspan><tspan class="st12" v:langID="1028"> </tspan><tspan class="st12" v:langID="1028">on<v:newlineChar/></tspan><tspan
+						x="22.1" dy="1.2em" class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan
+						class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6"
+						v:langID="1028">05</tspan><tspan class="st6" v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan class="st6"
+						v:langID="1028">F</tspan><tspan class="st6" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape18-185" v:mID="18" v:groupContext="shape" v:layerMember="1" transform="translate(280.118,-28.1607)">
+			<title>Dynamic connector.54</title>
+			<desc>Delay ≥ 30 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="87.1264" cy="336.152" width="70.59" height="17.6036"/>
+			<path d="M0 576.9 L0 596.75 L87.13 596.75 L87.13 120.53 L178.99 120.53 L178.99 173.16" class="st8"/>
+			<rect v:rectContext="textBkgnd" x="61.1583" y="331.352" width="51.9362" height="9.59985" class="st10"/>
+			<text x="61.16" y="338.55" class="st11" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Delay<tspan
+						class="st6" v:langID="1033"> </tspan><tspan class="st6" v:langID="1033">≥</tspan> 30 ms</text>		</g>
+		<g id="shape19-194" v:mID="19" v:groupContext="shape" v:layerMember="0" transform="translate(404.99,-381.946)">
+			<title>程序.55</title>
+			<desc>Output enable to disable SPI(0x02,0x24)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="54.119" cy="555.645" width="108.24" height="42.5197"/>
+			<rect x="0" y="534.385" width="108.238" height="42.5197" class="st1"/>
+			<text x="14.35" y="546.64" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Output enable to <tspan
+						x="37.96" dy="1.2em" class="st6">disable<v:newlineChar/></tspan><tspan x="20.27" dy="1.2em" class="st6"
+						v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">02</tspan><tspan class="st6"
+						v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan
+						class="st6" v:langID="1028">24</tspan><tspan class="st6" v:langID="1028">)</tspan></text>		</g>
+		<g id="shape20-208" v:mID="20" v:groupContext="shape" v:layerMember="1" transform="translate(452.211,-381.946)">
+			<title>Dynamic connector.56</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.01 576.9 L7.12 597.81" class="st8"/>
+		</g>
+		<g id="shape21-213" v:mID="21" v:groupContext="shape" v:layerMember="0" transform="translate(230.511,-314.46)">
+			<title>程序.57</title>
+			<desc>Driver latch off SPI(0x03,0x00)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.645" width="99.22" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.2126" height="42.5197" class="st1"/>
+			<text x="11.49" y="552.64" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Driver latch off <tspan
+						x="15.87" dy="1.2em" class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan
+						class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6"
+						v:langID="1028">03</tspan><tspan class="st6" v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">00</tspan><tspan class="st6"
+						v:langID="1028">)</tspan></text>		</g>
+		<g id="shape22-226" v:mID="22" v:groupContext="shape" v:layerMember="1" transform="translate(272.999,-377.457)">
+			<title>動態連接器.58</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.05 576.9 L7.05 587.53 L7.12 587.53 L7.12 589.94" class="st8"/>
+		</g>
+		<g id="shape23-231" v:mID="23" v:groupContext="shape" v:layerMember="0" transform="translate(409.879,-311.625)">
+			<title>終端子.20</title>
+			<desc>Section 5 Input Display Pattern</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.918" width="99.22" height="41.9738"/>
+			<path d="M20.99 576.9 L78.23 576.9 A20.9869 20.9869 -180 0 0 78.23 534.93 L20.99 534.93 A20.9869 20.9869 -180 1 0 20.99
+						 576.9 Z" class="st1"/>
+			<text x="27.92" y="546.92" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 5<v:newlineChar/><tspan
+						x="19.47" dy="1.2em" class="st3">Input Display </tspan><tspan x="31.28" dy="1.2em" class="st3">Pattern</tspan></text>		</g>
+		<g id="shape24-236" v:mID="24" v:groupContext="shape" v:layerMember="0" transform="translate(52.931,-456.305)">
+			<title>決策</title>
+			<desc>Busy = 1</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="35.4331" cy="548.7" width="59.06" height="42.3073"/>
+			<path d="M0 548.7 L35.43 520.49 L70.87 548.7 L35.43 576.9 L0 548.7 Z" class="st1"/>
+			<text x="16.99" y="551.7" class="st5" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Busy = 1</text>		</g>
+		<g id="shape25-239" v:mID="25" v:groupContext="shape" v:layerMember="1" transform="translate(95.4182,-456.305)">
+			<title>動態連接器.7</title>
+			<desc>No</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-7.11904" cy="591.045" width="40" height="17.6036"/>
+			<path d="M-7.05 576.9 L-7.05 587.53 L-7.12 587.53 L-7.12 597.81" class="st8"/>
+			<rect v:rectContext="textBkgnd" x="-11.731" y="586.246" width="9.22412" height="9.59985" class="st10"/>
+			<text x="-11.73" y="593.45" class="st11" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>No</text>		</g>
+		<g id="shape26-246" v:mID="26" v:groupContext="shape" v:layerMember="1" transform="translate(12.9134,-484.548)">
+			<title>動態連接器.23</title>
+			<desc>Yes</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="554.511" width="40" height="17.6036"/>
+			<path d="M7.09 576.9 L7.09 532.12" class="st14"/>
+			<rect v:rectContext="textBkgnd" x="0.870611" y="549.711" width="12.4321" height="9.59985" class="st10"/>
+			<text x="0.87" y="556.91" class="st11" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Yes</text>		</g>
+		<g id="shape27-251" v:mID="27" v:groupContext="shape" v:layerMember="1" transform="translate(95.4865,-542.103)">
+			<title>動態連接器.24</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M-7.05 576.9 L-7.05 587.53 L-7.12 587.53 L-7.12 598.85" class="st8"/>
+		</g>
+		<g id="shape28-256" v:mID="28" v:groupContext="shape" v:layerMember="0" transform="translate(230.511,-172.728)">
+			<title>程序.28</title>
+			<desc>PWM stop to toggle and set = 0</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="555.645" width="99.22" height="42.5197"/>
+			<rect x="0" y="534.385" width="99.2126" height="42.5197" class="st1"/>
+			<text x="25.68" y="546.64" class="st5" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>PWM  stop <v:newlineChar/><tspan
+						x="17.4" dy="1.2em" class="st6">to toggle and <v:newlineChar/></tspan><tspan x="33.1" dy="1.2em"
+						class="st6">set </tspan>= 0</text>		</g>
+		<g id="shape29-261" v:mID="29" v:groupContext="shape" v:layerMember="1" transform="translate(273.031,-172.728)">
+			<title>Dynamic connector.32</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 576.9 L7.09 595.44" class="st8"/>
+		</g>
+		<g id="shape30-266" v:mID="30" v:groupContext="shape" v:layerMember="1" transform="translate(20,-522.249)">
+			<title>動態連接器.41</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M0 569.82 L60.92 569.82" class="st8"/>
+		</g>
+		<g id="shape31-271" v:mID="31" v:groupContext="shape" v:layerMember="1" transform="translate(52.931,-477.442)">
+			<title>動態連接器.42</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M0 569.84 L-32.93 569.8" class="st14"/>
+		</g>
+		<g id="shape32-274" v:mID="32" v:groupContext="shape" v:layerMember="0" transform="translate(231.22,-239.342)">
+			<title>程序.29</title>
+			<desc>Start chargepump positive V VGH &#38; VDH on*4 SPI(0x05,0x01)</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="48.8976" cy="551.71" width="97.8" height="50.3884"/>
+			<rect x="0" y="526.516" width="97.7953" height="50.3884" class="st1"/>
+			<text x="8.07" y="536.71" class="st5" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Start chargepump <tspan
+						x="26.82" dy="1.2em" class="st6">positive V <v:newlineChar/></tspan><tspan x="12.52" dy="1.2em"
+						class="st12" v:langID="1028">VGH </tspan><tspan class="st12" v:langID="1028">&#38; </tspan><tspan
+						class="st12" v:langID="1028">VDH on</tspan><tspan dy="-0.198em" class="st13" v:langID="1028"
+						v:baseFontSize="10">*</tspan><tspan class="st13" v:langID="1028" v:baseFontSize="10">4<v:newlineChar/></tspan><tspan
+						x="16.35" dy="1.328em" class="st6" v:langID="1028">SPI</tspan><tspan class="st6" v:langID="1028">(</tspan><tspan
+						class="st6" v:langID="1028">0</tspan><tspan class="st6" v:langID="1028">x</tspan><tspan class="st6"
+						v:langID="1028">05</tspan><tspan class="st6" v:langID="1028">,</tspan><tspan class="st6" v:langID="1028">0</tspan><tspan
+						class="st6" v:langID="1028">x</tspan><tspan class="st6" v:langID="1028">01</tspan><tspan class="st6"
+						v:langID="1028">)</tspan></text>		</g>
+		<g id="shape33-293" v:mID="33" v:groupContext="shape" v:layerMember="1" transform="translate(273.031,-239.342)">
+			<title>動態連接器.33</title>
+			<desc>PWM toggle ≥ 30 ms</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="588.952" width="95.15" height="17.6036"/>
+			<path d="M7.09 576.9 L7.09 593.56" class="st8"/>
+			<rect v:rectContext="textBkgnd" x="-30.2375" y="584.152" width="74.6483" height="9.59985" class="st10"/>
+			<text x="-30.24" y="591.35" class="st11" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>PWM toggle<tspan
+						class="st6" v:langID="1028"> </tspan><tspan class="st6" v:langID="1028">≥</tspan> 30<tspan class="st6"
+						v:langID="1028"> </tspan><tspan class="st6" v:langID="1028">ms</tspan></text>		</g>
+		<g id="shape34-304" v:mID="34" v:groupContext="shape" v:layerMember="1" transform="translate(273.031,-314.46)">
+			<title>動態連接器.34</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 576.9 L7.09 594.19" class="st8"/>
+		</g>
+	</g>
+</svg>
