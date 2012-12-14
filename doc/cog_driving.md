@@ -8,50 +8,6 @@ Revision              02
 --------------------  -------------------------
 
 
-## Copyright
-
-**Copyright Pervasive Displays Incorporated.**
-
-![This work is licensed under a [Creative Commons Attribution-ShareAlike 3.0 Unported License](http://creativecommons.org/licenses/by-sa/3.0/deed.en_US).](images/common/cc-by-sa.svg)
-
-# Glossary of Acronyms
-
-EPD
-:   Electrophoretic Display (e-Paper Display)
-
-EPD Panel
-:   EPD
-
-EPD Module
-:   EPD with TCon board
-
-TCon
-:   Timing Controller
-
-TFT
-:   Thin Film Transistor
-
-MCU
-:   Microcontroller Unit
-
-FPC
-:   Flexible Printed Circuit
-
-FPL
-:   Front Plane Laminate
-
-SPI
-:   Serial Peripheral Interface
-
-COG
-:   Chip on Glass
-
-PCS
-:   Print Contrast Signal
-
-PDI
-:   Pervasive Displays Incorporated
-
 # General Description
 
 
@@ -545,3 +501,12 @@ stored in memory buffer. See the sample previous and new images below.
 # Power off COG Driver
 
 ![](images/cog-driving/power_off_cog_driver.svg)
+
+-----
+
+# include glossary.md
+
+-----
+
+# include copyright.md
+
