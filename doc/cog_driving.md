@@ -417,7 +417,7 @@ EPD size  Image resolution(pixels)  X    Y
 -------------------------------------------------------------------------------
 Data Bytes                 Scan bytes              Data Bytes
 -------------------------  ----------------------  ----------------------------
-1^st^ - 25^th^ (Even)      1^st ^- 24^th^          26^th^ - 50^th^ (Odd)
+1^st^ - 25^th^ (Even)      1^st^ - 24^th^          26^th^ - 50^th^ (Odd)
 
 2" Example: Because        2" Example: Write       2" Example: Write the odd
 method to write is         bytes for every scan    data bytes for a line
@@ -504,9 +504,9 @@ stored in memory buffer. See the sample previous and new images below.
 
 -----
 
-# include glossary.md
+# include glossary
 
 -----
 
-# include copyright.md
+# include copyright
 
