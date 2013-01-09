@@ -1,0 +1,29 @@
+#######################################
+# Syntax Coloring Map FLASH
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+FLASH	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin	KEYWORD2
+end	KEYWORD2
+available	KEYWORD2
+info	KEYWORD2
+read	KEYWORD2
+is_busy	KEYWORD2
+write_enable	KEYWORD2
+write_disable	KEYWORD2
+write	KEYWORD2
+sector_erase	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+#FLASH_	LITERAL1
