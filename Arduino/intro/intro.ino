@@ -125,7 +125,7 @@ typedef struct {
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
 #define CU8(...) (ARRAY(const uint8_t, __VA_ARGS__))
 
-void Power_on(void);
+
 void EPD_initialise(EPD_type *cog, EPD_size size);
 void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value);
 void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage stage);
