@@ -4,7 +4,7 @@
 
 The EPD extension board supports driving
 [Pervasive Displays Inc.](http://www.pervasivedisplays.com/products/panels)
-PDi's 1.44, 2 and 2.7 inch E-Paper display (EPD) modules with your
+PDi's 1.44, 2.0, and 2.7 inch E-Paper display (EPD) modules with your
 development projects. This expansion board provides a 20 control pins
 connection with your product or development kit to drive EPD via SPI
 interface.
@@ -13,7 +13,7 @@ interface.
 ## Features
 
 * Starter board to work with EPD
-* Supports driving 1.44", 2" or 2.7" EPD Panels
+* Supports driving 1.44", 2.0" or 2.7" EPD Panels
 * On board 8M bits serial flash memory and temperature sensor
 * 20 input/output pins bridge to any development/evaluation kit or product
 * Drect connect socket for Texas Instruments LaunchPad
