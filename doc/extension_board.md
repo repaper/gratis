@@ -23,10 +23,10 @@ interface.
 
 ## Board Picture
 
-* Front View ![Front view](/doc/images/extension_board/front.jpg)
-* Rear view  ![Rear view](/doc/images/extension_board/back.jpg)
-* Board placement ![Board placement](/doc/images/extension_board/placement.png)
-* 20 pin cable (for Arduino or bridging to other kit) ![Cable](/doc/images/extension_board/cable.jpg)
+* Front View ![Front view](images/extension_board/front.jpg)
+* Rear view  ![Rear view](images/extension_board/back.jpg)
+* Board placement ![Board placement](images/extension_board/placement.png)
+* 20 pin cable (for Arduino or bridging to other kit) ![Cable](images/extension_board/cable.jpg)
 
 
 ## Pin Assignment
@@ -62,7 +62,3 @@ Pin Number   Description
   are brought through the 20 pin connector.
 * Active low signals are marke like /RESET
 
-## Schematics
-
-- [EPD extension board circuit (DSN file)](/doc/schematics/EPD_ext.board_v02_circuit.DSN)
-- [EPD extension board Gerber files (zip file)](/doc/schematics/EPD_ext.board_v02_Gerber.zip)
