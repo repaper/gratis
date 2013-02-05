@@ -62,8 +62,8 @@ const
 #define PORT1_SPI_MOSI    BIT7
 
 // Port 2
-#define PORT2_PWM         BIT0
-#define PORT2_BUSY        BIT1
+#define PORT2_BUSY        BIT0
+#define PORT2_PWM         BIT1
 #define PORT2_RESET       BIT2
 #define PORT2_PANEL_ON    BIT3
 #define PORT2_DISCHARGE   BIT4
@@ -191,7 +191,6 @@ int main(void) {
 			for (int i = 0; i < frame_cycles; ++i) {
 				EPD_frame_data(&cog, PICTURE_BITS, EPD_normal);
 			}
-		} else {
 			state = -1;
 		}
 
@@ -651,10 +650,10 @@ void Delay_ms(unsigned int delay) {
 }
 
 
-#define TIMER1_OUT0 BIT0
-//#define TIMER1_OUT1 BIT1
+//#define TIMER1_OUT0 BIT0
+#define TIMER1_OUT1 BIT1
 //#define TIMER1_OUT2 BIT2
-#define TIMER1_IO_ENABLE (TIMER1_OUT0)
+#define TIMER1_IO_ENABLE (TIMER1_OUT1)
 
 #define TIMER1_COUNTS 4000
 

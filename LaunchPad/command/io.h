@@ -34,8 +34,8 @@
 #define PORT1_SPI_MOSI    BIT7
 
 // Port 2
-#define PORT2_PWM         BIT0
-#define PORT2_BUSY        BIT1
+#define PORT2_BUSY        BIT0
+#define PORT2_PWM         BIT1
 #define PORT2_RESET       BIT2
 #define PORT2_PANEL_ON    BIT3
 #define PORT2_DISCHARGE   BIT4

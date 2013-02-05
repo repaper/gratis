@@ -21,10 +21,10 @@
 #include "pwm.h"
 
 
-#define TIMER1_OUT0 BIT0
-//#define TIMER1_OUT1 BIT1
+//#define TIMER1_OUT0 BIT0
+#define TIMER1_OUT1 BIT1
 //#define TIMER1_OUT2 BIT2
-#define TIMER1_IO_ENABLE (TIMER1_OUT0)
+#define TIMER1_IO_ENABLE (TIMER1_OUT1)
 
 #define TIMER1_COUNTS 4000
 
