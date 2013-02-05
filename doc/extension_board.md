@@ -58,7 +58,7 @@ Pin Number   Description
 
 * The above values in parentheses like *(SW2)*, are not connected
   to the driver circuit and can be left open on non-LaunchPad
-  projects.  These are only provide so that all the LaunchPad pins
-  are brought through the 20 pin connector.
-* Active low signals are marke like /RESET
+  projects.  These are only provided so that all the LaunchPad pins
+  are brought through to the 20 pin connector.
+* Active low signals are indicated with a leading solidus (slash) e.g. /RESET
 
