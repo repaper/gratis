@@ -23,21 +23,26 @@
 // be clearly visible.
 
 // Operation from reset:
-// * wait for S2 button to be pressed and released
-// * clear the display
-// * wait for S2 button to be pressed and released
-// * display the first image (assuming screen is already white)
-// * wait for S2 button to be pressed and released
-// * remove the first image and display second image
+// * clear screen
+// * delay 5 seconds (flash LED)
+// * display text image
+// * delay 5 seconds (flash LED)
+// * display picture
+// * delay 5 seconds (flash LED)
 // * repeat from start
-//
-// Notes: LED1 will flash while the program waits for a button press
-//        LED1 will be off while display is updating
 
 
 #include <inttypes.h>
 #include <ctype.h>
+
+#if defined(__MSP430_CPU__)
+#define PROGMEM
+#define LAUNCHPAD 1
+#else
 #include <avr/pgmspace.h>
+#endif
+
+#define HANDS_OFF(x) x
 
 // Arduino libraries
 #include <SPI.h>
@@ -54,6 +59,7 @@
 
 #define EPD_SIZE EPD_2_0
 
+#define prog_uint8_t uint8_t
 
 // images
 PROGMEM const
@@ -76,7 +82,24 @@ PROGMEM const
 #define Delay_us(us) delayMicroseconds(us)
 
 
-// IO layout
+#if defined (LAUNCHPAD)
+
+// TI LaunchPad IO layout
+const int Pin_TEMPERATURE = A4;
+const int Pin_PANEL_ON = P2_3;
+const int Pin_BORDER = P2_5;
+const int Pin_DISCHARGE = P2_4;
+const int Pin_PWM = P2_1;
+const int Pin_RESET = P2_2;
+const int Pin_BUSY = P2_0;
+const int Pin_EPD_CS = P2_6;
+const int Pin_FLASH_CS = P2_7;
+const int Pin_SW2 = P1_3;
+const int Pin_RED_LED = P1_0;
+
+#else
+
+// Arduino IO layout
 const int Pin_TEMPERATURE = A0;
 const int Pin_PANEL_ON = 2;
 const int Pin_BORDER = 3;
@@ -88,11 +111,12 @@ const int Pin_EPD_CS = 8;
 const int Pin_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
+#endif
 
-// LED anode through resistor to Vcc
-// LED cathode to I/O pin
-#define LED_ON  LOW
-#define LED_OFF HIGH
+// LED anode through resistor to I/O pin
+// LED cathode to Ground
+#define LED_ON  HIGH
+#define LED_OFF LOW
 
 
 typedef enum {
@@ -116,10 +140,8 @@ typedef struct {
 	uint16_t bytes_per_scan;
 	const uint8_t *gate_source;
 	uint16_t gate_source_length;
-
 	bool filler;
 } EPD_type;
-
 
 
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
@@ -139,14 +161,11 @@ void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 void PWM_start(void);
 void PWM_stop(void);
 
-void Button_initialise(void);
-void Button_wait_click(void);
-
 
 // configure I/O port direction
 void setup() {
   pinMode(Pin_RED_LED, OUTPUT);
-  pinMode(Pin_SW2, INPUT);
+  pinMode(Pin_SW2, INPUT_PULLUP);
   pinMode(Pin_TEMPERATURE, INPUT);
   pinMode(Pin_PWM, OUTPUT);
   pinMode(Pin_BUSY, INPUT);
@@ -157,7 +176,7 @@ void setup() {
   pinMode(Pin_EPD_CS, OUTPUT);
   pinMode(Pin_FLASH_CS, OUTPUT);
 
-  digitalWrite(Pin_RED_LED, LOW);
+  digitalWrite(Pin_RED_LED, LED_OFF);
   digitalWrite(Pin_PWM, LOW);
   digitalWrite(Pin_RESET, LOW);
   digitalWrite(Pin_PANEL_ON, LOW);
@@ -165,8 +184,6 @@ void setup() {
   digitalWrite(Pin_BORDER, LOW);
   digitalWrite(Pin_EPD_CS, LOW);
   digitalWrite(Pin_FLASH_CS, HIGH);
-
-  Button_initialise();
 
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
@@ -183,7 +200,6 @@ void loop() {
 	EPD_type cog;
 
 	int frame_cycles = 8;
-	Button_wait_click();
 
 	EPD_initialise(&cog, EPD_SIZE);
 
@@ -214,16 +230,23 @@ void loop() {
 		for (int i = 0; i < frame_cycles; ++i) {
 			EPD_frame_data(&cog, PICTURE_BITS, EPD_normal);
 		}
-	} else {
 		state = -1;
 	}
 
 	EPD_finalise(&cog);
 	++state;
+
+	// flash LED for 5 seconds
+	for (int x = 0; x < 50; ++x) {
+		  digitalWrite(Pin_RED_LED, LED_ON);
+		  Delay_ms(50);
+		  digitalWrite(Pin_RED_LED, LED_OFF);
+		  Delay_ms(50);
+	}
 }
 
 
-void EPD_initialise(EPD_type *cog, EPD_size size) {
+HANDS_OFF(void EPD_initialise(EPD_type *cog, EPD_size size)) {
 	cog->size = size;
 	cog->lines_per_display = 96;
 	cog->dots_per_line = 128;
@@ -393,13 +416,13 @@ void EPD_initialise(EPD_type *cog, EPD_size size) {
 // the image is arranged by line which matches the display size
 // so smallest would have 96 * 32 bytes
 
-void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value) {
+HANDS_OFF(void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value)) {
 	for (uint8_t line = 0; line < cog->lines_per_display ; ++line) {
 		EPD_line(cog, line, 0, fixed_value, EPD_normal);
 	}
 }
 
-void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage stage) {
+HANDS_OFF(void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage stage)) {
 	for (uint8_t line = 0; line < cog->lines_per_display; ++line) {
 		EPD_line(cog, line, &image[line * cog->bytes_per_line], 0, stage);
 		//Delay_ms(20);
@@ -407,7 +430,7 @@ void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage 
 }
 
 
-void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, uint8_t fixed_value, EPD_stage stage) {
+HANDS_OFF(void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, uint8_t fixed_value, EPD_stage stage)) {
 	// charge pump voltage levels
 	Delay_us(10);
 	SPI_send(Pin_EPD_CS, CU8(0x70, 0x04), 2);
@@ -427,8 +450,11 @@ void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, ui
 	// even pixels
 	for (uint16_t b = cog->bytes_per_line; b > 0; --b) {
 		if (0 != data) {
-			// uint8_t pixels = data[b - 1] & 0xaa;
+#if defined(LAUNCHPAD)
+			uint8_t pixels = data[b - 1] & 0xaa;
+#else
 			uint8_t pixels = pgm_read_byte_near(data + b - 1) & 0xaa;
+#endif
 			switch(stage) {
 			case EPD_compensate:  // B -> W, W -> B (Current Image)
 				pixels = 0xaa | ((pixels ^ 0xaa) >> 1);
@@ -460,8 +486,11 @@ void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, ui
 	// odd pixels
 	for (uint16_t b = 0; b < cog->bytes_per_line; ++b) {
 		if (0 != data) {
-			// uint8_t pixels = data[b] & 0x55;
+#if defined(LAUNCHPAD)
+			uint8_t pixels = data[b] & 0x55;
+#else
 			uint8_t pixels = pgm_read_byte_near(data + b) & 0x55;
+#endif
 			switch(stage) {
 			case EPD_compensate:  // B -> W, W -> B (Current Image)
 				pixels = 0xaa | (pixels ^ 0x55);
@@ -502,7 +531,7 @@ void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, ui
 }
 
 
-void EPD_finalise(EPD_type *cog) {
+HANDS_OFF(void EPD_finalise(EPD_type *cog)) {
 
 	EPD_frame_fixed(cog, 0x55); // dummy frame
 	//EPD_frame_fixed(cog, 0x00); // dummy frame
@@ -636,34 +665,4 @@ void PWM_start(void) {
 
 void PWM_stop(void) {
 	analogWrite(Pin_PWM, 0);
-}
-
-
-void Button_initialise(void) {
-	// use a pull-up on button pin
-	// as button pulls to ground
-	pinMode(Pin_SW2, INPUT);
-}
-
-
-void Button_wait_state(int loop, bool state) {
-	for (;;) {
-		for (int i = 0; i < loop; ++i) {
-			if (state == (LOW == digitalRead(Pin_SW2))) {
-				Delay_ms(10);  // debounce
-				if (state == (LOW == digitalRead(Pin_SW2))) {
-					digitalWrite(Pin_RED_LED, LED_OFF);
-					return;
-				}
-			}
-			Delay_ms(20);
-		}
-		digitalWrite(Pin_RED_LED, !digitalRead(Pin_RED_LED));
-	}
-}
-
-
-void Button_wait_click(void) {
-	Button_wait_state(30, true); // wait for press
-	Button_wait_state(5, false); // wait for release
 }
