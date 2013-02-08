@@ -2,13 +2,17 @@
 
 ## intro
 
-A single C file example that toggles between a blank screen and two images
+A single file example that first clears the screen, then toggles
+between two images.  This example now includes Energia support
+so the this will run on both Arduino and LaunchPad.
 
 ## command
 
 A command-line example that acceps single character command from the
 serial port (9600 8N1).  Functions include XBM upload to FLASH,
 display image from flash etc.
+
+Currently this does not yet support Energia. (**TODO**)
 
 ## libraries
 

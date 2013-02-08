@@ -29,7 +29,7 @@
 // * delay 5 seconds (flash LED)
 // * display picture
 // * delay 5 seconds (flash LED)
-// * repeat from start
+// * back to text display
 
 
 #include <inttypes.h>
@@ -149,7 +149,7 @@ typedef struct {
 
 
 void EPD_initialise(EPD_type *cog, EPD_size size);
-void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value);
+void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value, EPD_stage stage);
 void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage stage);
 void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, uint8_t fixed_value, EPD_stage stage);
 void EPD_finalise(EPD_type *cog);
@@ -204,20 +204,37 @@ void loop() {
 	EPD_initialise(&cog, EPD_SIZE);
 
 	if (0 == state) {
+		// clear the screen
 		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xff);  // all black
+			EPD_frame_fixed(&cog, 0xff, EPD_compensate);
 		}
 		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xaa);  // all white
+			EPD_frame_fixed(&cog, 0xff, EPD_white);
 		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_fixed(&cog, 0xaa, EPD_inverse);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_fixed(&cog, 0xaa, EPD_normal);
+		}
+
 	} else if (1 == state) {
+		// clear -> text
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_fixed(&cog, 0xaa, EPD_compensate);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_fixed(&cog, 0xaa, EPD_white);
+		}
 		for (int i = 0; i < frame_cycles; ++i) {
 			EPD_frame_data(&cog, TEXT_BITS, EPD_inverse);
 		}
 		for (int i = 0; i < frame_cycles; ++i) {
 			EPD_frame_data(&cog, TEXT_BITS, EPD_normal);
 		}
+
 	} else if (2 == state) {
+		// text -> picture
 		for (int i = 0; i < frame_cycles; ++i) {
 			EPD_frame_data(&cog, TEXT_BITS, EPD_compensate);
 		}
@@ -230,7 +247,22 @@ void loop() {
 		for (int i = 0; i < frame_cycles; ++i) {
 			EPD_frame_data(&cog, PICTURE_BITS, EPD_normal);
 		}
-		state = -1;
+
+	} else if (3 == state) {
+		// picture -> text
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_data(&cog, PICTURE_BITS, EPD_compensate);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_data(&cog, PICTURE_BITS, EPD_white);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_data(&cog, TEXT_BITS, EPD_inverse);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD_frame_data(&cog, TEXT_BITS, EPD_normal);
+		}
+		state = 1;
 	}
 
 	EPD_finalise(&cog);
@@ -290,7 +322,6 @@ HANDS_OFF(void EPD_initialise(EPD_type *cog, EPD_size size)) {
 	// power up sequence
 	SPI_put(0x00);
 
-	// P2OUT &= ~(PORT2_RESET | PORT2_PANEL_ON | PORT2_DISCHARGE | PORT2_BORDER | PORT2_EPD_CS);
 	digitalWrite(Pin_RESET, LOW);
 	digitalWrite(Pin_PANEL_ON, LOW);
 	digitalWrite(Pin_DISCHARGE, LOW);
@@ -299,24 +330,22 @@ HANDS_OFF(void EPD_initialise(EPD_type *cog, EPD_size size)) {
 
 	PWM_start();
 	Delay_ms(5);
-	// P2OUT |= PORT2_PANEL_ON;
 	digitalWrite(Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
-	//P2OUT |= (PORT2_RESET | PORT2_BORDER | PORT2_EPD_CS | PORT2_FLASH_CS);
+
 	digitalWrite(Pin_RESET, HIGH);
 	digitalWrite(Pin_BORDER, HIGH);
 	digitalWrite(Pin_EPD_CS, HIGH);
 	digitalWrite(Pin_FLASH_CS, HIGH);
 	Delay_ms(5);
-	//P2OUT &= ~PORT2_RESET;
+
 	digitalWrite(Pin_RESET, LOW);
 	Delay_ms(5);
-	//P2OUT |= PORT2_RESET;
+
 	digitalWrite(Pin_RESET, HIGH);
 	Delay_ms(5);
 
 	// wait for COG to become ready
-	//while (0 != (P2IN & PORT2_BUSY)) {
 	while (HIGH == digitalRead(Pin_BUSY)) {
 	}
 
@@ -416,16 +445,15 @@ HANDS_OFF(void EPD_initialise(EPD_type *cog, EPD_size size)) {
 // the image is arranged by line which matches the display size
 // so smallest would have 96 * 32 bytes
 
-HANDS_OFF(void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value)) {
+HANDS_OFF(void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value, EPD_stage stage)) {
 	for (uint8_t line = 0; line < cog->lines_per_display ; ++line) {
-		EPD_line(cog, line, 0, fixed_value, EPD_normal);
+		EPD_line(cog, line, 0, fixed_value, stage);
 	}
 }
 
 HANDS_OFF(void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage stage)) {
 	for (uint8_t line = 0; line < cog->lines_per_display; ++line) {
 		EPD_line(cog, line, &image[line * cog->bytes_per_line], 0, stage);
-		//Delay_ms(20);
 	}
 }
 
@@ -435,7 +463,7 @@ HANDS_OFF(void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t
 	Delay_us(10);
 	SPI_send(Pin_EPD_CS, CU8(0x70, 0x04), 2);
 	Delay_us(10);
-	//SPI_send(Pin_EPD_CS, CU8(0x72, 0x03), 2);
+
 	SPI_send(Pin_EPD_CS, cog->gate_source, cog->gate_source_length);
 
 	// send data
@@ -533,17 +561,13 @@ HANDS_OFF(void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t
 
 HANDS_OFF(void EPD_finalise(EPD_type *cog)) {
 
-	EPD_frame_fixed(cog, 0x55); // dummy frame
-	//EPD_frame_fixed(cog, 0x00); // dummy frame
+	EPD_frame_fixed(cog, 0x55, EPD_normal); // dummy frame
 	EPD_line(cog, 0x7fffu, 0, 0x55, EPD_normal); // dummy_line
-	//EPD_line(cog, 0x7fffu, 0, 0x00); // dummy_line
 
 	Delay_ms(25);
 
-	// P2OUT &= ~PORT2_BORDER;
 	digitalWrite(Pin_BORDER, LOW);
 	Delay_ms(30);
-	// P2OUT |= PORT2_BORDER;
 	digitalWrite(Pin_BORDER, HIGH);
 
 	// latch reset turn on
@@ -613,18 +637,15 @@ HANDS_OFF(void EPD_finalise(EPD_type *cog)) {
 	SPI_send(Pin_EPD_CS, CU8(0x72, 0x00), 2);
 
 	// turn of power and all signals
-	//P2OUT &= ~(PORT2_RESET | PORT2_PANEL_ON | PORT2_DISCHARGE | PORT2_BORDER | PORT2_EPD_CS);
 	digitalWrite(Pin_RESET, LOW);
 	digitalWrite(Pin_PANEL_ON, LOW);
 	digitalWrite(Pin_BORDER, LOW);
 	digitalWrite(Pin_EPD_CS, LOW);
-	//P2OUT |= PORT2_DISCHARGE;
 	digitalWrite(Pin_DISCHARGE, HIGH);
 
 	SPI_put(0x00);
 
 	Delay_ms(150);
-	// P2OUT &= ~(PORT2_RESET | PORT2_PANEL_ON | PORT2_DISCHARGE | PORT2_BORDER | PORT2_EPD_CS);
 	digitalWrite(Pin_DISCHARGE, LOW);
 }
 
