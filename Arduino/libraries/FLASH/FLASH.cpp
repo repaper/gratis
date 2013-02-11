@@ -14,8 +14,7 @@
 
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
-#include <pins_arduino.h>
+//#include <pins_arduino.h>
 
 #include <SPI.h>
 

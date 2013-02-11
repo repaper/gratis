@@ -14,8 +14,7 @@
 
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
-#include <pins_arduino.h>
+//#include <pins_arduino.h>
 
 #include <SPI.h>
 
@@ -234,7 +233,7 @@ void EPD_Class::begin() {
 
 void EPD_Class::end() {
 
-	this->frame_fixed(0x55); // dummy frame
+	this->frame_fixed(0x55, EPD_normal); // dummy frame
 	this->line(0x7fffu, 0, 0x55, EPD_normal); // dummy_line
 
 	Delay_ms(25);
@@ -334,19 +333,11 @@ void EPD_Class::end() {
 // the image is arranged by line which matches the display size
 // so smallest would have 96 * 32 bytes
 
-void EPD_Class::frame_fixed(uint8_t fixed_value) {
+void EPD_Class::frame_fixed(uint8_t fixed_value, EPD_stage stage) {
 	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
-		this->line(line, 0, fixed_value, EPD_normal);
+		this->line(line, 0, fixed_value, stage);
 	}
 }
-
-#if 0
-void EPD_Class::frame_data_p(PROGMEM const prog_uint8_t *image, EPD_stage stage) {
-	for (uint8_t line = 0; line < this->lines_per_display; ++line) {
-		this->line(line, &image[line * this->bytes_per_line], 0, stage);
-	}
-}
-#endif
 
 void EPD_Class::frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage) {
 	static uint8_t buffer[264 / 8];

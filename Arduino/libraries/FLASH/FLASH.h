@@ -16,7 +16,6 @@
 #define EPD_FLASH_H 1
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
 #include <SPI.h>
 
 

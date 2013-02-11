@@ -16,8 +16,14 @@
 #define EPD_H 1
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
 #include <SPI.h>
+
+#if defined(__MSP430_CPU__)
+#define PROGMEM
+#define prog_uint8_t uint8_t
+#else
+#include <avr/pgmspace.h>
+#endif
 
 
 typedef enum {
@@ -59,8 +65,7 @@ private:
 	bool filler;
 
 public:
-	void frame_fixed(uint8_t fixed_value);
-	//void frame_data_p(PROGMEM const prog_uint8_t *image, EPD_stage stage);
+	void frame_fixed(uint8_t fixed_value, EPD_stage stage);
 	void frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	void line(uint16_t line, const uint8_t *data, uint8_t fixed_value, EPD_stage stage);

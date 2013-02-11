@@ -17,20 +17,40 @@
 #include <Arduino.h>
 #include <inttypes.h>
 #include <ctype.h>
-#include <avr/pgmspace.h>
 
-#include <Serial.h>
+//#include <Serial.h>
 #include <SPI.h>
 #include <FLASH.h>
 #include <EPD.h>
 
+// Change this for different display size
+#define EPD_SIZE EPD_2_0
+
+#define COMMAND_VERSION "1"
 
 // delays - more consistent naming
 #define Delay_ms(ms) delay(ms)
 #define Delay_us(us) delayMicroseconds(us)
 
 
-// IO layout
+#if defined(__MSP430_CPU__)
+
+// TI LaunchPad IO layout
+const int Pin_TEMPERATURE = A4;
+const int Pin_PANEL_ON = P2_3;
+const int Pin_BORDER = P2_5;
+const int Pin_DISCHARGE = P2_4;
+const int Pin_PWM = P2_1;
+const int Pin_RESET = P2_2;
+const int Pin_BUSY = P2_0;
+const int Pin_EPD_CS = P2_6;
+const int Pin_FLASH_CS = P2_7;
+const int Pin_SW2 = P1_3;
+const int Pin_RED_LED = P1_0;
+
+#else
+
+// Arduino IO layout
 const int Pin_TEMPERATURE = A0;
 const int Pin_PANEL_ON = 2;
 const int Pin_BORDER = 3;
@@ -43,15 +63,20 @@ const int Pin_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
 
-EPD_Class EPD(EPD_2_0, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
+#endif
 
 
-// LED anode through resistor to Vcc
-// LED cathode to I/O pin
-#define LED_ON  LOW
-#define LED_OFF HIGH
+// LED anode through resistor to I/O pin
+// LED cathode to Ground
+#define LED_ON  HIGH
+#define LED_OFF LOW
 
 
+// define the E-Ink display
+EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
+
+
+// function prototypes
 static void flash_info(void);
 static void flash_read(void *buffer, uint32_t address, uint16_t length);
 
@@ -59,13 +84,13 @@ static uint16_t xbm_count;
 static bool xbm_parser(uint8_t *b);
 
 
-uint8_t Serial_getc();
-uint16_t Serial_gethex(bool echo);
+static uint8_t Serial_getc();
+static uint16_t Serial_gethex(bool echo);
 static void Serial_puthex(uint32_t n, uint16_t bits);
-void Serial_puthex_byte(uint8_t n);
-void Serial_puthex_word(uint16_t n);
-void Serial_puthex_double(uint32_t n);
-void Serial_hex_dump(uint32_t address, const void *buffer, uint16_t length);
+static void Serial_puthex_byte(uint8_t n);
+static void Serial_puthex_word(uint16_t n);
+static void Serial_puthex_double(uint32_t n);
+static void Serial_hex_dump(uint32_t address, const void *buffer, uint16_t length);
 
 
 // I/O setup
@@ -97,12 +122,14 @@ void setup() {
 	SPI.setClockDivider(SPI_CLOCK_DIV4);
 
 	Serial.begin(9600);
-	// wait for USB CDC serial port to connect.  Leonardo only
+#if !defined(__MSP430_CPU__)
+	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
+#endif
 	Serial.println();
 	Serial.println();
-	Serial.println("Starting");
+	Serial.println("Command version: " COMMAND_VERSION);
 	Serial.println();
 
 	FLASH.begin(Pin_FLASH_CS, SPI);
@@ -297,10 +324,16 @@ void loop() {
 		const int frame_cycles = 16;
 		EPD.begin();
 		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_fixed(0xff);  // all black
+			EPD.frame_fixed(0xff, EPD_compensate);
 		}
 		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_fixed(0xaa);  // all white
+			EPD.frame_fixed(0xff, EPD_white);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD.frame_fixed(0xaa, EPD_inverse);
+		}
+		for (int i = 0; i < frame_cycles; ++i) {
+			EPD.frame_fixed(0xaa, EPD_normal);
 		}
 		EPD.end();
 		break;
