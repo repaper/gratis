@@ -53,6 +53,7 @@ private:
 	int EPD_Pin_BUSY;
 
 	EPD_size size;
+	uint16_t stage_time;
 	uint16_t lines_per_display;
 	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
@@ -65,8 +66,16 @@ private:
 	bool filler;
 
 public:
+	// single frame refresh
 	void frame_fixed(uint8_t fixed_value, EPD_stage stage);
 	void frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage);
+
+	// stage_time frame refresh
+	void frame_fixed_repeat(uint16_t stage_factor_10x, uint8_t fixed_value, EPD_stage stage);
+	void frame_cb_repeat(uint16_t stage_factor_10x, uint32_t address, EPD_reader *reader, EPD_stage stage);
+
+	// convert a
+	int temperature_to_factor_10x(int temperature);
 
 	void line(uint16_t line, const uint8_t *data, uint8_t fixed_value, EPD_stage stage);
 

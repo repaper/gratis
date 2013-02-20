@@ -34,6 +34,7 @@
 
 #include <inttypes.h>
 #include <ctype.h>
+#include <limits.h>
 
 #if defined(__MSP430_CPU__)
 #define PROGMEM
@@ -41,6 +42,8 @@
 #else
 #include <avr/pgmspace.h>
 #endif
+
+#define INTRO_VERSION 1
 
 #define HANDS_OFF(x) x
 
@@ -97,6 +100,10 @@ const int Pin_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
+// ADC maximum voltage at counts
+#define ADC_uV     3300000L
+#define ADC_COUNTS 1024L
+
 #else
 
 // Arduino IO layout
@@ -111,6 +118,11 @@ const int Pin_EPD_CS = 8;
 const int Pin_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
+
+// ADC maximum voltage at counts
+#define ADC_uV     5000000L
+#define ADC_COUNTS 1024L
+
 #endif
 
 // LED anode through resistor to I/O pin
@@ -118,6 +130,20 @@ const int Pin_RED_LED = 13;
 #define LED_ON  HIGH
 #define LED_OFF LOW
 
+// temperature chip parameters
+#define Vstart_uV 1145000L
+#define Tstart_C  100
+#define Vslope_uV -11040L
+
+// there is a potential divider on the input, so
+// scale to the correct voltage as would be seen
+// on the temperature output pin
+#define Rdiv_high 267L
+#define Rdiv_low 178L
+#define PD(v) ((Rdiv_high + Rdiv_low) * (v) / Rdiv_low)
+
+
+// EPD types
 
 typedef enum {
 	EPD_1_44,        // 128 x 96
@@ -134,6 +160,7 @@ typedef enum {           // Image pixel -> Display pixel
 
 typedef struct {
 	EPD_size size;
+	uint16_t stage_time;
 	uint16_t lines_per_display;
 	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
@@ -151,6 +178,8 @@ typedef struct {
 void EPD_initialise(EPD_type *cog, EPD_size size);
 void EPD_frame_fixed(EPD_type *cog, uint8_t fixed_value, EPD_stage stage);
 void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, EPD_stage stage);
+void EPD_frame_fixed_repeat(EPD_type *cog, uint16_t stage_factor_10x, uint8_t fixed_value, EPD_stage stage);
+void EPD_frame_data_repeat(EPD_type *cog, uint16_t stage_factor_10x, PROGMEM const prog_uint8_t *image, EPD_stage stage);
 void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, uint8_t fixed_value, EPD_stage stage);
 void EPD_finalise(EPD_type *cog);
 
@@ -161,34 +190,43 @@ void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 void PWM_start(void);
 void PWM_stop(void);
 
+int Temperature_get(int pin);
+
 
 // configure I/O port direction
 void setup() {
-  pinMode(Pin_RED_LED, OUTPUT);
-  pinMode(Pin_SW2, INPUT_PULLUP);
-  pinMode(Pin_TEMPERATURE, INPUT);
-  pinMode(Pin_PWM, OUTPUT);
-  pinMode(Pin_BUSY, INPUT);
-  pinMode(Pin_RESET, OUTPUT);
-  pinMode(Pin_PANEL_ON, OUTPUT);
-  pinMode(Pin_DISCHARGE, OUTPUT);
-  pinMode(Pin_BORDER, OUTPUT);
-  pinMode(Pin_EPD_CS, OUTPUT);
-  pinMode(Pin_FLASH_CS, OUTPUT);
+	pinMode(Pin_RED_LED, OUTPUT);
+	pinMode(Pin_SW2, INPUT_PULLUP);
+	pinMode(Pin_TEMPERATURE, INPUT);
+	pinMode(Pin_PWM, OUTPUT);
+	pinMode(Pin_BUSY, INPUT);
+	pinMode(Pin_RESET, OUTPUT);
+	pinMode(Pin_PANEL_ON, OUTPUT);
+	pinMode(Pin_DISCHARGE, OUTPUT);
+	pinMode(Pin_BORDER, OUTPUT);
+	pinMode(Pin_EPD_CS, OUTPUT);
+	pinMode(Pin_FLASH_CS, OUTPUT);
 
-  digitalWrite(Pin_RED_LED, LED_OFF);
-  digitalWrite(Pin_PWM, LOW);
-  digitalWrite(Pin_RESET, LOW);
-  digitalWrite(Pin_PANEL_ON, LOW);
-  digitalWrite(Pin_DISCHARGE, LOW);
-  digitalWrite(Pin_BORDER, LOW);
-  digitalWrite(Pin_EPD_CS, LOW);
-  digitalWrite(Pin_FLASH_CS, HIGH);
+	digitalWrite(Pin_RED_LED, LED_OFF);
+	digitalWrite(Pin_PWM, LOW);
+	digitalWrite(Pin_RESET, LOW);
+	digitalWrite(Pin_PANEL_ON, LOW);
+	digitalWrite(Pin_DISCHARGE, LOW);
+	digitalWrite(Pin_BORDER, LOW);
+	digitalWrite(Pin_EPD_CS, LOW);
+	digitalWrite(Pin_FLASH_CS, HIGH);
 
-  SPI.begin();
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV4);
+	SPI.begin();
+	SPI.setBitOrder(MSBFIRST);
+	SPI.setDataMode(SPI_MODE0);
+	SPI.setClockDivider(SPI_CLOCK_DIV4);
+
+	Serial.begin(9600);
+#if !defined(__MSP430_CPU__)
+	// wait for USB CDC serial port to connect.  Arduino Leonardo only
+	while (!Serial) {
+	}
+#endif
 }
 
 
@@ -199,69 +237,47 @@ static int state = 0;
 void loop() {
 	EPD_type cog;
 
-	int frame_cycles = 8;
+	int t = Temperature_get(Pin_TEMPERATURE);
+	int factor_10x = Temperature_to_factor_10x(t);
+
+	Serial.println();
+	Serial.print("Intro sketch version ");
+	Serial.println(INTRO_VERSION);
+	Serial.print("Temperature = ");
+	Serial.println(t);
+	Serial.print("Compensation factor * 10 = ");
+	Serial.print(factor_10x);
+	Serial.println();
 
 	EPD_initialise(&cog, EPD_SIZE);
 
 	if (0 == state) {
 		// clear the screen
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xff, EPD_compensate);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xff, EPD_white);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xaa, EPD_inverse);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xaa, EPD_normal);
-		}
+		EPD_frame_fixed_repeat(&cog, factor_10x, 0xff, EPD_compensate);
+		EPD_frame_fixed_repeat(&cog, factor_10x, 0xff, EPD_white);
+		EPD_frame_fixed_repeat(&cog, factor_10x, 0xaa, EPD_inverse);
+		EPD_frame_fixed_repeat(&cog, factor_10x, 0xaa, EPD_normal);
 
 	} else if (1 == state) {
 		// clear -> text
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xaa, EPD_compensate);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_fixed(&cog, 0xaa, EPD_white);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, TEXT_BITS, EPD_inverse);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, TEXT_BITS, EPD_normal);
-		}
+		EPD_frame_fixed_repeat(&cog, factor_10x, 0xaa, EPD_compensate);
+		EPD_frame_fixed_repeat(&cog, factor_10x, 0xaa, EPD_white);
+		EPD_frame_data_repeat(&cog, factor_10x, TEXT_BITS, EPD_inverse);
+		EPD_frame_data_repeat(&cog, factor_10x, TEXT_BITS, EPD_normal);
 
 	} else if (2 == state) {
 		// text -> picture
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, TEXT_BITS, EPD_compensate);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, TEXT_BITS, EPD_white);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, PICTURE_BITS, EPD_inverse);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, PICTURE_BITS, EPD_normal);
-		}
+		EPD_frame_data_repeat(&cog, factor_10x, TEXT_BITS, EPD_compensate);
+		EPD_frame_data_repeat(&cog, factor_10x, TEXT_BITS, EPD_white);
+		EPD_frame_data_repeat(&cog, factor_10x, PICTURE_BITS, EPD_inverse);
+		EPD_frame_data_repeat(&cog, factor_10x, PICTURE_BITS, EPD_normal);
 
 	} else if (3 == state) {
 		// picture -> text
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, PICTURE_BITS, EPD_compensate);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, PICTURE_BITS, EPD_white);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, TEXT_BITS, EPD_inverse);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD_frame_data(&cog, TEXT_BITS, EPD_normal);
-		}
+		EPD_frame_data_repeat(&cog, factor_10x, PICTURE_BITS, EPD_compensate);
+		EPD_frame_data_repeat(&cog, factor_10x, PICTURE_BITS, EPD_white);
+		EPD_frame_data_repeat(&cog, factor_10x, TEXT_BITS, EPD_inverse);
+		EPD_frame_data_repeat(&cog, factor_10x, TEXT_BITS, EPD_normal);
 		state = 1;
 	}
 
@@ -280,6 +296,7 @@ void loop() {
 
 HANDS_OFF(void EPD_initialise(EPD_type *cog, EPD_size size)) {
 	cog->size = size;
+	cog->stage_time = 480; // milliseconds
 	cog->lines_per_display = 96;
 	cog->dots_per_line = 128;
 	cog->bytes_per_line = 128 / 8;
@@ -309,6 +326,7 @@ HANDS_OFF(void EPD_initialise(EPD_type *cog, EPD_size size)) {
 
 		break;
 	case EPD_2_7:
+		cog->stage_time = 630; // milliseconds
 		cog->lines_per_display = 176;
 		cog->dots_per_line = 264;
 		cog->bytes_per_line = 264 / 8;
@@ -456,6 +474,37 @@ HANDS_OFF(void EPD_frame_data(EPD_type *cog, PROGMEM const prog_uint8_t *image, 
 		EPD_line(cog, line, &image[line * cog->bytes_per_line], 0, stage);
 	}
 }
+
+
+// repeated frame taking temperature compensation into account
+HANDS_OFF(void EPD_frame_fixed_repeat(EPD_type *cog, uint16_t stage_factor_10x, uint8_t fixed_value, EPD_stage stage)) {
+	long stage_time = cog->stage_time * stage_factor_10x / 10;
+	do {
+		unsigned long t_start = millis();
+		EPD_frame_fixed(cog, fixed_value, stage);
+		unsigned long t_end = millis();
+		if (t_end > t_start) {
+			stage_time -= t_end - t_start;
+		} else {
+			stage_time -= t_start - t_end + 1 + ULONG_MAX;
+		}
+	} while (stage_time > 0);
+}
+
+HANDS_OFF(void EPD_frame_data_repeat(EPD_type *cog, uint16_t stage_factor_10x, PROGMEM const prog_uint8_t *image, EPD_stage stage)) {
+	long stage_time = cog->stage_time * stage_factor_10x / 10;
+	do {
+		unsigned long t_start = millis();
+		EPD_frame_data(cog, image, stage);
+		unsigned long t_end = millis();
+		if (t_end > t_start) {
+			stage_time -= t_end - t_start;
+		} else {
+			stage_time -= t_start - t_end + 1 + ULONG_MAX;
+		}
+	} while (stage_time > 0);
+}
+
 
 
 HANDS_OFF(void EPD_line(EPD_type *cog, uint16_t line, PROGMEM const prog_uint8_t *data, uint8_t fixed_value, EPD_stage stage)) {
@@ -686,4 +735,32 @@ void PWM_start(void) {
 
 void PWM_stop(void) {
 	analogWrite(Pin_PWM, 0);
+}
+
+
+int Temperature_get(int pin) {
+	long vADC = analogRead(pin);
+	long v_uV = PD(vADC * ADC_uV / ADC_COUNTS);
+	return Tstart_C + ((v_uV - Vstart_uV) / Vslope_uV);
+}
+
+// convert a temperature in Celcius to
+// the scale factor for frame_*_repeat methods
+int Temperature_to_factor_10x(int temperature) {
+	if (temperature <= -10) {
+		return 170;
+	} else if (temperature <= -5) {
+		return 120;
+	} else if (temperature <= 5) {
+		return 80;
+	} else if (temperature <= 10) {
+		return 40;
+	} else if (temperature <= 15) {
+		return 30;
+	} else if (temperature <= 20) {
+		return 20;
+	} else if (temperature <= 40) {
+		return 10;
+	}
+	return 7;
 }

@@ -15,6 +15,7 @@
 
 #include <Arduino.h>
 //#include <pins_arduino.h>
+#include <limits.h>
 
 #include <SPI.h>
 
@@ -56,6 +57,7 @@ EPD_Class::EPD_Class(EPD_size size,
 	SPI(SPI_driver) {
 
 	this->size = size;
+	this->stage_time = 480; // milliseconds
 	this->lines_per_display = 96;
 	this->dots_per_line = 128;
 	this->bytes_per_line = 128 / 8;
@@ -95,6 +97,7 @@ EPD_Class::EPD_Class(EPD_size size,
 	}
 
 	case EPD_2_7: {
+		this->stage_time = 630; // milliseconds
 		this->lines_per_display = 176;
 		this->dots_per_line = 264;
 		this->bytes_per_line = 264 / 8;
@@ -325,10 +328,32 @@ void EPD_Class::end() {
 }
 
 
-//One frame of data is the number of lines * rows. For example:
-//The 1.44” frame of data is 96 lines * 128 dots.
-//The 2” frame of data is 96 lines * 200 dots.
-//The 2.7” frame of data is 176 lines * 264 dots.
+// convert a temperature in Celcius to
+// the scale factor for frame_*_repeat methods
+int EPD_Class::temperature_to_factor_10x(int temperature) {
+	if (temperature <= -10) {
+		return 170;
+	} else if (temperature <= -5) {
+		return 120;
+	} else if (temperature <= 5) {
+		return 80;
+	} else if (temperature <= 10) {
+		return 40;
+	} else if (temperature <= 15) {
+		return 30;
+	} else if (temperature <= 20) {
+		return 20;
+	} else if (temperature <= 40) {
+		return 10;
+	}
+	return 7;
+}
+
+
+// One frame of data is the number of lines * rows. For example:
+// The 1.44” frame of data is 96 lines * 128 dots.
+// The 2” frame of data is 96 lines * 200 dots.
+// The 2.7” frame of data is 176 lines * 264 dots.
 
 // the image is arranged by line which matches the display size
 // so smallest would have 96 * 32 bytes
@@ -339,12 +364,43 @@ void EPD_Class::frame_fixed(uint8_t fixed_value, EPD_stage stage) {
 	}
 }
 
+
 void EPD_Class::frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage) {
 	static uint8_t buffer[264 / 8];
 	for (uint8_t line = 0; line < this->lines_per_display; ++line) {
 		reader(buffer, address + line * this->bytes_per_line, this->bytes_per_line);
 		this->line(line, buffer, 0, stage);
 	}
+}
+
+
+void EPD_Class::frame_fixed_repeat(uint16_t stage_factor_10x, uint8_t fixed_value, EPD_stage stage) {
+	long stage_time = this->stage_time * stage_factor_10x / 10;
+	do {
+		unsigned long t_start = millis();
+		this->frame_fixed(fixed_value, stage);
+		unsigned long t_end = millis();
+		if (t_end > t_start) {
+			stage_time -= t_end - t_start;
+		} else {
+			stage_time -= t_start - t_end + 1 + ULONG_MAX;
+		}
+	} while (stage_time > 0);
+}
+
+
+void EPD_Class::frame_cb_repeat(uint16_t stage_factor_10x, uint32_t address, EPD_reader *reader, EPD_stage stage) {
+	long stage_time = this->stage_time * stage_factor_10x / 10;
+	do {
+		unsigned long t_start = millis();
+		this->frame_cb(address, reader, stage);
+		unsigned long t_end = millis();
+		if (t_end > t_start) {
+			stage_time -= t_end - t_start;
+		} else {
+			stage_time -= t_start - t_end + 1 + ULONG_MAX;
+		}
+	} while (stage_time > 0);
 }
 
 

@@ -1,10 +1,22 @@
 # Example Programs
 
+The example programs support both the Energia (TI LaunchPad with MSP430G2553)
+and the Arduino Leonardo (Atmel AVR).
+
+The files include some conditional code to switch between the two platforms.
+This code does the following:
+
+1. Convert PROGMEM types to normal types for the TI MCU since it has a unified
+   address space.
+2. Adjust the I/O pins definitions and ADC reference for differences between
+   the two platforms.
+
 ## intro
 
 A single file example that first clears the screen, then toggles
-between two images.  This example now includes Energia support
-so the this will run on both Arduino and LaunchPad.
+between two images.  Neens the serial port (9600 8N1) connected and
+displays the version, temperature and compensation values on each
+cycle.
 
 ## command
 
@@ -12,8 +24,12 @@ A command-line example that acceps single character command from the
 serial port (9600 8N1).  Functions include XBM upload to FLASH,
 display image from flash etc.
 
-This example now includes Energia support so the this will run on both
-Arduino and LaunchPad.
+Use the **h** command on the serial port (9600 8N1) to obtain a list
+of commands.
+
+The 4 stage display cycle is split into two separate commands. The
+**r** command removed and image and the **i** command displays an
+image.
 
 ## libraries
 
@@ -23,7 +39,18 @@ Arduino and LaunchPad.
 * **FLASH** - driver for the SPI FLASH chip on the EPD eval board
 * **EPD** Panel driver
 
+# Connection of EPD board to LaunchPad
+
+The board simply plugs onto the LaunchPad.
+
 # Connection of EPD board to Arduino
+
+The board needs a cable to connect to the Leonardo.
+V1 boards are 3.3V and need level conversion. V2 and later boards
+are dual voltage includine 3.3V regulator for the EPD panel and level
+converters.
+
+## Level conversion for V1
 
 * The EPD board is 3.3V.
 * The Arduino is 5V.

@@ -48,6 +48,10 @@ const int Pin_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
+// ADC maximum voltage at counts
+#define ADC_uV     3300000L
+#define ADC_COUNTS 1024L
+
 #else
 
 // Arduino IO layout
@@ -63,6 +67,10 @@ const int Pin_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
 
+// ADC maximum voltage at counts
+#define ADC_uV     5000000L
+#define ADC_COUNTS 1024L
+
 #endif
 
 
@@ -72,6 +80,19 @@ const int Pin_RED_LED = 13;
 #define LED_OFF LOW
 
 
+// temperature chip parameters
+#define Vstart_uV 1145000L
+#define Tstart_C  100
+#define Vslope_uV -11040L
+
+// there is a potential divider on the input, so
+// scale to the correct voltage as would be seen
+// on the temperature output pin
+#define Rdiv_high 267L
+#define Rdiv_low 178L
+#define PD(v) ((Rdiv_high + Rdiv_low) * (v) / Rdiv_low)
+
+
 // define the E-Ink display
 EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
 
@@ -79,6 +100,8 @@ EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RE
 // function prototypes
 static void flash_info(void);
 static void flash_read(void *buffer, uint32_t address, uint16_t length);
+
+static int get_temperature(int pin);
 
 static uint16_t xbm_count;
 static bool xbm_parser(uint8_t *b);
@@ -166,6 +189,7 @@ void loop() {
 		Serial.println("l          - search for non-empty sectors");
 		Serial.println("w          - clear screen to white");
 		Serial.println("f          - dump FLASH identification");
+		Serial.println("t          - show temperature");
 		break;
 	case 'd':
 	{
@@ -247,14 +271,11 @@ void loop() {
 	{
 		uint32_t address = Serial_gethex(true);
 		address <<= 12;
-		const int frame_cycles = 5;
 		EPD.begin();
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_cb(address, flash_read, EPD_inverse);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_cb(address, flash_read, EPD_normal);
-		}
+		int t = get_temperature(Pin_TEMPERATURE);
+		int factor_10x = EPD.temperature_to_factor_10x(t);
+		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_inverse);
+		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_normal);
 		EPD.end();
 		break;
 	}
@@ -263,14 +284,11 @@ void loop() {
 	{
 		uint32_t address = Serial_gethex(true);
 		address <<= 12;
-		const int frame_cycles = 5;
 		EPD.begin();
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_cb(address, flash_read, EPD_compensate);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_cb(address, flash_read, EPD_white);
-		}
+		int t = get_temperature(Pin_TEMPERATURE);
+		int factor_10x = EPD.temperature_to_factor_10x(t);
+		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_compensate);
+		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_white);
 		EPD.end();
 		break;
 	}
@@ -321,21 +339,32 @@ void loop() {
 
 	case 'w':
 	{
-		const int frame_cycles = 16;
 		EPD.begin();
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_fixed(0xff, EPD_compensate);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_fixed(0xff, EPD_white);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_fixed(0xaa, EPD_inverse);
-		}
-		for (int i = 0; i < frame_cycles; ++i) {
-			EPD.frame_fixed(0xaa, EPD_normal);
-		}
+		int t = get_temperature(Pin_TEMPERATURE);
+		int factor_10x = EPD.temperature_to_factor_10x(t);
+		EPD.frame_fixed_repeat(factor_10x, 0xff, EPD_compensate);
+		EPD.frame_fixed_repeat(factor_10x, 0xff, EPD_white);
+		EPD.frame_fixed_repeat(factor_10x, 0xaa, EPD_inverse);
+		EPD.frame_fixed_repeat(factor_10x, 0xaa, EPD_normal);
 		EPD.end();
+		break;
+	}
+
+	case 't':
+	{
+		long vADC = analogRead(Pin_TEMPERATURE);
+		Serial.println();
+		Serial.print("Temperature ADC = ");
+		Serial.print(vADC);
+		Serial.print(" (0x");
+		Serial_puthex_word(vADC);
+		Serial.print(")");
+		Serial.println();
+		Serial.print("Temperature = ");
+		Serial.print(get_temperature(Pin_TEMPERATURE));
+		Serial.print(" Celcius");
+		Serial.println();
+
 		break;
 	}
 
@@ -361,6 +390,13 @@ static void flash_info(void) {
 
 static void flash_read(void *buffer, uint32_t address, uint16_t length) {
 	FLASH.read(buffer, address, length);
+}
+
+
+static int get_temperature(int pin) {
+	long vADC = analogRead(pin);
+	long v_uV = PD(vADC * ADC_uV / ADC_COUNTS);
+	return Tstart_C + ((v_uV - Vstart_uV) / Vslope_uV);
 }
 
 
