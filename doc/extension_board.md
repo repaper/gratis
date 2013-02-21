@@ -31,28 +31,36 @@ interface.
 
 ## Pin Assignment
 
-Pin Number   Description
-----------   -----------
-1.           Vcc 3V
-2.           *(LED1)*
-3.           *(UART_RX)*
-4.           *(UART_TX)*
-5.           *(SW2)*
-6.           Temperature
-7.           SPI\_CLK
-8.           BUSY
-9.           PWM
-10.          /RESET
-11.          PANEL\_ON
-12.          DISCHARGE
-13.          BORDER_CONTROL
-14.          SPI_MISO
-15.          SPI_MOSI
-16.          *(RST/SBWTDIO)*
-17.          *(TEST/SBWTCK)*
-18.          FLASH\_CS
-19.          /EPD\_CS
-20.          GND
+The table below give the pin connections of the 20 bin male ribbon
+connector.  Looking a the board oriented display side up (as front
+view above) and connector on the left.  Pin 1 is the top left pin (the
+left column are all odd numbered pins) and pin 2 is immediately to its
+right (right hand column is all the even pins).  There is also small 1
+and 2 on the PCB silk screen above the socket and a 19 and 20 below
+the socket.
+
+Pin Number   Description       Colour   Leonardo
+----------   ---------------   ------   --------
+1.           Vcc 3V            Red      3.3V
+2.           *(LED1)*          White    -
+3.           *(UART_RX)*       Grey     -
+4.           *(UART_TX)*       Purple   -
+5.           *(SW2)*           Blue     -
+6.           Temperature       Green    Analog-A0
+7.           SPI\_CLK          Yellow   ICSP-3
+8.           BUSY              Orange   Digital-7
+9.           PWM               Brown    Digital-5
+10.          /RESET            Black    Digital-6
+11.          PANEL\_ON         Red      Digital-2
+12.          DISCHARGE         White    Digital-4
+13.          BORDER_CONTROL    Grey     Digital-3
+14.          SPI_MISO          Purple   ICSP-1
+15.          SPI_MOSI          Blue     ICSP-4
+16.          *(RST/SBWTDIO)*   Green    -
+17.          *(TEST/SBWTCK)*   Yellow   -
+18.          FLASH\_CS         Orange   Digital-9
+19.          /EPD\_CS          Brown    Digital-8
+20.          GND               Black    GND
 
 ### Notes
 
@@ -61,4 +69,7 @@ Pin Number   Description
   projects.  These are only provided so that all the LaunchPad pins
   are brought through to the 20 pin connector.
 * Active low signals are indicated with a leading solidus (slash) e.g. /RESET
-
+* The ICSP pins on a Leonardo have a small dot to mark pin 1 and the letters ICSP
+  above it; pin 2 is to the right of pin 1, same as the normal IDC ribbon cable order
+  i.e. left colum 1,3,5 and right column 2,4,6.  More details on the
+  [Arduino Leonardo page](http://arduino.cc/en/Main/arduinoBoardLeonardo)
