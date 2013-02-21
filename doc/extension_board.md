@@ -31,7 +31,7 @@ interface.
 
 ## Pin Assignment
 
-The table below give the pin connections of the 20 bin male ribbon
+The table below give the pin connections of the 20-pin male ribbon
 connector.  Looking a the board oriented display side up (as front
 view above) and connector on the left.  Pin 1 is the top left pin (the
 left column are all odd numbered pins) and pin 2 is immediately to its
