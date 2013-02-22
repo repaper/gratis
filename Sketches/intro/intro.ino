@@ -14,13 +14,11 @@
 // governing permissions and limitations under the License.
 
 
-// This program is to illustrate the display operation
-// as described in the datasheets.  It has no temperature compensation
-// so the display should be at nominal 20..25 Celsius.  The code is in
-// a simple linear fashion and all the delays are set to maximum, but the
-// SPI clock is set lower than its limit.  Therfore the display sequence
-// will be much slower than normal and all of the individual display stages
-// be clearly visible.
+// This program is to illustrate the display operation as described in
+// the datasheets.  The code is in a simple linear fashion and all the
+// delays are set to maximum, but the SPI clock is set lower than its
+// limit.  Therefore the display sequence will be much slower than
+// normal and all of the individual display stages be clearly visible.
 
 // Operation from reset:
 // * clear screen
