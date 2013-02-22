@@ -113,6 +113,7 @@ EPD_Class::EPD_Class(EPD_size size,
 	}
 	}
 
+	this->factored_stage_time = this->stage_time;
 }
 
 
@@ -237,7 +238,7 @@ void EPD_Class::begin() {
 void EPD_Class::end() {
 
 	this->frame_fixed(0x55, EPD_normal); // dummy frame
-	this->line(0x7fffu, 0, 0x55, EPD_normal); // dummy_line
+	this->line(0x7fffu, 0, 0x55, false, EPD_normal); // dummy_line
 
 	Delay_ms(25);
 
@@ -360,7 +361,14 @@ int EPD_Class::temperature_to_factor_10x(int temperature) {
 
 void EPD_Class::frame_fixed(uint8_t fixed_value, EPD_stage stage) {
 	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
-		this->line(line, 0, fixed_value, stage);
+		this->line(line, 0, fixed_value, false, stage);
+	}
+}
+
+
+void EPD_Class::frame_data(PROGMEM const prog_uint8_t *image, EPD_stage stage){
+	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
+		this->line(line, &image[line * this->bytes_per_line], 0, true, stage);
 	}
 }
 
@@ -369,13 +377,13 @@ void EPD_Class::frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage) 
 	static uint8_t buffer[264 / 8];
 	for (uint8_t line = 0; line < this->lines_per_display; ++line) {
 		reader(buffer, address + line * this->bytes_per_line, this->bytes_per_line);
-		this->line(line, buffer, 0, stage);
+		this->line(line, buffer, 0, false, stage);
 	}
 }
 
 
-void EPD_Class::frame_fixed_repeat(uint16_t stage_factor_10x, uint8_t fixed_value, EPD_stage stage) {
-	long stage_time = this->stage_time * stage_factor_10x / 10;
+void EPD_Class::frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage) {
+	long stage_time = this->factored_stage_time;
 	do {
 		unsigned long t_start = millis();
 		this->frame_fixed(fixed_value, stage);
@@ -389,8 +397,23 @@ void EPD_Class::frame_fixed_repeat(uint16_t stage_factor_10x, uint8_t fixed_valu
 }
 
 
-void EPD_Class::frame_cb_repeat(uint16_t stage_factor_10x, uint32_t address, EPD_reader *reader, EPD_stage stage) {
-	long stage_time = this->stage_time * stage_factor_10x / 10;
+void EPD_Class::frame_data_repeat(PROGMEM const prog_uint8_t *image, EPD_stage stage) {
+	long stage_time = this->factored_stage_time;
+	do {
+		unsigned long t_start = millis();
+		this->frame_data(image, stage);
+		unsigned long t_end = millis();
+		if (t_end > t_start) {
+			stage_time -= t_end - t_start;
+		} else {
+			stage_time -= t_start - t_end + 1 + ULONG_MAX;
+		}
+	} while (stage_time > 0);
+}
+
+
+void EPD_Class::frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage) {
+	long stage_time = this->factored_stage_time;
 	do {
 		unsigned long t_start = millis();
 		this->frame_cb(address, reader, stage);
@@ -404,7 +427,7 @@ void EPD_Class::frame_cb_repeat(uint16_t stage_factor_10x, uint32_t address, EPD
 }
 
 
-void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, EPD_stage stage) {
+void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage) {
 	// charge pump voltage levels
 	Delay_us(10);
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
@@ -423,8 +446,17 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, EP
 	// even pixels
 	for (uint16_t b = this->bytes_per_line; b > 0; --b) {
 		if (0 != data) {
+#if defined(__MSP430_CPU__)
 			uint8_t pixels = data[b - 1] & 0xaa;
-			//uint8_t pixels = pgm_read_byte_near(data + b - 1) & 0xaa;
+#else
+			// AVR has multiple memory spaces
+			uint8_t pixels;
+			if (read_progmem) {
+				pixels = pgm_read_byte_near(data + b - 1) & 0xaa;
+			} else {
+				pixels = data[b - 1] & 0xaa;
+			}
+#endif
 			switch(stage) {
 			case EPD_compensate:  // B -> W, W -> B (Current Image)
 				pixels = 0xaa | ((pixels ^ 0xaa) >> 1);
@@ -456,8 +488,17 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, EP
 	// odd pixels
 	for (uint16_t b = 0; b < this->bytes_per_line; ++b) {
 		if (0 != data) {
+#if defined(__MSP430_CPU__)
 			uint8_t pixels = data[b] & 0x55;
-			//uint8_t pixels = pgm_read_byte_near(data + b) & 0x55;
+#else
+			// AVR has multiple memory spaces
+			uint8_t pixels;
+			if (read_progmem) {
+				pixels = pgm_read_byte_near(data + b) & 0x55;
+			} else {
+				pixels = data[b] & 0x55;
+			}
+#endif
 			switch(stage) {
 			case EPD_compensate:  // B -> W, W -> B (Current Image)
 				pixels = 0xaa | (pixels ^ 0x55);

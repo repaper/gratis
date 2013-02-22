@@ -18,20 +18,19 @@
 #include <inttypes.h>
 #include <ctype.h>
 
-//#include <Serial.h>
 #include <SPI.h>
 #include <FLASH.h>
 #include <EPD.h>
+#include <S5813A.h>
+
 
 // Change this for different display size
 #define EPD_SIZE EPD_2_0
 
 #define COMMAND_VERSION "1"
 
-// delays - more consistent naming
-#define Delay_ms(ms) delay(ms)
-#define Delay_us(us) delayMicroseconds(us)
 
+// definition of I/O pins LaunchPad and Arduino are different
 
 #if defined(__MSP430_CPU__)
 
@@ -48,10 +47,6 @@ const int Pin_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
-// ADC maximum voltage at counts
-#define ADC_uV     3300000L
-#define ADC_COUNTS 1024L
-
 #else
 
 // Arduino IO layout
@@ -67,10 +62,6 @@ const int Pin_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
 
-// ADC maximum voltage at counts
-#define ADC_uV     5000000L
-#define ADC_COUNTS 1024L
-
 #endif
 
 
@@ -79,29 +70,14 @@ const int Pin_RED_LED = 13;
 #define LED_ON  HIGH
 #define LED_OFF LOW
 
-
-// temperature chip parameters
-#define Vstart_uV 1145000L
-#define Tstart_C  100
-#define Vslope_uV -11040L
-
-// there is a potential divider on the input, so
-// scale to the correct voltage as would be seen
-// on the temperature output pin
-#define Rdiv_high 267L
-#define Rdiv_low 178L
-#define PD(v) ((Rdiv_high + Rdiv_low) * (v) / Rdiv_low)
-
-
-// define the E-Ink display
-EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
+// pre-processor convert to string
+#define MAKE_STRING1(X) #X
+#define MAKE_STRING(X) MAKE_STRING1(X)
 
 
 // function prototypes
 static void flash_info(void);
 static void flash_read(void *buffer, uint32_t address, uint16_t length);
-
-static int get_temperature(int pin);
 
 static uint16_t xbm_count;
 static bool xbm_parser(uint8_t *b);
@@ -109,11 +85,15 @@ static bool xbm_parser(uint8_t *b);
 
 static uint8_t Serial_getc();
 static uint16_t Serial_gethex(bool echo);
-static void Serial_puthex(uint32_t n, uint16_t bits);
+static void Serial_puthex(uint32_t n, int bits);
 static void Serial_puthex_byte(uint8_t n);
 static void Serial_puthex_word(uint16_t n);
 static void Serial_puthex_double(uint32_t n);
 static void Serial_hex_dump(uint32_t address, const void *buffer, uint16_t length);
+
+
+// define the E-Ink display
+EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
 
 
 // I/O setup
@@ -153,6 +133,7 @@ void setup() {
 	Serial.println();
 	Serial.println();
 	Serial.println("Command version: " COMMAND_VERSION);
+	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
 	Serial.println();
 
 	FLASH.begin(Pin_FLASH_CS, SPI);
@@ -161,9 +142,10 @@ void setup() {
 	} else {
 		Serial.println("unsupported FLASH chip");
 		flash_info();
-		//for (;;) {
-		//}
 	}
+
+	// configure temperature sensor
+	S5813A.begin(Pin_TEMPERATURE);
 }
 
 // main loop
@@ -272,10 +254,10 @@ void loop() {
 		uint32_t address = Serial_gethex(true);
 		address <<= 12;
 		EPD.begin();
-		int t = get_temperature(Pin_TEMPERATURE);
-		int factor_10x = EPD.temperature_to_factor_10x(t);
-		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_inverse);
-		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_normal);
+		int t = S5813A.read();
+		EPD.setFactor(t);
+		EPD.frame_cb_repeat(address, flash_read, EPD_inverse);
+		EPD.frame_cb_repeat(address, flash_read, EPD_normal);
 		EPD.end();
 		break;
 	}
@@ -285,10 +267,10 @@ void loop() {
 		uint32_t address = Serial_gethex(true);
 		address <<= 12;
 		EPD.begin();
-		int t = get_temperature(Pin_TEMPERATURE);
-		int factor_10x = EPD.temperature_to_factor_10x(t);
-		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_compensate);
-		EPD.frame_cb_repeat(factor_10x, address, flash_read, EPD_white);
+		int t = S5813A.read();
+		EPD.setFactor(t);
+		EPD.frame_cb_repeat(address, flash_read, EPD_compensate);
+		EPD.frame_cb_repeat(address, flash_read, EPD_white);
 		EPD.end();
 		break;
 	}
@@ -340,12 +322,9 @@ void loop() {
 	case 'w':
 	{
 		EPD.begin();
-		int t = get_temperature(Pin_TEMPERATURE);
-		int factor_10x = EPD.temperature_to_factor_10x(t);
-		EPD.frame_fixed_repeat(factor_10x, 0xff, EPD_compensate);
-		EPD.frame_fixed_repeat(factor_10x, 0xff, EPD_white);
-		EPD.frame_fixed_repeat(factor_10x, 0xaa, EPD_inverse);
-		EPD.frame_fixed_repeat(factor_10x, 0xaa, EPD_normal);
+		int t = S5813A.read();
+		EPD.setFactor(t);
+		EPD.clear();
 		EPD.end();
 		break;
 	}
@@ -361,7 +340,7 @@ void loop() {
 		Serial.print(")");
 		Serial.println();
 		Serial.print("Temperature = ");
-		Serial.print(get_temperature(Pin_TEMPERATURE));
+		Serial.print(S5813A.read());
 		Serial.print(" Celcius");
 		Serial.println();
 
@@ -390,13 +369,6 @@ static void flash_info(void) {
 
 static void flash_read(void *buffer, uint32_t address, uint16_t length) {
 	FLASH.read(buffer, address, length);
-}
-
-
-static int get_temperature(int pin) {
-	long vADC = analogRead(pin);
-	long v_uV = PD(vADC * ADC_uV / ADC_COUNTS);
-	return Tstart_C + ((v_uV - Vstart_uV) / Vslope_uV);
 }
 
 
@@ -452,10 +424,13 @@ static uint16_t Serial_gethex(bool echo) {
 }
 
 
-static void Serial_puthex(uint32_t n, uint16_t bits) {
-	static const char hex[] = "0123456789abcdef";
+static void Serial_puthex(uint32_t n, int bits) {
 	for (int i = bits - 4; i >= 0; i -= 4) {
-		Serial.write(hex[(n >> i) & 0x0f]);
+		char nibble = ((n >> i) & 0x0f) + '0';
+		if (nibble > '9') {
+			nibble += 'a' - '9' - 1;
+		}
+		Serial.print(nibble);
 	}
 }
 

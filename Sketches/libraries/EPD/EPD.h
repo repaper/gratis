@@ -54,6 +54,7 @@ private:
 
 	EPD_size size;
 	uint16_t stage_time;
+	uint16_t factored_stage_time;
 	uint16_t lines_per_display;
 	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
@@ -66,24 +67,60 @@ private:
 	bool filler;
 
 public:
+	// power up and power down the EPD panel
+	void begin();
+	void end();
+
+	void setFactor(int temperature = 25) {
+		this->factored_stage_time = this->stage_time * this->temperature_to_factor_10x(temperature) / 10;
+	}
+
+	// clear display (anything -> white)
+	void clear() {
+		this->frame_fixed_repeat(0xff, EPD_compensate);
+		this->frame_fixed_repeat(0xff, EPD_white);
+		this->frame_fixed_repeat(0xaa, EPD_inverse);
+		this->frame_fixed_repeat(0xaa, EPD_normal);
+	}
+
+	// assuming a clear (white) screen output an image
+	void image(PROGMEM const prog_uint8_t *image) {
+		this->frame_fixed_repeat(0xaa, EPD_compensate);
+		this->frame_fixed_repeat(0xaa, EPD_white);
+		this->frame_data_repeat(image, EPD_inverse);
+		this->frame_data_repeat(image, EPD_normal);
+	}
+
+	// change from old image to new image
+	void image(PROGMEM const prog_uint8_t *old_image, PROGMEM const prog_uint8_t *new_image) {
+		this->frame_data_repeat(old_image, EPD_compensate);
+		this->frame_data_repeat(old_image, EPD_white);
+		this->frame_data_repeat(new_image, EPD_inverse);
+		this->frame_data_repeat(new_image, EPD_normal);
+	}
+
+	// Low level API calls
+	// ===================
+
 	// single frame refresh
 	void frame_fixed(uint8_t fixed_value, EPD_stage stage);
+	void frame_data(PROGMEM const prog_uint8_t *new_image, EPD_stage stage);
 	void frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// stage_time frame refresh
-	void frame_fixed_repeat(uint16_t stage_factor_10x, uint8_t fixed_value, EPD_stage stage);
-	void frame_cb_repeat(uint16_t stage_factor_10x, uint32_t address, EPD_reader *reader, EPD_stage stage);
+	void frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage);
+	void frame_data_repeat(PROGMEM const prog_uint8_t *new_image, EPD_stage stage);
+	void frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
-	// convert a
+	// convert temperature to compensation factor
 	int temperature_to_factor_10x(int temperature);
 
-	void line(uint16_t line, const uint8_t *data, uint8_t fixed_value, EPD_stage stage);
+	// single line display - very low-level
+	// also has to handle AVR progmem
+	void line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage);
 
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
-
-	void begin();
-	void end();
 
 	EPD_Class(EPD_size size,
 		  int panel_on_pin,

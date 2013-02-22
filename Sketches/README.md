@@ -11,25 +11,37 @@ This code does the following:
 2. Adjust the I/O pins definitions and ADC reference for differences between
    the two platforms.
 
-## intro
+## demo
 
-A single file example that first clears the screen, then toggles
-between two images.  Neens the serial port (9600 8N1) connected and
-displays the version, temperature and compensation values on each
-cycle.
+This example first clears the screen, then toggles between two images.
+Needs the serial port (9600 8N1) connected and displays the version,
+temperature and compensation values on each cycle.
+
+This is built upon the EPD API in the libraries folder ans shows how
+to use the API to display images from the MCU FLASH.  Only a few images
+are possible to be stored since the on-chip FLASH is limited.
 
 ## command
 
 A command-line example that acceps single character command from the
-serial port (9600 8N1).  Functions include XBM upload to FLASH,
-display image from flash etc.
+serial port (9600 8N1).  Functions include XBM upload to to the SPI
+FLASH chip on the EPD evaluation board, display image from this FLASH
+and several other functions.
 
-Use the **h** command on the serial port (9600 8N1) to obtain a list
+Use the `h` command on the serial port (9600 8N1) to obtain a list
 of commands.
 
-The 4 stage display cycle is split into two separate commands. The
-**r** command removed and image and the **i** command displays an
-image.
+When using the serial monitor on Arduino/Energia IDE any command that
+take a hex number as parameter need a `<space>` character after it, as
+the **Send** button will not automatically add a CR/LF.  For single
+letter commands like the `t` temperature sensor read just type the
+charater and click **Send**.
+
+The 4 stage display cycle is split into two separate commands. The `r`
+command removes an image and the `i` command displays an image.
+e.g. if the current image was from sector 30 and you wanted to change
+to sector 43 then type `r30<space>i43<space>` into the serial monitor
+and click **Send**.
 
 ## libraries
 
@@ -37,7 +49,9 @@ image.
   The intro program includes two of these directly.
   The Command program can use these for its upload command
 * **FLASH** - driver for the SPI FLASH chip on the EPD eval board
-* **EPD** Panel driver
+* **EPD** E-Ink Panel driver
+* **S5813A** Temperature sensor driver
+
 
 # Connection of EPD board to LaunchPad
 
@@ -45,12 +59,14 @@ The board simply plugs onto the LaunchPad.
 
 # Connection of EPD board to Arduino
 
-The board needs a cable to connect to the Leonardo.
-V1 boards are 3.3V and need level conversion. V2 and later boards
-are dual voltage includine 3.3V regulator for the EPD panel and level
-converters.
+The board needs a cable to connect to the Leonardo.  V1 boards are
+3.3V and need level conversion. V2 and later boards are dual voltage
+including a 3.3V regulator for the EPD panel and level converters and
+so can directly connect to the Leonardo.
 
-## Level conversion for V1
+## Level conversion for V1 Boards
+
+**Only applies to V1 boards**
 
 * The EPD board is 3.3V.
 * The Arduino is 5V.
