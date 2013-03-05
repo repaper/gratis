@@ -1,3 +1,4 @@
+% RePaper ePaper Display COG Driver Interface Timing
 
 # ePaper Display COG Driver Interface Timing
 

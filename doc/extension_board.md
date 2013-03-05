@@ -1,3 +1,5 @@
+% RePaper EPD Extension Board
+
 # EPD Extension Board
 
 ## Introduction
