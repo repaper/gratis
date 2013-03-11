@@ -17,6 +17,7 @@ interface.
 * Starter board to work with EPD
 * Supports driving 1.44", 2.0" or 2.7" EPD Panels
 * On board 8M bits serial flash memory and temperature sensor
+* VCC input voltage is available from 10V to 3V
 * 20 input/output pins bridge to any development/evaluation kit or product
 * Drect connect socket for Texas Instruments LaunchPad
 * Documentation for Panels and driving waveform
