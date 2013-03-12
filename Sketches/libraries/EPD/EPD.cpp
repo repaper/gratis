@@ -14,7 +14,6 @@
 
 
 #include <Arduino.h>
-//#include <pins_arduino.h>
 #include <limits.h>
 
 #include <SPI.h>
@@ -373,6 +372,15 @@ void EPD_Class::frame_data(PROGMEM const prog_uint8_t *image, EPD_stage stage){
 }
 
 
+#if defined(EPD_ENABLE_EXTRA_SRAM)
+void EPD_Class::frame_sram(const uint8_t *image, EPD_stage stage){
+	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
+		this->line(line, &image[line * this->bytes_per_line], 0, false, stage);
+	}
+}
+#endif
+
+
 void EPD_Class::frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage) {
 	static uint8_t buffer[264 / 8];
 	for (uint8_t line = 0; line < this->lines_per_display; ++line) {
@@ -410,6 +418,23 @@ void EPD_Class::frame_data_repeat(PROGMEM const prog_uint8_t *image, EPD_stage s
 		}
 	} while (stage_time > 0);
 }
+
+
+#if defined(EPD_ENABLE_EXTRA_SRAM)
+void EPD_Class::frame_sram_repeat(const uint8_t *image, EPD_stage stage) {
+	long stage_time = this->factored_stage_time;
+	do {
+		unsigned long t_start = millis();
+		this->frame_sram(image, stage);
+		unsigned long t_end = millis();
+		if (t_end > t_start) {
+			stage_time -= t_end - t_start;
+		} else {
+			stage_time -= t_start - t_end + 1 + ULONG_MAX;
+		}
+	} while (stage_time > 0);
+}
+#endif
 
 
 void EPD_Class::frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage) {

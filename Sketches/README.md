@@ -43,14 +43,28 @@ e.g. if the current image was from sector 30 and you wanted to change
 to sector 43 then type `r30<space>i43<space>` into the serial monitor
 and click **Send**.
 
+## thermo (Arduino Mega only)
+
+A frame buffer graphic demo uses 4800 bytes of SRAM for 2.0" display
+so is restricted to Arduino Mega or ATmega1280/ATmega2560 chip
+designs.  It draws a temperature display in digits and a a simple
+scale plus a few graphic elements.  Delays for amnute the refreshed
+the display.
+
 ## libraries
 
-* **Images** - sample XBM files.
-  The intro program includes two of these directly.
-  The Command program can use these for its upload command
-* **FLASH** - driver for the SPI FLASH chip on the EPD eval board
-* **EPD** E-Ink Panel driver
-* **S5813A** Temperature sensor driver
+* **Images** - Sample XBM files.  The intro program includes two of
+  these directly.  The Command program can use these for its upload
+  command.
+* **FLASH** - Driver for the SPI FLASH chip on the EPD eval board.
+* **EPD** - E-Ink Panel driver.
+* **EPD_GFX** - This subclasses the
+  [Adafruit_GFX library](https://github.com/adafruit/Adafruit-GFX-Library)
+  which needs to be downloaded an installed in to this folder.
+  **NOTE** - This needs at least 8 kBytes of SRAM on the AVR MCU to
+  function.  So can only this can be used with Arduino Mega or
+  ATmega1280/ATmega2560 chip designs.
+* **S5813A** - Temperature sensor driver.
 
 
 # Connection of EPD board to LaunchPad

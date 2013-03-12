@@ -25,6 +25,10 @@
 #include <avr/pgmspace.h>
 #endif
 
+// if more SRAM available (8 kBytes)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega_2560__)
+#define EPD_ENABLE_EXTRA_SRAM 1
+#endif
 
 typedef enum {
 	EPD_1_44,        // 128 x 96
@@ -83,7 +87,7 @@ public:
 		this->frame_fixed_repeat(0xaa, EPD_normal);
 	}
 
-	// assuming a clear (white) screen output an image
+	// assuming a clear (white) screen output an image (PROGMEM data)
 	void image(PROGMEM const prog_uint8_t *image) {
 		this->frame_fixed_repeat(0xaa, EPD_compensate);
 		this->frame_fixed_repeat(0xaa, EPD_white);
@@ -91,7 +95,7 @@ public:
 		this->frame_data_repeat(image, EPD_normal);
 	}
 
-	// change from old image to new image
+	// change from old image to new image (PROGMEM data)
 	void image(PROGMEM const prog_uint8_t *old_image, PROGMEM const prog_uint8_t *new_image) {
 		this->frame_data_repeat(old_image, EPD_compensate);
 		this->frame_data_repeat(old_image, EPD_white);
@@ -99,17 +103,34 @@ public:
 		this->frame_data_repeat(new_image, EPD_normal);
 	}
 
+#if defined(EPD_ENABLE_EXTRA_SRAM)
+
+	// change from old image to new image (SRAM version)
+	void image_sram(const uint8_t *old_image, const uint8_t *new_image) {
+		this->frame_sram_repeat(old_image, EPD_compensate);
+		this->frame_sram_repeat(old_image, EPD_white);
+		this->frame_sram_repeat(new_image, EPD_inverse);
+		this->frame_sram_repeat(new_image, EPD_normal);
+	}
+#endif
+
 	// Low level API calls
 	// ===================
 
 	// single frame refresh
 	void frame_fixed(uint8_t fixed_value, EPD_stage stage);
 	void frame_data(PROGMEM const prog_uint8_t *new_image, EPD_stage stage);
+#if defined(EPD_ENABLE_EXTRA_SRAM)
+	void frame_sram(const uint8_t *new_image, EPD_stage stage);
+#endif
 	void frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// stage_time frame refresh
 	void frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage);
 	void frame_data_repeat(PROGMEM const prog_uint8_t *new_image, EPD_stage stage);
+#if defined(EPD_ENABLE_EXTRA_SRAM)
+	void frame_sram_repeat(const uint8_t *new_image, EPD_stage stage);
+#endif
 	void frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// convert temperature to compensation factor
