@@ -213,6 +213,7 @@ void loop() {
 	int bar_x0 = 24;
 	int bar_y0 = 60;
 
+	G_EPD.fillRect(bar_x0, bar_y0, T_MAX - T_MIN, bar_h, EPD_GFX::WHITE);
 	G_EPD.fillRect(bar_x0, bar_y0, bar_w, bar_h, EPD_GFX::BLACK);
 
 	// scale
