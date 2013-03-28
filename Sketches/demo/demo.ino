@@ -68,14 +68,14 @@
 // images
 PROGMEM const
 #define unsigned
-#define char prog_uint8_t
+#define char uint8_t
 #include TEXT_IMAGE
 #undef char
 #undef unsigned
 
 PROGMEM const
 #define unsigned
-#define char prog_uint8_t
+#define char uint8_t
 #include PICTURE
 #undef char
 #undef unsigned

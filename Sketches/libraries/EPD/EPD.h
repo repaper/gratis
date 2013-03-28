@@ -20,7 +20,6 @@
 
 #if defined(__MSP430_CPU__)
 #define PROGMEM
-#define prog_uint8_t uint8_t
 #else
 #include <avr/pgmspace.h>
 #endif
@@ -63,9 +62,9 @@ private:
 	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
 	uint16_t bytes_per_scan;
-	PROGMEM const prog_uint8_t *gate_source;
+	PROGMEM const uint8_t *gate_source;
 	uint16_t gate_source_length;
-	PROGMEM const prog_uint8_t *channel_select;
+	PROGMEM const uint8_t *channel_select;
 	uint16_t channel_select_length;
 
 	bool filler;
@@ -88,7 +87,7 @@ public:
 	}
 
 	// assuming a clear (white) screen output an image (PROGMEM data)
-	void image(PROGMEM const prog_uint8_t *image) {
+	void image(PROGMEM const uint8_t *image) {
 		this->frame_fixed_repeat(0xaa, EPD_compensate);
 		this->frame_fixed_repeat(0xaa, EPD_white);
 		this->frame_data_repeat(image, EPD_inverse);
@@ -96,7 +95,7 @@ public:
 	}
 
 	// change from old image to new image (PROGMEM data)
-	void image(PROGMEM const prog_uint8_t *old_image, PROGMEM const prog_uint8_t *new_image) {
+	void image(PROGMEM const uint8_t *old_image, PROGMEM const uint8_t *new_image) {
 		this->frame_data_repeat(old_image, EPD_compensate);
 		this->frame_data_repeat(old_image, EPD_white);
 		this->frame_data_repeat(new_image, EPD_inverse);
@@ -119,7 +118,7 @@ public:
 
 	// single frame refresh
 	void frame_fixed(uint8_t fixed_value, EPD_stage stage);
-	void frame_data(PROGMEM const prog_uint8_t *new_image, EPD_stage stage);
+	void frame_data(PROGMEM const uint8_t *new_image, EPD_stage stage);
 #if defined(EPD_ENABLE_EXTRA_SRAM)
 	void frame_sram(const uint8_t *new_image, EPD_stage stage);
 #endif
@@ -127,7 +126,7 @@ public:
 
 	// stage_time frame refresh
 	void frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage);
-	void frame_data_repeat(PROGMEM const prog_uint8_t *new_image, EPD_stage stage);
+	void frame_data_repeat(PROGMEM const uint8_t *new_image, EPD_stage stage);
 #if defined(EPD_ENABLE_EXTRA_SRAM)
 	void frame_sram_repeat(const uint8_t *new_image, EPD_stage stage);
 #endif
