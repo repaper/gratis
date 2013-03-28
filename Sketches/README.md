@@ -51,6 +51,40 @@ designs.  It draws a temperature display in digits and a a simple
 scale plus a few graphic elements.  Delays for amnute the refreshed
 the display.
 
+## amslide (AlaMode)
+
+A demonstartion slide show for the 2.0" display connected to a
+[Wyolum](http://www.wyolum.com)
+[AlaMode](http://wyolum.com/projects/alamode/).  This is basically an
+Arduino Uno (ATMega328) type of device that can be connected directly
+to a Rasberry-Pi and programmed from the Arduino IDE running on a
+Rasberry-Pi (see the Wyolum web sit to [get started](http://wyolum.com/projects/alamode/alamode-getting-started/).
+
+This demo simply diplays images from a card in the AlaMode microSD
+slot; a file `index.txt` lists the files to be displayed and how many
+seconds to display the image.  The format is that each line has the
+number of seconds as a decimal integer, a space and the image file
+path.
+
+The images are binary files that match the display, there is a zip
+file containing some demo images and a sample `index.txt`.  Just unzip
+this file to the root of a micro SD card, download the amdemo.ino and
+the images will be displayed continuously.  I the serial monitor is
+running the the names of the files will be displayed.
+
+The images in the sample are derived from the XBM library images using
+the Command: `tail -n +4 "${xbm}" | xxd -r -p > "${bin}"` Where the
+variables `xbm` represents the XBM source file ane and `bin`
+represents the binary output file name.  This results in the bytes in
+the binary file having the same values as the hex numbers in the XBM
+file.  Note that the Arduino SD code uses the 8.3 filename format so
+choose a compatible name e.g. `cat.20`
+
+Portability - This should work on other Arduinos that have an SD or
+micro SD interface either directy attached or on a plug-in shield; but
+may need some changes to I/O pin order if the SD CS is not routed to
+Pin 10 as in AlaMode case.
+
 ## libraries
 
 * **Images** - Sample XBM files.  The intro program includes two of
