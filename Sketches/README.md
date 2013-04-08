@@ -6,8 +6,8 @@
 ## Source Code Repository
 
 The source code to the Repaper software is hosted by
-[GitHub](http://github.com/repaper/gratis). The [example programs](#example-programs) are in
-[Sketches](http://github.com/repaper/gratis/Sketches) directory.
+[GitHub](https://github.com/repaper/gratis). The [example programs](#example-programs) are in
+[Sketches](https://github.com/repaper/gratis/tree/master/Sketches) directory.
 
 
 ## Development Tools
@@ -41,6 +41,8 @@ This code does the following:
 
 ## demo
 
+Link to the [demo source](https://github.com/repaper/gratis/tree/master/Sketches/demo).
+
 This example first clears the screen, then toggles between two images.
 Needs the serial port (9600 8N1) connected and displays the version,
 temperature and compensation values on each cycle.
@@ -50,6 +52,8 @@ to use the API to display images from the MCU FLASH.  Only a few images
 are possible to be stored since the on-chip FLASH is limited.
 
 ## command
+
+Link to the [command source](https://github.com/repaper/gratis/tree/master/Sketches/command).
 
 A command-line example that acceps single character command from the
 serial port (9600 8N1).  Functions include XBM upload to to the SPI
@@ -71,17 +75,23 @@ e.g. if the current image was from sector 30 and you wanted to change
 to sector 43 then type `r30<space>i43<space>` into the serial monitor
 and click **Send**.
 
+
 ## thermo (Arduino Mega only)
+
+Link to the [thermo source](https://github.com/repaper/gratis/tree/master/Sketches/thermo).
 
 A frame buffer graphic demo uses 4800 bytes of SRAM for 2.0" display
 so is restricted to Arduino Mega or ATmega1280/ATmega2560 chip
 designs.  It draws a temperature display in digits and a a simple
-scale plus a few graphic elements.  Delays for amnute the refreshed
+scale plus a few graphic elements.  Delays for a minute then refreshes
 the display.
+
 
 ## amslide (AlaMode)
 
-A demonstartion slide show for the 2.0" display connected to a
+Link to the [amslide source](https://github.com/repaper/gratis/tree/master/Sketches/amslide).
+
+A demonstration slide show for the 2.0" display connected to a
 [Wyolum](http://www.wyolum.com)
 [AlaMode](http://wyolum.com/projects/alamode/).  This is basically an
 Arduino Uno (ATMega328) type of device that can be connected directly
@@ -115,30 +125,44 @@ Pin 10 as in AlaMode case.
 
 ## libraries
 
-* **Images** - Sample XBM files.  The intro program includes two of
-  these directly.  The Command program can use these for its upload
-  command.
+Link to the [libraries source](https://github.com/repaper/gratis/tree/master/Sketches/libraries).
+(copy all of these to you local libraries folder)
+
+* **Images** - Sample XBM files.  The demo program includes two of
+  these directly.  The Command program can use these files for its
+  upload command.
 * **FLASH** - Driver for the SPI FLASH chip on the EPD eval board.
 * **EPD** - E-Ink Panel driver.
 * **EPD_GFX** - This subclasses the
   [Adafruit_GFX library](https://github.com/adafruit/Adafruit-GFX-Library)
-  which needs to be downloaded an installed in to this folder.
-  **NOTE** - This needs at least 8 kBytes of SRAM on the AVR MCU to
-  function.  So can only this can be used with Arduino Mega or
-  ATmega1280/ATmega2560 chip designs.
+  which needs to be downloaded an installed in to the libraries folder
+  an named **Adafruit_GFX**.  **IMPORTANT** - This library module needs at
+  least 8 kBytes of SRAM on the AVR MCU to function.  So can only this
+  can be used with Arduino Mega or ATmega1280/ATmega2560 chip designs.
 * **S5813A** - Temperature sensor driver.
 
 
 # Connection of EPD board to LaunchPad
 
-The board simply plugs onto the LaunchPad.
+The board simply plugs onto the LaunchPad, just be sure to orient the
+board correctly; when correctly oriented the LaunchPad S1 and S2
+buttons will clear of the board.
+
 
 # Connection of EPD board to Arduino
 
-The board needs a cable to connect to the Leonardo.  V1 boards are
-3.3V and need level conversion. V2 and later boards are dual voltage
-including a 3.3V regulator for the EPD panel and level converters and
-so can directly connect to the Leonardo.
+The board needs a cable to connect to the Leonardo.  The EPD boards
+are dual voltage and include a 3.3V regulator for the EPD panel and
+level converters and so it can directly connect to the 5 Volt
+Arduinos.  Note that the board uses the SPI interface which is on
+different pins depending on the particular Arduino version.  The
+[Extension Board](http://repaper.org/doc/extension_board.html) has a
+table of
+[Pin Assignments](http://repaper.org/doc/extension_board.html#pin-assignment)
+for some Arduinos; the main difference is the three SPI pin (SI, SO,
+CLK) location which vary between the various Arduinos an can be on
+dedicated pins, overlapped with Digital I/O or shared with the ICSP
+header.
 
 
 ## Getting Started (Coming soon)
