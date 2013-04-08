@@ -76,3 +76,5 @@ Pin Number   Description       Colour   Leonardo    Uno
   above it; pin 2 is to the right of pin 1, same as the normal IDC ribbon cable order
   i.e. left colum 1,3,5 and right column 2,4,6.  More details on the
   [Arduino Leonardo page](http://arduino.cc/en/Main/arduinoBoardLeonardo)
+
+

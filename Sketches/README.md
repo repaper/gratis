@@ -1,3 +1,31 @@
+% RePaper Code
+
+# Code
+
+
+## Source Code Repository
+
+The source code to the Repaper software is hosted by
+[GitHub](http://github.com/repaper/gratis). The [example programs](#example-programs) are in
+[Sketches](http://github.com/repaper/gratis/Sketches) directory.
+
+
+## Development Tools
+
+### TI LaunchPad
+
+The [Energia](http://energia.nu/) IDE can be downloaded from their
+[Home Page](http://energia.nu/), Windows, Mac OS/X and Linux are
+supported and this needs [Java](http://java.com) to be installed.
+
+### Arduino
+
+The [arduino web site](http://www.arduino.cc) has download links for
+Windows, Mac OS/X and other operating systems.
+[Java](http://java.com) is necessary to run the GUI, but it is
+possible to install a command line only version.
+
+
 # Example Programs
 
 The example programs support both the Energia (TI LaunchPad with MSP430G2553)
@@ -112,27 +140,21 @@ The board needs a cable to connect to the Leonardo.  V1 boards are
 including a 3.3V regulator for the EPD panel and level converters and
 so can directly connect to the Leonardo.
 
-## Level conversion for V1 Boards
 
-**Only applies to V1 boards**
+## Getting Started (Coming soon)
 
-* The EPD board is 3.3V.
-* The Arduino is 5V.
-* All digital outputs from Arduino to need 5V to 3.3V divider.  A 4k7
-  from Arduion to EPD with a 10k pulldown on the EPD side is
-  sufficient to drop the 5V to 3.3V, Becareful of the SPI clock
-  signal, not to degrade the edges as the FLASH read is quite
-  sensitive to this.
-* All digital inputs to the Arduino need 3.3V to 5V step up.  an
-  N-Channel MOSFET such a 2N7000 (DIP), 2N7002 (SMT), BSS138 (SMT) or
-  equivalent. Source connects to EPD output with a 10k pullup to 3.3V;
-  Gate connect to 3.3V and the Drain connect to the Arduino input with
-  a 10k pullup to 5V.  Two converters are required for BUSY and MISO lines.
-* Temperature line is analog so can connect directly to ADC input.
+Something like....
 
-A prebuilt converter can be obtained from:
+1. download + unzip file
+2. drop content of libraries into libraries folder
+3. open example code
+4. make these connections
+5. instructions on how to use the flex connector
+6. include a video at the bottom of the demo (or other code) working properly so that novice users know what to expect (and to let them know when their circuit isn't working properly).
 
-* [Sparkfun Logic Level Converter](https://www.sparkfun.com/products/8745).
-* [Hobbytronics](http://www.hobbytronics.co.uk) also have the Sparkfun converter and have a short
-  [tutorial with circuits](http://www.hobbytronics.co.uk/mosfet-voltage-level-converter).
-* [Adafruit 74LVC245](http://www.adafruit.com/products/735) can be used as a level shifter.
+
+### Howto: Arduino
+
+
+
+### Howto: LaunchPad
