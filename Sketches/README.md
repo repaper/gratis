@@ -12,50 +12,54 @@ The source code to the Repaper software is hosted by
 
 ## Development Tools
 
+This project officially supports both the Arduino-based and Ti LaunchPad platforms.
+
+### Arduino
+
+The [Arduino web site](http://www.arduino.cc) has download links for
+Windows, Mac OS/X and other operating systems.
+
+Note: [Java](http://java.com) is necessary to run the GUI, but it is
+possible to install a command line only version.
+
 ### TI LaunchPad
 
 The [Energia](http://energia.nu/) IDE can be downloaded from their
 [Home Page](http://energia.nu/), Windows, Mac OS/X and Linux are
 supported and this needs [Java](http://java.com) to be installed.
 
-### Arduino
-
-The [arduino web site](http://www.arduino.cc) has download links for
-Windows, Mac OS/X and other operating systems.
-[Java](http://java.com) is necessary to run the GUI, but it is
-possible to install a command line only version.
-
 
 # Example Programs
 
-The example programs support both the Energia (TI LaunchPad with MSP430G2553)
-and the Arduino Leonardo (Atmel AVR).
+The example programs support both the Arduino (Atmel AVR) and the
+Energia (TI LaunchPad with MSP430G2553).
 
 The files include some conditional code to switch between the two platforms.
 This code does the following:
 
 1. Convert PROGMEM types to normal types for the TI MCU since it has a unified
    address space.
-2. Adjust the I/O pins definitions and ADC reference for differences between
+
+1. Adjust the I/O pins definitions and ADC reference for differences between
    the two platforms.
 
-## demo
+## Demo Sketch
 
-Link to the [demo source](https://github.com/repaper/gratis/tree/master/Sketches/demo).
+> Link to the [demo source](https://github.com/repaper/gratis/tree/master/Sketches/demo).
 
 This example first clears the screen, then toggles between two images.
 Needs the serial port (9600 8N1) connected and displays the version,
 temperature and compensation values on each cycle.
 
-This is built upon the EPD API in the libraries folder ans shows how
+This is built upon the EPD API in the libraries folder and shows how
 to use the API to display images from the MCU FLASH.  Only a few images
 are possible to be stored since the on-chip FLASH is limited.
 
-## command
+## Command Sketch
 
-Link to the [command source](https://github.com/repaper/gratis/tree/master/Sketches/command).
+> Link to the [command source](https://github.com/repaper/gratis/tree/master/Sketches/command).
 
-A command-line example that acceps single character command from the
+A command-line example that accepts single character command from the
 serial port (9600 8N1).  Functions include XBM upload to to the SPI
 FLASH chip on the EPD evaluation board, display image from this FLASH
 and several other functions.
@@ -67,7 +71,7 @@ When using the serial monitor on Arduino/Energia IDE any command that
 take a hex number as parameter need a `<space>` character after it, as
 the **Send** button will not automatically add a CR/LF.  For single
 letter commands like the `t` temperature sensor read just type the
-charater and click **Send**.
+character and click **Send**.
 
 The 4 stage display cycle is split into two separate commands. The `r`
 command removes an image and the `i` command displays an image.
@@ -76,29 +80,29 @@ to sector 43 then type `r30<space>i43<space>` into the serial monitor
 and click **Send**.
 
 
-## thermo (Arduino Mega only)
+## Thermo Sketch (Arduino Mega only)
 
-Link to the [thermo source](https://github.com/repaper/gratis/tree/master/Sketches/thermo).
+> Link to the [thermo source](https://github.com/repaper/gratis/tree/master/Sketches/thermo).
 
 A frame buffer graphic demo uses 4800 bytes of SRAM for 2.0" display
 so is restricted to Arduino Mega or ATmega1280/ATmega2560 chip
-designs.  It draws a temperature display in digits and a a simple
+designs.  It draws a temperature display in digits and a simple
 scale plus a few graphic elements.  Delays for a minute then refreshes
 the display.
 
 
-## amslide (AlaMode)
+## Amslide Sketch (AlaMode)
 
-Link to the [amslide source](https://github.com/repaper/gratis/tree/master/Sketches/amslide).
+> Link to the [amslide source](https://github.com/repaper/gratis/tree/master/Sketches/amslide).
 
 A demonstration slide show for the 2.0" display connected to a
 [Wyolum](http://www.wyolum.com)
 [AlaMode](http://wyolum.com/projects/alamode/).  This is basically an
 Arduino Uno (ATMega328) type of device that can be connected directly
-to a Rasberry-Pi and programmed from the Arduino IDE running on a
-Rasberry-Pi (see the Wyolum web sit to [get started](http://wyolum.com/projects/alamode/alamode-getting-started/).
+to a Raspberry-Pi and programmed from the Arduino IDE running on a
+Raspberry-Pi (see the Wyolum web sit to [get started](http://wyolum.com/projects/alamode/alamode-getting-started/).
 
-This demo simply diplays images from a card in the AlaMode microSD
+This demo simply displays images from a card in the AlaMode microSD
 slot; a file `index.txt` lists the files to be displayed and how many
 seconds to display the image.  The format is that each line has the
 number of seconds as a decimal integer, a space and the image file
@@ -107,25 +111,25 @@ path.
 The images are binary files that match the display, there is a zip
 file containing some demo images and a sample `index.txt`.  Just unzip
 this file to the root of a micro SD card, download the amdemo.ino and
-the images will be displayed continuously.  I the serial monitor is
-running the the names of the files will be displayed.
+the images will be displayed continuously. When the serial monitor is
+running the names of the files will be displayed.
 
 The images in the sample are derived from the XBM library images using
 the Command: `tail -n +4 "${xbm}" | xxd -r -p > "${bin}"` Where the
-variables `xbm` represents the XBM source file ane and `bin`
+variables `xbm` represents the XBM source file and `bin`
 represents the binary output file name.  This results in the bytes in
 the binary file having the same values as the hex numbers in the XBM
 file.  Note that the Arduino SD code uses the 8.3 filename format so
 choose a compatible name e.g. `cat.20`
 
 Portability - This should work on other Arduinos that have an SD or
-micro SD interface either directy attached or on a plug-in shield; but
+micro SD interface either directly attached or on a plug-in shield; but
 may need some changes to I/O pin order if the SD CS is not routed to
 Pin 10 as in AlaMode case.
 
-## libraries
+## Libraries
 
-Link to the [libraries source](https://github.com/repaper/gratis/tree/master/Sketches/libraries).
+> Link to the [libraries source](https://github.com/repaper/gratis/tree/master/Sketches/libraries).
 (copy all of these to you local libraries folder)
 
 * **Images** - Sample XBM files.  The demo program includes two of
@@ -142,27 +146,25 @@ Link to the [libraries source](https://github.com/repaper/gratis/tree/master/Ske
 * **S5813A** - Temperature sensor driver.
 
 
+# Connection of EPD board to Arduino
+
+The board needs a cable to connect to the Arduino.  The EPD boards
+are dual voltage and include a 3.3V regulator for the EPD panel and
+level converters and so it can directly connect to the 5 Volt
+Arduinos.  Note that the board uses the SPI interface, which is on
+different pins depending on the particular Arduino version.  The
+[Extension Board](http://repaper.org/doc/extension_board.html) has a
+table of [Pin Assignments](http://repaper.org/doc/extension_board.html#pin-assignment)
+for some Arduinos; the main difference is the three SPI pin (SI, SO,
+CLK) location which vary between the various Arduinos an can be on
+dedicated pins, overlapped with Digital I/O or shared with the ICSP
+header.
+
 # Connection of EPD board to LaunchPad
 
 The board simply plugs onto the LaunchPad, just be sure to orient the
 board correctly; when correctly oriented the LaunchPad S1 and S2
 buttons will clear of the board.
-
-
-# Connection of EPD board to Arduino
-
-The board needs a cable to connect to the Leonardo.  The EPD boards
-are dual voltage and include a 3.3V regulator for the EPD panel and
-level converters and so it can directly connect to the 5 Volt
-Arduinos.  Note that the board uses the SPI interface which is on
-different pins depending on the particular Arduino version.  The
-[Extension Board](http://repaper.org/doc/extension_board.html) has a
-table of
-[Pin Assignments](http://repaper.org/doc/extension_board.html#pin-assignment)
-for some Arduinos; the main difference is the three SPI pin (SI, SO,
-CLK) location which vary between the various Arduinos an can be on
-dedicated pins, overlapped with Digital I/O or shared with the ICSP
-header.
 
 
 ## Getting Started (Coming soon)
@@ -176,9 +178,3 @@ Something like....
 5. instructions on how to use the flex connector
 6. include a video at the bottom of the demo (or other code) working properly so that novice users know what to expect (and to let them know when their circuit isn't working properly).
 
-
-### Howto: Arduino
-
-
-
-### Howto: LaunchPad
