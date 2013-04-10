@@ -42,28 +42,28 @@ right (right hand column is all the even pins).  There is also small 1
 and 2 on the PCB silk screen above the socket and a 19 and 20 below
 the socket.
 
-Pin Number   Description       Colour   Leonardo    Uno
-----------   ---------------   ------   --------    ---------
-1.           Vcc 3V            Red      3.3V        3.3V
-2.           *(LED1)*          White    -           -
-3.           *(UART_RX)*       Grey     -           -
-4.           *(UART_TX)*       Purple   -           -
-5.           *(SW2)*           Blue     -           -
-6.           Temperature       Green    Analog-A0   Analog-A0
-7.           SPI\_CLK          Yellow   ICSP-3      Digital-13
-8.           BUSY              Orange   Digital-7   Digital-7
-9.           PWM               Brown    Digital-5   Digital-5
-10.          /RESET            Black    Digital-6   Digital-6
-11.          PANEL\_ON         Red      Digital-2   Digital-2
-12.          DISCHARGE         White    Digital-4   Digital-4
-13.          BORDER_CONTROL    Grey     Digital-3   Digital-3
-14.          SPI_MISO          Purple   ICSP-1      Digital-12
-15.          SPI_MOSI          Blue     ICSP-4      Digital-11
-16.          *(RST/SBWTDIO)*   Green    -
-17.          *(TEST/SBWTCK)*   Yellow   -
-18.          FLASH\_CS         Orange   Digital-9   Digital-9
-19.          /EPD\_CS          Brown    Digital-8   Digital-8
-20.          GND               Black    GND         GND
+Pin Number   Description       Colour   Leonardo    Uno          Mega
+----------   ---------------   ------   ---------   ----------   ---------
+1.           Vcc 3V            Red      3.3V        3.3V         3.3V
+2.           *(LED1)*          White    -           -            -
+3.           *(UART_RX)*       Grey     -           -            -
+4.           *(UART_TX)*       Purple   -           -            -
+5.           *(SW2)*           Blue     -           -            -
+6.           Temperature       Green    Analog-A0   Analog-A0    Analog-A0
+7.           SPI\_CLK          Yellow   ICSP-3      Digital-13   Digital-52
+8.           BUSY              Orange   Digital-7   Digital-7    Digital-7
+9.           PWM               Brown    Digital-5   Digital-5    Digital-5
+10.          /RESET            Black    Digital-6   Digital-6    Digital-6
+11.          PANEL\_ON         Red      Digital-2   Digital-2    Digital-2
+12.          DISCHARGE         White    Digital-4   Digital-4    Digital-4
+13.          BORDER_CONTROL    Grey     Digital-3   Digital-3    Digital-3
+14.          SPI_MISO          Purple   ICSP-1      Digital-12   Digital-50
+15.          SPI_MOSI          Blue     ICSP-4      Digital-11   Digital-51
+16.          *(RST/SBWTDIO)*   Green    -           -            -
+17.          *(TEST/SBWTCK)*   Yellow   -           -            -
+18.          FLASH\_CS         Orange   Digital-9   Digital-9    Digital-9
+19.          /EPD\_CS          Brown    Digital-8   Digital-8    Digital-8
+20.          GND               Black    GND         GND          GND
 
 ### Notes
 
