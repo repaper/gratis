@@ -55,6 +55,10 @@ This is built upon the EPD API in the libraries folder and shows how
 to use the API to display images from the MCU FLASH.  Only a few images
 are possible to be stored since the on-chip FLASH is limited.
 
+Not: This will not run on the TI LaunchPad with a 2.7" display as the
+resulting code exceeds the 16kB memory size, only 1.44" and 2.0" will
+fit on this platform.
+
 ## Command Sketch
 
 > Link to the [command source](https://github.com/repaper/gratis/tree/master/Sketches/command).
