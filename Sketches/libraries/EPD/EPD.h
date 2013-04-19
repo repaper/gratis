@@ -25,7 +25,7 @@
 #endif
 
 // if more SRAM available (8 kBytes)
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega_2560__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define EPD_ENABLE_EXTRA_SRAM 1
 #endif
 
