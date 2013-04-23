@@ -44,17 +44,38 @@
 
 
 // Change this for different display size
-// supported sizes: 1_44 2_0 2_7
+// supported sizes: 144 20 27
+#define SCREEN_SIZE 27 // 144 20 27
+
+#if (SCREEN_SIZE == 144)
+#define EPD_SIZE EPD_1_44
+#define TEXT_IMAGE "text_image_1_44.xbm"
+#define TEXT_BITS text_image_1_44_bits
+#define PICTURE "cat_1_44.xbm"
+#define PICTURE_BITS cat_1_44_bits
+
+#elif (SCREEN_SIZE == 20)
 #define EPD_SIZE EPD_2_0
-
-// configure images for display size
-// change these to match display size above
-
 #define TEXT_IMAGE "text_image_2_0.xbm"
 #define TEXT_BITS text_image_2_0_bits
-
 #define PICTURE "cat_2_0.xbm"
 #define PICTURE_BITS cat_2_0_bits
+
+#elif (SCREEN_SIZE == 27)
+#define EPD_SIZE EPD_2_7
+#define TEXT_IMAGE "text_hello_2_7.xbm"
+#define TEXT_BITS text_hello_2_7_bits
+#define PICTURE "cat_2_7.xbm"
+#define PICTURE_BITS cat_2_7_bits
+
+#else
+#error Unknown EPB size
+#endif
+
+// Error message for MSP430
+#if (SCREEN_SIZE == 27) && defined(__MSP430_CPU__)
+#error MSP430: not enough memory
+#endif
 
 // no futher changed below this point
 
