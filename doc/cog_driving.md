@@ -245,7 +245,7 @@ minimum is 4MHz. The SPI mode is 0.
 
 * Below is a description of the SPI Format:
 
-
+SPI(0xI~1~I~2~, 0xD~1~D~2~D~3~D~4,~D~5~D~6~D~7~D~8~…)
 
 Where:
 
