@@ -1,4 +1,0 @@
-% 1.4” TFT EPD Panel
-% RePaper.org
-% 2013
-

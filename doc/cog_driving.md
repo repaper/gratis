@@ -1,4 +1,6 @@
-% RePaper ePaper Display COG Driver Interface Timing
+% ePaper Display COG Driver Interface Timing
+% RePaper.org
+% 2013
 
 # ePaper Display COG Driver Interface Timing
 
@@ -39,9 +41,9 @@ is excellent for e-readers which are frequently updated. For V110 and
 V220, contrast ratio and white reflectance are compared in the charts
 below for reference.
 
-![](images/cog-driving/fpl_v110_vs_v220.svg)
+![](images/cog_driving/fpl_v110_vs_v220.svg)
 
-![](images/cog-driving/fpl_v110_vs_v220-1.svg)
+![](images/cog_driving/fpl_v110_vs_v220-1.svg)
 
 Around the active area of the EPD is a 0.5mm width blank area called the
 border. It should be connected to V~DL~ (-15V) to keep the border white.
@@ -190,14 +192,14 @@ No  Signal            I/O  Connected to          Function
 
 ## Reference Circuit
 
-![](images/cog-driving/reference_circuit.svg)
+![](images/cog_driving/reference_circuit.svg)
 
 Note:
 
 ​1. V~DD~ and V~CC~ must be discharged promptly after power off.
 ​1. Pin.1 location
 
-![](images/cog-driving/pin.1_location.svg)
+![](images/cog_driving/pin.1_location.svg)
 
 ## EPD Driving Flow Chart
 
@@ -205,7 +207,7 @@ The flowchart below provides an overview of the actions necessary to
 update the EPD. The steps below refer to the detailed descriptions in
 the respective sections.
 
-![](images/cog-driving/epd_driving_flow_chart.svg)
+![](images/cog_driving/epd_driving_flow_chart.svg)
 
 ## Controller
 
@@ -216,7 +218,7 @@ and “6. Power Off COG Driver”. The segment number and title matches a
 section title in this document which contain the details for each
 segment.
 
-![](images/cog-driving/controller.svg)
+![](images/cog_driving/controller.svg)
 
 Note:
 
@@ -243,7 +245,7 @@ minimum is 4MHz. The SPI mode is 0.
 
 * Below is a description of the SPI Format:
 
-SPI(0xI~1~I~2~, 0xD~1~D~2~D~3~D~4,~D~5~D~6~D~7~D~8~…)
+
 
 Where:
 
@@ -283,11 +285,11 @@ be found on the next page.
 
 * SPI command signals and flowchart:
 
-![](images/cog-driving/spi_timing_format.svg)
+![](images/cog_driving/spi_timing_format.svg)
 
 * SPI command timing
 
-![](images/cog-driving/spi_command_timing.svg)
+![](images/cog_driving/spi_command_timing.svg)
 
 # Write to the Memory
 
@@ -317,7 +319,7 @@ EPD size  Image resolution(pixels)  Previous + new image Buffer (bytes)
 
 This flowchart describes power sequence for the COG Driver.
 
-![](images/cog-driving/power_on_cog_driver.svg)
+![](images/cog_driving/power_on_cog_driver.svg)
 
 ​1. Start :
 
@@ -339,7 +341,7 @@ taking care of the electronic ink particles.
 
 # Initialize COG Driver
 
-![](images/cog-driving/initialize_cog_driver.svg)
+![](images/cog_driving/initialize_cog_driver.svg)
 
 Note:
 
@@ -440,7 +442,7 @@ D(2,y)}
 
   * The 2.7” frame of data is 176 lines \* 264 dots.
 
-![](images/cog-driving/data_structure.svg)
+![](images/cog_driving/data_structure.svg)
 
 * One stage is the number of frames used to write an intermediate
 pattern. This can vary based on the MCU choice. PDI’s design writes 16
@@ -448,7 +450,7 @@ frames of data per stage, and then 4 stages for 2” and 1.44” to update
 the display from the previous to the new pattern. 2.7” need 21 frames of
 data per stage.
 
-![](images/cog-driving/four_stages.svg)
+![](images/cog_driving/four_stages.svg)
 
 -----------------------------------------------------------------
 Panel Size  FPL   Stage Time (ms)  MCU Frame Time (ms)(Recommend)
@@ -474,15 +476,15 @@ Driver. The COG Driver uses a buffer to update the display line by line.
 
 * 1.44” Input Data Order
 
-![](images/cog-driving/1.44inch_input_data_order.svg)
+![](images/cog_driving/1.44inch_input_data_order.svg)
 
 * 2” Input Data Order
 
-![](images/cog-driving/2inch_input_data_order.svg)
+![](images/cog_driving/2inch_input_data_order.svg)
 
 * 2.7” Input Data Order
 
-![](images/cog-driving/2.7inch_input_data_order.svg)
+![](images/cog_driving/2.7inch_input_data_order.svg)
 
 ## Writing to the display in stages
 
@@ -494,14 +496,14 @@ The flow chart that follows describes how to update an image from a
 previous displayed image stored in memory buffer to a new image also
 stored in memory buffer. See the sample previous and new images below.
 
-![](images/cog-driving/writing_to_the_display_in_stages.svg)
+![](images/cog_driving/writing_to_the_display_in_stages.svg)
 
-![](images/cog-driving/temperature.svg)
+![](images/cog_driving/temperature.svg)
 
 
 # Power off COG Driver
 
-![](images/cog-driving/power_off_cog_driver.svg)
+![](images/cog_driving/power_off_cog_driver.svg)
 
 -----
 

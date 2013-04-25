@@ -169,16 +169,3 @@ header.
 The board simply plugs onto the LaunchPad, just be sure to orient the
 board correctly; when correctly oriented the LaunchPad S1 and S2
 buttons will clear of the board.
-
-
-## Getting Started (Coming soon)
-
-Something like....
-
-1. download + unzip file
-2. drop content of libraries into libraries folder
-3. open example code
-4. make these connections
-5. instructions on how to use the flex connector
-6. include a video at the bottom of the demo (or other code) working properly so that novice users know what to expect (and to let them know when their circuit isn't working properly).
-

@@ -1,4 +1,0 @@
-% ePaper Display COG Driver Interface Timing
-% RePaper.org
-% 2013
-

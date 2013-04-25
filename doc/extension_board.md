@@ -1,4 +1,6 @@
-% RePaper EPD Extension Board
+% EPD Extension Board
+% RePaper.org
+% 2013
 
 # EPD Extension Board
 
