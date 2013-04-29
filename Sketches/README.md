@@ -152,6 +152,8 @@ Pin 10 as in AlaMode case.
 
 # Connection of EPD board to Arduino
 
+> See: Using the Extension board with Ardunio ([HTML](http://learn.adafruit.com/repaper-eink-development-board), [PDF](http://learn.adafruit.com/downloads/pdf/repaper-eink-development-board.pdf)) by [Adafruit](http://www.adafruit.com)
+
 The board needs a cable to connect to the Arduino.  The EPD boards
 are dual voltage and include a 3.3V regulator for the EPD panel and
 level converters and so it can directly connect to the 5 Volt
