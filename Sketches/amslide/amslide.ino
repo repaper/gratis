@@ -20,6 +20,9 @@
 // limit.  Therfore the display sequence will be much slower than
 // normal and all of the individual display stages be clearly visible.
 
+// Written in collaboration with justin@wyolum.com
+// and developed on a Wyolum AlaMode http://wyolum.com/
+
 // Operation from reset:
 // * display version
 // * display compiled-in display setting
