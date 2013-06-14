@@ -316,14 +316,13 @@ void EPD_Class::end() {
 	digitalWrite(this->EPD_Pin_RESET, LOW);
 	digitalWrite(this->EPD_Pin_PANEL_ON, LOW);
 	digitalWrite(this->EPD_Pin_BORDER, LOW);
+
+	SPI_put(0x00);  // ensure SPI MOSI is Low before CS Low
 	digitalWrite(this->EPD_Pin_EPD_CS, LOW);
 
+	// discharge pulse
 	digitalWrite(this->EPD_Pin_DISCHARGE, HIGH);
-
-	SPI_put(0x00);
-
 	Delay_ms(150);
-
 	digitalWrite(this->EPD_Pin_DISCHARGE, LOW);
 }
 
