@@ -45,7 +45,7 @@
 
 // Change this for different display size
 // supported sizes: 144 20 27
-#define SCREEN_SIZE 27 // 144 20 27
+#define SCREEN_SIZE 27
 
 #if (SCREEN_SIZE == 144)
 #define EPD_SIZE EPD_1_44
