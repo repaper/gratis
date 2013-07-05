@@ -44,43 +44,60 @@
 
 
 // Change this for different display size
-// supported sizes: 144 20 27
-#define SCREEN_SIZE 27
+// supported sizes: 144 200 270
+#define SCREEN_SIZE 0
 
+// select two images from:  text_image text-hello cat aphrodite venus saturn
+#define IMAGE_1  text_image
+#define IMAGE_2  cat
+
+// set up images from screen size2
 #if (SCREEN_SIZE == 144)
 #define EPD_SIZE EPD_1_44
-#define TEXT_IMAGE "text_image_1_44.xbm"
-#define TEXT_BITS text_image_1_44_bits
-#define PICTURE "cat_1_44.xbm"
-#define PICTURE_BITS cat_1_44_bits
+#define FILE_SUFFIX _1_44.xbm
+#define NAME_SUFFIX _1_44_bits
 
-#elif (SCREEN_SIZE == 20)
+#elif (SCREEN_SIZE == 200)
 #define EPD_SIZE EPD_2_0
-#define TEXT_IMAGE "text_image_2_0.xbm"
-#define TEXT_BITS text_image_2_0_bits
-#define PICTURE "cat_2_0.xbm"
-#define PICTURE_BITS cat_2_0_bits
+#define FILE_SUFFIX _2_0.xbm
+#define NAME_SUFFIX _2_0_bits
 
-#elif (SCREEN_SIZE == 27)
+#elif (SCREEN_SIZE == 270)
 #define EPD_SIZE EPD_2_7
-#define TEXT_IMAGE "text_hello_2_7.xbm"
-#define TEXT_BITS text_hello_2_7_bits
-#define PICTURE "cat_2_7.xbm"
-#define PICTURE_BITS cat_2_7_bits
+#define FILE_SUFFIX _2_7.xbm
+#define NAME_SUFFIX _2_7_bits
 
 #else
-#error Unknown EPB size
+#error "Unknown EPB size: Change the #define SCREEN_SIZE to a supported value"
 #endif
 
 // Error message for MSP430
-#if (SCREEN_SIZE == 27) && defined(__MSP430_CPU__)
+#if (SCREEN_SIZE == 270) && defined(__MSP430_CPU__)
 #error MSP430: not enough memory
 #endif
 
 // no futher changed below this point
 
 // current version number
-#define DEMO_VERSION "1"
+#define DEMO_VERSION "2"
+
+
+// pre-processor convert to string
+#define MAKE_STRING1(X) #X
+#define MAKE_STRING(X) MAKE_STRING1(X)
+
+// other pre-processor magic
+// tiken joining and computing the string for #include
+#define ID(X) X
+#define MAKE_NAME1(X,Y) ID(X##Y)
+#define MAKE_NAME(X,Y) MAKE_NAME1(X,Y)
+#define MAKE_JOIN(X,Y) MAKE_STRING(MAKE_NAME(X,Y))
+
+// calculate the include name and variable names
+#define IMAGE_1_FILE MAKE_JOIN(IMAGE_1,FILE_SUFFIX)
+#define IMAGE_1_BITS MAKE_NAME(IMAGE_1,NAME_SUFFIX)
+#define IMAGE_2_FILE MAKE_JOIN(IMAGE_2,FILE_SUFFIX)
+#define IMAGE_2_BITS MAKE_NAME(IMAGE_2,NAME_SUFFIX)
 
 
 // Add Images library to compiler path
@@ -90,14 +107,14 @@
 PROGMEM const
 #define unsigned
 #define char uint8_t
-#include TEXT_IMAGE
+#include IMAGE_1_FILE
 #undef char
 #undef unsigned
 
 PROGMEM const
 #define unsigned
 #define char uint8_t
-#include PICTURE
+#include IMAGE_2_FILE
 #undef char
 #undef unsigned
 
@@ -139,11 +156,6 @@ const int Pin_RED_LED = 13;
 // LED cathode to Ground
 #define LED_ON  HIGH
 #define LED_OFF LOW
-
-
-// pre-processor convert to string
-#define MAKE_STRING1(X) #X
-#define MAKE_STRING(X) MAKE_STRING1(X)
 
 
 // define the E-Ink display
@@ -215,35 +227,37 @@ void loop() {
 	EPD.begin(); // power up the EPD panel
 	EPD.setFactor(temperature); // adjust for current temperature
 
+	int delay_counts = 50;
 	switch(state) {
 	default:
 	case 0:         // clear the screen
 		EPD.clear();
 		state = 1;
+		delay_counts = 5;  // reduce delay so first image come up quickly
 		break;
 
 	case 1:         // clear -> text
-		EPD.image(TEXT_BITS);
+		EPD.image(IMAGE_1_BITS);
 		++state;
 		break;
 
 	case 2:         // text -> picture
-		EPD.image(TEXT_BITS, PICTURE_BITS);
+		EPD.image(IMAGE_1_BITS, IMAGE_2_BITS);
 		++state;
 		break;
 
 	case 3:        // picture -> text
-		EPD.image(PICTURE_BITS, TEXT_BITS);
+		EPD.image(IMAGE_2_BITS, IMAGE_1_BITS);
 		state = 2;  // backe to picture nex time
 		break;
 	}
 	EPD.end();   // power down the EPD panel
 
 	// flash LED for 5 seconds
-	for (int x = 0; x < 50; ++x) {
-		  digitalWrite(Pin_RED_LED, LED_ON);
-		  delay(50);
-		  digitalWrite(Pin_RED_LED, LED_OFF);
-		  delay(50);
+	for (int x = 0; x < delay_counts; ++x) {
+		digitalWrite(Pin_RED_LED, LED_ON);
+		delay(50);
+		digitalWrite(Pin_RED_LED, LED_OFF);
+		delay(50);
 	}
 }
