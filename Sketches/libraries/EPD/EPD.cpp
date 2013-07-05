@@ -236,15 +236,26 @@ void EPD_Class::begin() {
 
 void EPD_Class::end() {
 
-	this->frame_fixed(0x55, EPD_normal); // dummy frame
-	this->line(0x7fffu, 0, 0x55, false, EPD_normal); // dummy_line
+	// dummy frame
+	this->frame_fixed(0x55, EPD_normal);
 
-	Delay_ms(25);
+	// dummy line and border
+	if (EPD_1_44 == this->size) {
+		// only for 1.44" EPD
+		this->line(0x7fffu, 0, 0xaa, false, EPD_normal);
 
-	digitalWrite(this->EPD_Pin_BORDER, LOW);
-	Delay_ms(30);
+		Delay_ms(250);
 
-	digitalWrite(this->EPD_Pin_BORDER, HIGH);
+	} else {
+		// all other display sizes
+		this->line(0x7fffu, 0, 0x55, false, EPD_normal);
+
+		Delay_ms(25);
+
+		digitalWrite(this->EPD_Pin_BORDER, LOW);
+		Delay_ms(250);
+		digitalWrite(this->EPD_Pin_BORDER, HIGH);
+	}
 
 	// latch reset turn on
 	Delay_us(10);
@@ -466,6 +477,12 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 	// CS low
 	digitalWrite(this->EPD_Pin_EPD_CS, LOW);
 	SPI_put_wait(0x72, this->EPD_Pin_BUSY);
+
+	// border byte only necessary for 1.44" EPD
+	if (EPD_1_44 == this->size) {
+		SPI_put_wait(0x00, this->EPD_Pin_BUSY);
+		//SPI_send(this->EPD_Pin_EPD_CS, CU8(0x00), 1);
+	}
 
 	// even pixels
 	for (uint16_t b = this->bytes_per_line; b > 0; --b) {
