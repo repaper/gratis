@@ -20,6 +20,9 @@
 class S5813A_Class {
 private:
 	int temperature_pin;
+
+	S5813A_Class(const S5813A_Class &f);  // prevent copy
+
 public:
 	int read();
 	long readVoltage();  // returns micro volts

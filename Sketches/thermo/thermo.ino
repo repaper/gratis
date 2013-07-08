@@ -14,11 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// This program is to illustrate the display operation as described in
-// the datasheets.  The code is in a simple linear fashion and all the
-// delays are set to maximum, but the SPI clock is set lower than its
-// limit.  Therfore the display sequence will be much slower than
-// normal and all of the individual display stages be clearly visible.
+// graphic temperature display
 
 // Operation from reset:
 // * display version
@@ -34,6 +30,7 @@
 #include <inttypes.h>
 #include <ctype.h>
 
+// required libraried
 #include <SPI.h>
 #include <FLASH.h>
 #include <EPD.h>
@@ -54,7 +51,7 @@
 // no futher changes below this point
 
 // current version number
-#define THERMO_VERSION "1"
+#define THERMO_VERSION "2"
 
 
 #if defined(__MSP430_CPU__)
@@ -102,7 +99,7 @@ const int Pin_RED_LED = 13;
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
+EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
 
 // graphic handler
 EPD_GFX G_EPD(EPD, S5813A);
@@ -130,11 +127,6 @@ void setup() {
 	digitalWrite(Pin_EPD_CS, LOW);
 	digitalWrite(Pin_FLASH_CS, HIGH);
 
-	SPI.begin();
-	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
-	SPI.setClockDivider(SPI_CLOCK_DIV4);
-
 	Serial.begin(9600);
 #if !defined(__MSP430_CPU__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
@@ -147,7 +139,7 @@ void setup() {
 	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
 	Serial.println();
 
-	FLASH.begin(Pin_FLASH_CS, SPI);
+	FLASH.begin(Pin_FLASH_CS);
 	if (FLASH.available()) {
 		Serial.println("FLASH chip detected OK");
 	} else {

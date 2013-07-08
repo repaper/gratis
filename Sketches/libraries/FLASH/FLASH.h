@@ -16,18 +16,21 @@
 #define EPD_FLASH_H 1
 
 #include <Arduino.h>
-#include <SPI.h>
 
 
 class FLASH_Class {
 private:
-	SPIClass &SPI;
 	int CS;
+
+	void spi_setup(void);
+	void spi_teardown(void);
+	bool is_busy(void);
+	FLASH_Class(const FLASH_Class &f);  // prevent copy
+
 public:
 	bool available(void);
 	void info(uint8_t *maufacturer, uint16_t *device);
 	void read(void *buffer, uint32_t address, uint16_t length);
-	bool is_busy(void);
 	void write_enable(void);
 	void write_disable(void);
 	void write(uint32_t address, void *buffer, uint16_t length);
@@ -36,10 +39,10 @@ public:
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
-	void begin(int chip_select_pin, SPIClass &SPI_driver);
+	void begin(int chip_select_pin);
 	void end();
 
-	FLASH_Class(int chip_select_pin, SPIClass &SPI_driver);
+	FLASH_Class(int chip_select_pin);
 
 };
 

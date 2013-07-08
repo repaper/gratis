@@ -18,6 +18,7 @@
 #include <inttypes.h>
 #include <ctype.h>
 
+// required libraries
 #include <SPI.h>
 #include <FLASH.h>
 #include <EPD.h>
@@ -27,7 +28,7 @@
 // Change this for different display size
 #define EPD_SIZE EPD_2_0
 
-#define COMMAND_VERSION "1"
+#define COMMAND_VERSION "2"
 
 
 // definition of I/O pins LaunchPad and Arduino are different
@@ -93,7 +94,7 @@ static void Serial_hex_dump(uint32_t address, const void *buffer, uint16_t lengt
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
+EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
 
 
 // I/O setup
@@ -119,11 +120,6 @@ void setup() {
 	digitalWrite(Pin_EPD_CS, LOW);
 	digitalWrite(Pin_FLASH_CS, HIGH);
 
-	SPI.begin();
-	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
-	SPI.setClockDivider(SPI_CLOCK_DIV4);
-
 	Serial.begin(9600);
 #if !defined(__MSP430_CPU__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
@@ -136,13 +132,8 @@ void setup() {
 	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
 	Serial.println();
 
-	FLASH.begin(Pin_FLASH_CS, SPI);
-	if (FLASH.available()) {
-		Serial.println("FLASH chip detected OK");
-	} else {
-		Serial.println("unsupported FLASH chip");
-		flash_info();
-	}
+	FLASH.begin(Pin_FLASH_CS);
+	flash_info();
 
 	// configure temperature sensor
 	S5813A.begin(Pin_TEMPERATURE);
@@ -201,8 +192,6 @@ void loop() {
 		uint32_t sector = Serial_gethex(true);
 		FLASH.write_enable();
 		FLASH.sector_erase(sector << 12);
-		while (FLASH.is_busy()) {
-		}
 		FLASH.write_disable();
 		break;
 	}
@@ -358,6 +347,13 @@ void loop() {
 static void flash_info(void) {
 	uint8_t maufacturer;
 	uint16_t device;
+
+	if (FLASH.available()) {
+		Serial.println("FLASH chip detected OK");
+	} else {
+		Serial.println("unsupported FLASH chip");
+	}
+
 	FLASH.info(&maufacturer, &device);
 	Serial.print("FLASH: manufacturer = ");
 	Serial_puthex_byte(maufacturer);

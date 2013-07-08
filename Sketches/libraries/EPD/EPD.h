@@ -46,7 +46,6 @@ typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class {
 private:
-	SPIClass &SPI;
 	int EPD_Pin_EPD_CS;
 	int EPD_Pin_PANEL_ON;
 	int EPD_Pin_BORDER;
@@ -68,6 +67,8 @@ private:
 	uint16_t channel_select_length;
 
 	bool filler;
+
+	EPD_Class(const EPD_Class &f);  // prevent copy
 
 public:
 	// power up and power down the EPD panel
@@ -149,8 +150,7 @@ public:
 		  int pwm_pin,
 		  int reset_pin,
 		  int busy_pin,
-		  int chip_select_pin,
-		  SPIClass &SPI_driver);
+		  int chip_select_pin);
 
 };
 

@@ -14,11 +14,14 @@
 
 
 #include <Arduino.h>
-//#include <pins_arduino.h>
 
 #include <SPI.h>
 
 #include "FLASH.h"
+
+// delays - more consistent naming
+#define Delay_ms(ms) delay(ms)
+#define Delay_us(us) delayMicroseconds(us)
 
 
 // FLASH MX25V8005 8Mbit flash chip command set (50MHz max clock)
@@ -54,17 +57,16 @@ enum {
 
 
 // the default FLASH device
-FLASH_Class FLASH(12, SPI);
+FLASH_Class FLASH(12);
 
 
-FLASH_Class::FLASH_Class(int chip_select_pin, SPIClass &SPI_driver) : SPI(SPI_driver), CS(chip_select_pin) {
+FLASH_Class::FLASH_Class(int chip_select_pin) : CS(chip_select_pin) {
 }
 
 
-void FLASH_Class::begin(int chip_select_pin, SPIClass &SPI_driver) {
+void FLASH_Class::begin(int chip_select_pin) {
 	digitalWrite(chip_select_pin, HIGH);
 	pinMode(chip_select_pin, OUTPUT);
-	this->SPI = SPI_driver;
 	this->CS = chip_select_pin;
 }
 
@@ -72,15 +74,30 @@ void FLASH_Class::begin(int chip_select_pin, SPIClass &SPI_driver) {
 void FLASH_Class::end() {
 }
 
+// configure the SPI for FLASH access
+void FLASH_Class::spi_setup() {
+	SPI.begin();
+	SPI.setBitOrder(MSBFIRST);
+	SPI.setDataMode(SPI_MODE3);
+	SPI.setClockDivider(SPI_CLOCK_DIV4);
+	Delay_us(10);
+
+	digitalWrite(this->CS, HIGH);
+	SPI.transfer(FLASH_NOP); // flush the SPI buffer
+	// SPI.transfer(FLASH_NOP); // ..
+	// SPI.transfer(FLASH_NOP); // ..
+	Delay_us(50);
+}
+
+// shutdown SPI after FLASH access
+void FLASH_Class::spi_teardown() {
+	Delay_us(50);
+	digitalWrite(this->CS, HIGH);
+	SPI.end();
+}
 
 // return true if the chip is supported
 bool FLASH_Class::available(void) {
-
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP); // flush the SPI buffers
-	this->SPI.transfer(FLASH_NOP); // ..
-	this->SPI.transfer(FLASH_NOP); // ..
-
 	uint8_t maufacturer;
 	uint16_t device;
 	this->info(&maufacturer, &device); // initial read to reset the chip
@@ -91,40 +108,43 @@ bool FLASH_Class::available(void) {
 
 
 void FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
-
+	this->spi_setup();
 	digitalWrite(this->CS, LOW);
-	this->SPI.transfer(FLASH_RDID);
-	*maufacturer = this->SPI.transfer(FLASH_NOP);
-	uint8_t id_high = this->SPI.transfer(FLASH_NOP);
-	uint8_t id_low = this->SPI.transfer(FLASH_NOP);
+	Delay_us(10);
+	SPI.transfer(FLASH_RDID);
+	*maufacturer = SPI.transfer(FLASH_NOP);
+	uint8_t id_high = SPI.transfer(FLASH_NOP);
+	uint8_t id_low = SPI.transfer(FLASH_NOP);
 	*device = (id_high << 8) | id_low;
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	this->spi_teardown();
 }
 
 
 void FLASH_Class::read(void *buffer, uint32_t address, uint16_t length) {
+	this->spi_setup();
 	digitalWrite(this->CS, LOW);
-	this->SPI.transfer(FLASH_FAST_READ);
-	this->SPI.transfer(address >> 16);
-	this->SPI.transfer(address >> 8);
-	this->SPI.transfer(address);
-	this->SPI.transfer(FLASH_NOP); // read dummy byte
+	Delay_us(10);
+	SPI.transfer(FLASH_FAST_READ);
+	SPI.transfer(address >> 16);
+	SPI.transfer(address >> 8);
+	SPI.transfer(address);
+	SPI.transfer(FLASH_NOP); // read dummy byte
 	for (uint8_t *p = (uint8_t *)buffer; length != 0; --length) {
-		*p++ = this->SPI.transfer(FLASH_NOP);
+		*p++ = SPI.transfer(FLASH_NOP);
 	}
-
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	this->spi_teardown();
 }
 
 
 bool FLASH_Class::is_busy(void) {
+	this->spi_setup();
 	digitalWrite(this->CS, LOW);
-	this->SPI.transfer(FLASH_RDSR);
-	bool busy = 0 != (FLASH_WIP & this->SPI.transfer(0xff));
+	Delay_us(10);
+	SPI.transfer(FLASH_RDSR);
+	bool busy = 0 != (FLASH_WIP & SPI.transfer(0xff));
 	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	SPI.transfer(FLASH_NOP);
+	Delay_us(50);
 	return busy;
 }
 
@@ -133,9 +153,9 @@ void FLASH_Class::write_enable(void) {
 	while (this->is_busy()) {
 	}
 	digitalWrite(this->CS, LOW);
-	this->SPI.transfer(FLASH_WREN);
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	Delay_us(10);
+	SPI.transfer(FLASH_WREN);
+	this->spi_teardown();
 }
 
 
@@ -143,28 +163,28 @@ void FLASH_Class::write_enable(void) {
 void FLASH_Class::write_disable(void) {
 	while (this->is_busy()) {
 	}
+
 	digitalWrite(this->CS, LOW);
-	this->SPI.transfer(FLASH_WRDI);
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	Delay_us(10);
+	SPI.transfer(FLASH_WRDI);
+	this->spi_teardown();
 }
 
 
 void FLASH_Class::write(uint32_t address, void *buffer, uint16_t length) {
 	while (this->is_busy()) {
 	}
+
 	digitalWrite(this->CS, LOW);
-
-	this->SPI.transfer(FLASH_PP);
-	this->SPI.transfer(address >> 16);
-	this->SPI.transfer(address >> 8);
-	this->SPI.transfer(address);
+	Delay_us(10);
+	SPI.transfer(FLASH_PP);
+	SPI.transfer(address >> 16);
+	SPI.transfer(address >> 8);
+	SPI.transfer(address);
 	for (uint8_t *p = (uint8_t *)buffer; length != 0; --length) {
-		this->SPI.transfer(*p++);
+		SPI.transfer(*p++);
 	}
-
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	this->spi_teardown();
 }
 
 
@@ -173,10 +193,10 @@ void FLASH_Class::sector_erase(uint32_t address) {
 	}
 
 	digitalWrite(this->CS, LOW);
-	this->SPI.transfer(FLASH_SE);
-	this->SPI.transfer(address >> 16);
-	this->SPI.transfer(address >> 8);
-	this->SPI.transfer(address);
-	digitalWrite(this->CS, HIGH);
-	this->SPI.transfer(FLASH_NOP);
+	Delay_us(10);
+	SPI.transfer(FLASH_SE);
+	SPI.transfer(address >> 16);
+	SPI.transfer(address >> 8);
+	SPI.transfer(address);
+	this->spi_teardown();
 }
