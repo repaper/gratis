@@ -171,7 +171,7 @@ void FLASH_Class::write_disable(void) {
 }
 
 
-void FLASH_Class::write(uint32_t address, void *buffer, uint16_t length) {
+void FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
 	while (this->is_busy()) {
 	}
 
@@ -181,7 +181,7 @@ void FLASH_Class::write(uint32_t address, void *buffer, uint16_t length) {
 	SPI.transfer(address >> 16);
 	SPI.transfer(address >> 8);
 	SPI.transfer(address);
-	for (uint8_t *p = (uint8_t *)buffer; length != 0; --length) {
+	for (const uint8_t *p = (const uint8_t *)buffer; length != 0; --length) {
 		SPI.transfer(*p++);
 	}
 	this->spi_teardown();

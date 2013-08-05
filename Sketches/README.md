@@ -84,6 +84,24 @@ to sector 43 then type `r30<space>i43<space>` into the serial monitor
 and click **Send**.
 
 
+## Flash Loader Sketch
+
+> Link to the [flash loader source](https://github.com/repaper/gratis/tree/master/Sketches/flash_loader).
+
+this program has two modes of operation:
+
+1. Copy a #inculded image to the FLASH chip on the eval board.  define
+   the image name and the destination sector.  After programming the
+   image will be displayed
+
+2. Display a sequence of images from the FLASH chip on the eval board.
+   A list of sector numbers an millisecod delay times defined by the
+   `DISPLAY_LIST` macro to enable this mode.  In this mode the flash
+   programming does not occur.  The images are stored in the same
+   forma as the command program above, so any images uploaded by it
+   can be displayed by this program
+
+
 ## Thermo Sketch (Arduino Mega only)
 
 > Link to the [thermo source](https://github.com/repaper/gratis/tree/master/Sketches/thermo).
