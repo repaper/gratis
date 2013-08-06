@@ -184,8 +184,12 @@ CLK) location which vary between the various Arduinos an can be on
 dedicated pins, overlapped with Digital I/O or shared with the ICSP
 header.
 
+![EPD with Arduino Mega Photo by <a href="http://learn.adafruit.com/assets/8320">Bill Earl</a>](/images/expansion_board/epd-mega.jpg)
+
 # Connection of EPD board to LaunchPad
 
 The board simply plugs onto the LaunchPad, just be sure to orient the
 board correctly; when correctly oriented the LaunchPad S1 and S2
-buttons will clear of the board.
+buttons will clear of the board:
+
+![EDP with LaunchPad](/images/expansion_board/epd-boosterpack.jpg)

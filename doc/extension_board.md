@@ -6,12 +6,14 @@
 
 ## Introduction
 
-The EPD extension board supports driving
-[Pervasive Displays Inc.](http://www.pervasivedisplays.com/products/panels)
-PDi's 1.44, 2.0, and 2.7 inch E-Paper display (EPD) modules with your
-development projects. This expansion board provides a 20 control pins
+The EPD extension board supports driving 1.44, 2.0, and 2.7 inch ePaper display (EPD)
+modules with your development projects. This expansion board provides a 20 control pins
 connection with your product or development kit to drive EPD via SPI
 interface.
+
+<a href="http://www.adafruit.com/products/1316" target="_blank" class="btn buy">Buy Now</a>
+
+**<a href="http://www.adafruit.com/products/1316">The EPD Extension board is available for international shipment from our friends at Adafruit Industries.</a>**
 
 
 ## Features
