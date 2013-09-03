@@ -41,6 +41,8 @@
 
 // Change this for different display size
 // supported sizes: 1_44 2_0
+// NOTE: change the pixel_width in EPD_GFX.h to match
+//       selected display (1.44 -> 128, 2.00 -> 200)
 #define EPD_SIZE EPD_2_0
 
 
