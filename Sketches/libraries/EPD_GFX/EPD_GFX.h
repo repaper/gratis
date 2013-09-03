@@ -44,8 +44,8 @@ public:
 
 	// constructor
 	EPD_GFX(EPD_Class &epd, S5813A_Class &s5813a) :
+		Adafruit_GFX(this->pixel_width, this->pixel_height),
 		EPD(epd), S5813A(s5813a) {
-		Adafruit_GFX:constructor(this->pixel_width, this->pixel_height);
 	}
 
 	void begin();

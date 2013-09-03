@@ -51,7 +51,7 @@
 // no futher changes below this point
 
 // current version number
-#define THERMO_VERSION "2"
+#define THERMO_VERSION "3"
 
 
 #if defined(__MSP430_CPU__)
@@ -171,12 +171,11 @@ void loop() {
 	int h = G_EPD.height();
 	int w = G_EPD.width();
 
-	G_EPD.drawRect(1, 1, w - 2, h - 2,  EPD_GFX::BLACK);
-	G_EPD.drawRect(3, 3, w - 6, h - 6,  EPD_GFX::BLACK);
+	G_EPD.drawRect(1, 1, w - 2, h - 2, EPD_GFX::BLACK);
+	G_EPD.drawRect(3, 3, w - 6, h - 6, EPD_GFX::BLACK);
 
 	G_EPD.fillTriangle(135,20, 186,40, 152,84, EPD_GFX::BLACK);
 	G_EPD.fillTriangle(139,26, 180,44, 155,68, EPD_GFX::WHITE);
-
 
 	char temp[sizeof("-999 C")];
 	snprintf(temp, sizeof(temp), "%4d C", temperature);
@@ -186,6 +185,9 @@ void loop() {
 	for (int i = 0; i < sizeof(temp) - 1; ++i, x += 14) {
 		G_EPD.drawChar(x, y, temp[i], EPD_GFX::BLACK, EPD_GFX::WHITE, 2);
 	}
+
+	// small circle for degrees symbol
+	G_EPD.drawCircle(20 + 4 * 14 + 6, 30, 4, EPD_GFX::BLACK);
 
 // 100 difference just to simplify things
 // so 1 pixel = 1 degree
