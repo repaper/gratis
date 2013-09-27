@@ -1,0 +1,3 @@
+#!/bin/sh
+# convert XBM on stdin to binary on stdout
+tail -n +4 | xxd -r -p

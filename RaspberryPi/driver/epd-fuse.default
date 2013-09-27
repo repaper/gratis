@@ -1,0 +1,7 @@
+# Default settings for epd-fuse file is sourced by /bin/sh from
+# /etc/init.d/epd-fuse
+
+# Options to pass to epd_fuse
+#EPD_MOUNTPOINT=/dev/epd
+#EPD_SIZE=2.0
+#EPD_OPTS='-o allow_other -o default_permissions'
