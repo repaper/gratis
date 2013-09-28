@@ -52,18 +52,34 @@ sudo ./epd_test
 
 This allows the display to be represented as a virtual director of files, which are:
 
-File      Read/Write   Description
---------  -----------  ---------------------------------
-version   Read Only    The driver version number
-panel     Read Only    String describing the panel and giving its pixel width and height
-current   Read Only    Binary image that  matches the currently displayed image
-display   Read Write   Image being assembled for next display
-command   Write Only   Execute display operation
+File         Read/Write   Description
+--------     -----------  ---------------------------------
+version      Read Only    The driver version number
+panel        Read Only    String describing the panel and giving its pixel width and height
+current      Read Only    Binary image that  matches the currently displayed image (big endian)
+display      Read Write   Image being assembled for next display (big endian)
+temperature  Read Write   Set this to the current temperature in Celcius
+command      Write Only   Execute display operation
+BE           Directory    Big endian version of current and display
+LE           Directory    Little endian version of current and display
 
 Command   Byte   Description
 --------  -----  --------------------------------
 'C'       0x43   Clear the EPD, set `current` to all zeros, `display` is not affected
 'U'       0x5A   Erase `current` from EPD, output `display` to EPD, copy display to `current`
+
+Notes:
+
+* The default bit ordering for the display is big endian i.e. the top left pixel is
+  the value 0x80 in the first byte.
+* The `BE` directory is the same as the root `current` and `display`.
+* The `LE` directory `current` and `display` reference the top left pixel as 0x01
+  in the first byte.
+* The `current_inverse` and `display_inverse` represent black as zero (0) and white as one (1)
+  while the unsuffixed items represent the display's natural coding (0=>white, 1=>black)
+* The particular combination of `BE/display_inverse` is used in the Python EPD demo
+  since it fits better with the Imaging library used.
+
 
 Build and run using:
 
@@ -171,10 +187,6 @@ Pin Number   Description       Colour   Raspberry Pi
 
 
 # TODO / BUGS
-
-* A temperature file in the driver do that the external program can
-  set the compensation.  Required since the Rasberry Pi does not have an analog input,
-  or maybe the the userland programhas some other way to determin this.
 
 * Verify the compensation timer.
 
