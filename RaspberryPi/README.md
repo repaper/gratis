@@ -10,7 +10,7 @@
 ## Compiling
 
 These test programs should compile with no additional libraries, but
-the epd need the fuse development library installed.
+the EPD driver needs the fuse development library installed.
 
 ~~~~~
 sudo apt-get install libfuse-dev
@@ -22,9 +22,9 @@ Connect two LEDs each with a limiting resistor (1k..2k); first
 resistor connects from `P1_10` to anode of LED1, second resistor
 connects from `P1_12` to anode of LED2, and both LED cathode connect
 to ground `P!_14`.  When the program is started LED1 will light and
-LED2 wil brighten and dim under PWM control.  Both LEDs will turn off
-as program finishes (taked about a minute).  There are some other
-commented out LED flasing loops in this test.
+LED2 will brighten and dim under PWM control.  Both LEDs will turn off
+as program finishes (takes about a minute).  There are some other
+commented out LED flashing loops in this test.
 
 Build and run using:
 
@@ -37,7 +37,7 @@ sudo ./gpio_test
 ### EPD Test
 
 This will first clear the panel then display a series of images (all
-2.0" images from Aruino example).  This need the Linux SPI module
+2.0" images from Arduino example).  This need the Linux SPI module
 installed.
 
 Build and run using:
@@ -58,7 +58,7 @@ version      Read Only    The driver version number
 panel        Read Only    String describing the panel and giving its pixel width and height
 current      Read Only    Binary image that  matches the currently displayed image (big endian)
 display      Read Write   Image being assembled for next display (big endian)
-temperature  Read Write   Set this to the current temperature in Celcius
+temperature  Read Write   Set this to the current temperature in Celsius
 command      Write Only   Execute display operation
 BE           Directory    Big endian version of current and display
 LE           Directory    Little endian version of current and display
@@ -76,7 +76,7 @@ Notes:
 * The `LE` directory `current` and `display` reference the top left pixel as 0x01
   in the first byte.
 * The `current_inverse` and `display_inverse` represent black as zero (0) and white as one (1)
-  while the unsuffixed items represent the display's natural coding (0=>white, 1=>black)
+  while those item without the suffix represent the display's natural coding (0=>white, 1=>black)
 * The particular combination of `BE/display_inverse` is used in the Python EPD demo
   since it fits better with the Imaging library used.
 
@@ -138,17 +138,17 @@ python DrawDemo.py
 ## Image demo
 
 * Accepts a lists of image files on the command line.
-* Converts them to greyscale to ensure formts like PNG, JPEG and GIF will work.
+* Converts them to grey scale to ensure formats like PNG, JPEG and GIF will work.
 * Inverts the image since the E-Ink panel is reverse (i.e. black on white).
 * Converts image to single bit (PIL "1" mode).
 * Display the middle of the image (using crop function).
 * Delay.
-* Display the resized image.
-* Delay befor fetching next file.
+* Display the re-sized image.
+* Delay before fetching next file.
 
 
 Note if scratch is installed on the system, the following commands will
-show some cartoon animals.  The images when resized will be distorted
+show some cartoon animals.  The images when re-sized will be distorted
 if the aspect ration of the original image is not the same as the
 display.
 
@@ -186,7 +186,7 @@ Pin Number   Description       Colour   Raspberry Pi
 20.          GND               Black    P1-25
 
 
-# TODO / BUGS
+# TO DO / BUGS
 
 * Verify the compensation timer.
 
