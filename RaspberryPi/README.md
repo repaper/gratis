@@ -157,6 +157,28 @@ python ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/cat*
 python ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/d*.png
 ~~~~~
 
+## Twitter Demo
+
+Setup easy_install and use it to get pip, then use pip to get tweepy.
+Copy the sample configuration an edit to include your authentication
+information.  Rather than using the basic authentication it is better
+to set up a Twitter App and generate a token for this.  The token
+generation is quick at
+[https://dev.twitter.com/](https://dev.twitter.com/).  After creating
+the App,just click the button to create an access token.
+
+~~~~~
+sudo apt-get install python-setuptools
+sudo easy_install pip
+sudo pip install tweepy
+# setup the config
+cp tweepy_auth.py-SAMPLE tweepy_auth.py
+# *** edit the config
+# run the demo (this watches for linux)
+python TwitterDemo.py linux
+~~~~~
+
+
 
 # E-Ink Panel Board Connections
 

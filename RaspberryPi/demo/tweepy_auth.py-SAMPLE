@@ -1,0 +1,21 @@
+# authentication for twitter demo
+
+# IMPORTANT: Only uncomment one of the blocks below
+# The OAuth is better since your password will not be exposed
+# and OAuth keys can easily be revoked.
+
+# Uncomment this block if using basic authentication
+# ==================================================
+
+#basic = True
+#USERNAME = ''
+#PASSWORD = ''
+
+# Uncomment this block if using OAuth authentication
+# ==================================================
+
+#basic = False
+#CONSUMER_KEY = ''
+#CONSUMER_SECRET = ''
+#ACCESS_TOKEN = ''
+#ACCESS_TOKEN_SECRET = ''
