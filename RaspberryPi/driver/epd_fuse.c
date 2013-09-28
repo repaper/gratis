@@ -49,15 +49,18 @@ static const char version_buffer[] = {STR(VERSION) "\n"};
 #define busy_pin      GPIO_P1_22
 
 
-static const char *version_path = "/version";   // the program version string
-static const char *panel_path = "/panel";       // type of panel connected
-static const char *current_path = "/current";   // the current screen image
-static const char *display_path = "/display";   // the next image to display
-static const char *command_path = "/command";   // any write transfers display -> EPD and updates current
+static const char *version_path          = "/version";          // the program version string
+static const char *panel_path            = "/panel";            // type of panel connected
+static const char *current_path          = "/current";          // the current screen image
+static const char *current_inverted_path = "/current_inverse";  // the current screen image
+static const char *display_path          = "/display";          // the next image to display
+static const char *display_inverted_path = "/display_inverse";  // the next image to display
+static const char *command_path          = "/command";          // any write transfers display -> EPD and updates current
 
 static const char *spi_device = "/dev/spidev0.0";  // default Rasberry PI SPI device path
 
-static int temperature = 25;                    // for external temperature compensation (not yet!)
+
+static int temperature = 25;                       // for external temperature compensation (not yet!)
 
 static const struct panel_struct {
 	const char *key;
@@ -73,6 +76,7 @@ static const struct panel_struct {
 	{NULL, NULL, 0, 0, 0, 0}  // must be last entry
 };
 
+
 // need to sync size with above (max of all sizes)
 // this will be the next display
 static char display_buffer[264 * 176 / 8];
@@ -86,6 +90,7 @@ static SPI_type *spi = NULL;
 
 
 // function prototypes
+static void special_memcpy(char *d, const char *s, size_t size, bool bit_reversed, bool inverted);
 static void run_command(const char c);
 
 
@@ -97,29 +102,14 @@ static int display_access(const char *path, int mode) {
 }
 
 
-static int display_getattr(const char *path, struct stat *stbuf) {
-
-	memset(stbuf, 0, sizeof(struct stat));
-	if (strcmp(path, "/") == 0) {
-		stbuf->st_mode = S_IFDIR | 01777;
-		stbuf->st_nlink = 2;
-	} else if (strcmp(path, version_path) == 0) {
-		stbuf->st_mode = S_IFREG | 0444;
-		stbuf->st_nlink = 1;
-		stbuf->st_size = VERSION_SIZE;
-	} else if (strcmp(path, panel_path) == 0) {
-		stbuf->st_mode = S_IFREG | 0444;
-		stbuf->st_nlink = 1;
-		stbuf->st_size = strlen(panel->description);
-	} else if (strcmp(path, command_path) == 0) {
-		stbuf->st_mode = S_IFREG | 0222;
-		stbuf->st_nlink = 1;
-		stbuf->st_size = 1;
-	} else if (strcmp(path, current_path) == 0) {
+static int display_subdir_getattr(const char *path, struct stat *stbuf) {
+	if (strcmp(path, current_path) == 0 ||
+	    strcmp(path, current_inverted_path) == 0) {
 		stbuf->st_mode = S_IFREG | 0444;
 		stbuf->st_nlink = 1;
 		stbuf->st_size = panel->byte_count;
-	} else if (strcmp(path, display_path) == 0) {
+	} else if (strcmp(path, display_path) == 0 ||
+		   strcmp(path, display_inverted_path) == 0) {
 		stbuf->st_mode = S_IFREG | 0666;
 		stbuf->st_nlink = 1;
 		stbuf->st_size = panel->byte_count;
@@ -132,30 +122,105 @@ static int display_getattr(const char *path, struct stat *stbuf) {
 	return 0;
 }
 
-static int display_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-			 off_t offset, struct fuse_file_info *fi) {
-	(void) offset;
-	(void) fi;
 
-	if (strcmp(path, "/") != 0) {
-		return -ENOENT;
+static int display_getattr(const char *path, struct stat *stbuf) {
+
+	memset(stbuf, 0, sizeof(struct stat));
+	if (strcmp(path, "/") == 0) {
+		stbuf->st_mode = S_IFDIR | 01777;
+		stbuf->st_nlink = 2;
+
+	} else if (strcmp(path, "/BE") == 0 ||
+		   strcmp(path, "/LE") == 0) {
+		stbuf->st_mode = S_IFDIR | 0777;
+		stbuf->st_nlink = 2;
+
+	} else if (strncmp(path, "/BE/", 4) == 0 ||
+		   strncmp(path, "/LE/", 4) == 0) {
+		return display_subdir_getattr(path + 3, stbuf);
+
+	} else if (strcmp(path, version_path) == 0) {
+		stbuf->st_mode = S_IFREG | 0444;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = VERSION_SIZE;
+
+	} else if (strcmp(path, panel_path) == 0) {
+		stbuf->st_mode = S_IFREG | 0444;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = strlen(panel->description);
+
+	} else if (strcmp(path, command_path) == 0) {
+		stbuf->st_mode = S_IFREG | 0222;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = 1;
+
+	} else {
+		return display_subdir_getattr(path, stbuf);
 	}
-
-	filler(buf, ".", NULL, 0);
-	filler(buf, "..", NULL, 0);
-	filler(buf, current_path + 1, NULL, 0);
-	filler(buf, display_path + 1, NULL, 0);
-	filler(buf, panel_path + 1, NULL, 0);
-	filler(buf, command_path + 1, NULL, 0);
-	filler(buf, version_path + 1, NULL, 0);
-
 	return 0;
 }
 
+static int display_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+			   off_t offset, struct fuse_file_info *fi) {
+	(void) offset;
+	(void) fi;
+
+	if (strcmp(path, "/") == 0) {
+		filler(buf, ".", NULL, 0);
+		filler(buf, "..", NULL, 0);
+		filler(buf, "BE", NULL, 0);
+		filler(buf, "LE", NULL, 0);
+		filler(buf, current_path + 1, NULL, 0);
+		filler(buf, current_inverted_path + 1, NULL, 0);
+		filler(buf, display_path + 1, NULL, 0);
+		filler(buf, display_inverted_path + 1, NULL, 0);
+		filler(buf, panel_path + 1, NULL, 0);
+		filler(buf, command_path + 1, NULL, 0);
+		filler(buf, version_path + 1, NULL, 0);
+		return 0;
+	} else if (strcmp(path, "/BE") == 0 ||
+		   strcmp(path, "/LE") == 0) {
+		filler(buf, ".", NULL, 0);
+		filler(buf, "..", NULL, 0);
+		filler(buf, current_path + 1, NULL, 0);
+		filler(buf, current_inverted_path + 1, NULL, 0);
+		filler(buf, display_path + 1, NULL, 0);
+		filler(buf, display_inverted_path + 1, NULL, 0);
+		return 0;
+	}
+	return -ENOENT;
+}
+
 static int display_open(const char *path, struct fuse_file_info *fi) {
+	bool write_allowed = false;
+
 	// read-write items
-	if (strcmp(path, display_path) == 0 ||
-	    strcmp(path, command_path) == 0) {
+	if (strcmp(path, command_path) == 0) {
+		write_allowed = true;
+	} else if (strcmp(path, panel_path) == 0 ||
+		   strcmp(path, version_path) == 0) {
+		write_allowed = false;
+	} else {
+		if (strncmp(path, "/BE/", 4) == 0) {
+			path += 3;
+		} else if (strncmp(path, "/LE/", 4) == 0) {
+			path += 3;
+		}
+
+		if (strcmp(path, display_path) == 0 ||
+		    strcmp(path, display_inverted_path) == 0) {
+			write_allowed = true;
+		} else if (strcmp(path, current_path) == 0 ||
+			   strcmp(path, current_inverted_path) == 0) {
+			write_allowed = false;
+		} else {
+			return -ENOENT;
+		}
+	}
+
+	// check access mode
+	if (write_allowed) {
+
 		switch (fi->flags & (O_RDONLY | O_WRONLY | O_APPEND | O_TRUNC)) {
 		case O_RDONLY:
 		case O_WRONLY:
@@ -170,83 +235,132 @@ static int display_open(const char *path, struct fuse_file_info *fi) {
 	}
 
 	// read-only items
-	if (strcmp(path, panel_path) != 0 &&
-	    strcmp(path, current_path) != 0 &&
-	    strcmp(path, version_path) != 0) {
-		return -ENOENT;
-	}
 	if ((fi->flags & 3) != O_RDONLY) {
 		return -EACCES;
 	}
 	return 0;
 }
 
+
 static int display_create(const char *path, mode_t mode, struct fuse_file_info *fi) {
 	(void) mode;
 	(void) fi;
 
-	if (strcmp(path, display_path) == 0 ||
-	    strcmp(path, command_path) == 0) {
+	if (strcmp(path, command_path) == 0) {
 		return 0;
 	}
+
+	if (strncmp(path, "/BE/", 4) == 0) {
+		path += 3;
+	} else if (strncmp(path, "/LE/", 4) == 0) {
+		path += 3;
+	}
+
+	if (strcmp(path, display_path) == 0 ||
+	    strcmp(path, display_inverted_path) == 0) {
+		return 0;
+	}
+
 	return -EACCES;
 }
 
 
 static int display_truncate(const char *path, off_t offset) {
 	(void) offset;
-	if (strcmp(path, display_path) == 0 ||
-	    strcmp(path, command_path) == 0) {
+	if (strcmp(path, command_path) == 0) {
 		return 0;
 	}
+
+	if (strncmp(path, "/BE/", 4) == 0) {
+		path += 3;
+	} else if (strncmp(path, "/LE/", 4) == 0) {
+		path += 3;
+	}
+
+	if (strcmp(path, display_path) == 0 ||
+	    strcmp(path, display_inverted_path) == 0) {
+		return 0;
+	}
+
 	return -EACCES;
 }
 
 
-static int display_read(const char *path, char *buffer, size_t size, off_t offset,
-			struct fuse_file_info *fi) {
-	(void) fi;
-	size_t length;
-	const char *source;
-
-	if (strcmp(path, version_path) == 0) {
-		source = version_buffer;
-		length = VERSION_SIZE;
-	} else if (strcmp(path, panel_path) == 0) {
-		source = panel->description;
-		length = strlen(source);
-	} else if (strcmp(path, current_path) == 0) {
-		source = current_buffer;
-		length = panel->byte_count;
-	} else if (strcmp(path, display_path) == 0) {
-		source = display_buffer;
-		length = panel->byte_count;
-	} else {
-		return -ENOENT;
-	}
+// try to copy 'size' bytes to 'buffer' from 'offset' in 'source'
+// where there are 'length' bytes in 'source'
+static int buffer_read(char *buffer, size_t size, off_t offset,
+		       const char *source, size_t length,
+		       bool bit_reversed, bool inverted) {
 	// common read code
 	if (offset < length) {
 		if (offset + size > length) {
 			size = length - offset;
 		}
-		memcpy(buffer, source + offset, size);
+		special_memcpy(buffer, source + offset, size, bit_reversed, inverted);
 	} else {
 		size = 0;
 	}
 	return size;
 }
 
+static int display_read(const char *path, char *buffer, size_t size, off_t offset,
+			struct fuse_file_info *fi) {
+	(void) fi;
+
+	if (strcmp(path, version_path) == 0) {
+		return buffer_read(buffer, size, offset, version_buffer, VERSION_SIZE, false, false);
+	} else if (strcmp(path, panel_path) == 0) {
+		return buffer_read(buffer, size, offset, panel->description, strlen(panel->description), false, false);
+	}
+
+	// test big/little endian
+	bool bit_reversed = false;
+	if (strncmp(path, "/BE/", 4) == 0) {
+		path += 3;
+	} else if (strncmp(path, "/LE/", 4) == 0) {
+		path += 3;
+		bit_reversed = true;
+	}
+
+	if (strcmp(path, current_path) == 0) {
+		return buffer_read(buffer, size, offset, current_buffer, panel->byte_count, bit_reversed, false);
+	} else if (strcmp(path, current_inverted_path) == 0) {
+		return buffer_read(buffer, size, offset, current_buffer, panel->byte_count, bit_reversed, true);
+	} else if (strcmp(path, display_path) == 0) {
+		return buffer_read(buffer, size, offset, display_buffer, panel->byte_count, bit_reversed, false);
+	} else if (strcmp(path, display_inverted_path) == 0) {
+		return buffer_read(buffer, size, offset, display_buffer, panel->byte_count, bit_reversed, true);
+	}
+
+	return -ENOENT;
+}
+
+
 static int display_write(const char *path, const char *buffer, size_t size, off_t offset,
 			 struct fuse_file_info *fi) {
 	size_t len;
 	(void) fi;
+	bool inverted = false;
+	bool bit_reversed = false;
+
 	if (strcmp(path, command_path) == 0) {
 		if (size > 0) {
 			run_command(buffer[0]);
 		}
 		return size;
 	}
-	if (strcmp(path, display_path) != 0) {
+
+	// test big/little endian
+	if (strncmp(path, "/BE/", 4) == 0) {
+		path += 3;
+	} else if (strncmp(path, "/LE/", 4) == 0) {
+		path += 3;
+		bit_reversed = true;
+	}
+
+	if (strcmp(path, display_inverted_path) == 0) {
+		inverted = true;
+	} else if (strcmp(path, display_path) != 0) {
 		return -ENOENT;
 	}
 
@@ -255,7 +369,7 @@ static int display_write(const char *path, const char *buffer, size_t size, off_
 		if (offset + size > len) {
 			size = len - offset;
 		}
-		memcpy(display_buffer + offset, buffer, size);
+		special_memcpy(display_buffer + offset, buffer, size, bit_reversed, inverted);
 	} else {
 		size = 0;
 	}
@@ -333,6 +447,64 @@ static struct fuse_operations display_operations = {
 	.destroy  = display_destroy
 };
 
+
+// bit reversed table
+static const char reverse[256] = {
+//	__00____01____02____03____04____05____06____07____08____09____0a____0b____0c____0d____0e____0f
+	0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
+//	__10____11____12____13____14____15____16____17____18____19____1a____1b____1c____1d____1e____1f
+	0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8, 0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8,
+//	__20____21____22____23____24____25____26____27____28____29____2a____2b____2c____2d____2e____2f
+	0x04, 0x84, 0x44, 0xc4, 0x24, 0xa4, 0x64, 0xe4, 0x14, 0x94, 0x54, 0xd4, 0x34, 0xb4, 0x74, 0xf4,
+//	__30____31____32____33____34____35____36____37____38____39____3a____3b____3c____3d____3e____3f
+	0x0c, 0x8c, 0x4c, 0xcc, 0x2c, 0xac, 0x6c, 0xec, 0x1c, 0x9c, 0x5c, 0xdc, 0x3c, 0xbc, 0x7c, 0xfc,
+//	__40____41____42____43____44____45____46____47____48____49____4a____4b____4c____4d____4e____4f
+	0x02, 0x82, 0x42, 0xc2, 0x22, 0xa2, 0x62, 0xe2, 0x12, 0x92, 0x52, 0xd2, 0x32, 0xb2, 0x72, 0xf2,
+//	__50____51____52____53____54____55____56____57____58____59____5a____5b____5c____5d____5e____5f
+	0x0a, 0x8a, 0x4a, 0xca, 0x2a, 0xaa, 0x6a, 0xea, 0x1a, 0x9a, 0x5a, 0xda, 0x3a, 0xba, 0x7a, 0xfa,
+//	__60____61____62____63____64____65____66____67____68____69____6a____6b____6c____6d____6e____6f
+	0x06, 0x86, 0x46, 0xc6, 0x26, 0xa6, 0x66, 0xe6, 0x16, 0x96, 0x56, 0xd6, 0x36, 0xb6, 0x76, 0xf6,
+//	__70____71____72____73____74____75____76____77____78____79____7a____7b____7c____7d____7e____7f
+	0x0e, 0x8e, 0x4e, 0xce, 0x2e, 0xae, 0x6e, 0xee, 0x1e, 0x9e, 0x5e, 0xde, 0x3e, 0xbe, 0x7e, 0xfe,
+//	__80____81____82____83____84____85____86____87____88____89____8a____8b____8c____8d____8e____8f
+	0x01, 0x81, 0x41, 0xc1, 0x21, 0xa1, 0x61, 0xe1, 0x11, 0x91, 0x51, 0xd1, 0x31, 0xb1, 0x71, 0xf1,
+//	__90____91____92____93____94____95____96____97____98____99____9a____9b____9c____9d____9e____9f
+	0x09, 0x89, 0x49, 0xc9, 0x29, 0xa9, 0x69, 0xe9, 0x19, 0x99, 0x59, 0xd9, 0x39, 0xb9, 0x79, 0xf9,
+//	__a0____a1____a2____a3____a4____a5____a6____a7____a8____a9____aa____ab____ac____ad____ae____af
+	0x05, 0x85, 0x45, 0xc5, 0x25, 0xa5, 0x65, 0xe5, 0x15, 0x95, 0x55, 0xd5, 0x35, 0xb5, 0x75, 0xf5,
+//	__b0____b1____b2____b3____b4____b5____b6____b7____b8____b9____ba____bb____bc____bd____be____bf
+	0x0d, 0x8d, 0x4d, 0xcd, 0x2d, 0xad, 0x6d, 0xed, 0x1d, 0x9d, 0x5d, 0xdd, 0x3d, 0xbd, 0x7d, 0xfd,
+//	__c0____c1____c2____c3____c4____c5____c6____c7____c8____c9____ca____cb____cc____cd____ce____cf
+	0x03, 0x83, 0x43, 0xc3, 0x23, 0xa3, 0x63, 0xe3, 0x13, 0x93, 0x53, 0xd3, 0x33, 0xb3, 0x73, 0xf3,
+//	__d0____d1____d2____d3____d4____d5____d6____d7____d8____d9____da____db____dc____dd____de____df
+	0x0b, 0x8b, 0x4b, 0xcb, 0x2b, 0xab, 0x6b, 0xeb, 0x1b, 0x9b, 0x5b, 0xdb, 0x3b, 0xbb, 0x7b, 0xfb,
+//	__e0____e1____e2____e3____e4____e5____e6____e7____e8____e9____ea____eb____ec____ed____ee____ef
+	0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7, 0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
+//	__f0____f1____f2____f3____f4____f5____f6____f7____f8____f9____fa____fb____fc____fd____fe____ff
+	0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef, 0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
+};
+
+
+// copy buffer
+static void special_memcpy(char *d, const char *s, size_t size, bool bit_reversed, bool inverted) {
+	if (bit_reversed) {
+		if (inverted) {
+			for (size_t n = 0; n < size; ++n) {
+				*d++ = reverse[(unsigned)(*s++)] ^ 0xff;
+			}
+		} else {
+			for (size_t n = 0; n < size; ++n) {
+				*d++ = reverse[(unsigned)(*s++)];
+			}
+		}
+	} else if (inverted) {
+		for (size_t n = 0; n < size; ++n) {
+			*d++ = *s++ ^ 0xff;
+		}
+	} else {
+		memcpy(d, s, size);
+	}
+}
 
 // run a command
 static void run_command(const char c) {

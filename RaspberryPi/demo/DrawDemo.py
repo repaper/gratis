@@ -18,6 +18,8 @@ import Image
 import ImageDraw
 from EPD import EPD
 
+WHITE = 1
+BLACK = 0
 
 def main(argv):
     """main program - draw and display a test image"""
@@ -32,27 +34,29 @@ def main(argv):
 
 
 def demo(epd):
-    """simple drawing demo"""
+    """simple drawing demo - black drawing on white background"""
 
-    image = Image.new('1', epd.size, 0)
+    # initiall set all white background
+    image = Image.new('1', epd.size, WHITE)
 
+    # prepare for drawing
     draw = ImageDraw.Draw(image)
 
     # three pixels in tol left corner
-    draw.point((0, 0), fill=1)
-    draw.point((1, 0), fill=1)
-    draw.point((0, 1), fill=1)
+    draw.point((0, 0), fill=BLACK)
+    draw.point((1, 0), fill=BLACK)
+    draw.point((0, 1), fill=BLACK)
 
     # lines
-    draw.line([(10,20),(100,20)], fill=1)
-    draw.line([(10,90),(100,60)], fill=1)
+    draw.line([(10,20),(100,20)], fill=BLACK)
+    draw.line([(10,90),(100,60)], fill=BLACK)
 
     # filled circle, elipse
-    draw.ellipse((120, 10, 150, 40), fill=1, outline=1)
-    draw.ellipse((120, 60, 170, 90), fill=0, outline=1)
+    draw.ellipse((120, 10, 150, 40), fill=BLACK, outline=BLACK)
+    draw.ellipse((120, 60, 170, 90), fill=WHITE, outline=BLACK)
 
     # text
-    draw.text((30, 30), 'hello world', fill=1)
+    draw.text((30, 30), 'hello world', fill=BLACK)
 
     # display image on the panel
     epd.display(image)

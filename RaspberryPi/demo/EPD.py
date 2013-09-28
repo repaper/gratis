@@ -14,6 +14,7 @@
 
 
 import Image
+import ImageOps
 import re
 import os
 
@@ -109,16 +110,21 @@ to use:
 
 
     def display(self, image):
+
+        # attempt grayscale conversion, ath then to single bit
+        # better to do this before callin this if the image is to
+        # be dispayed several times
+        if image.mode != "1":
+            image = ImageOps.grayscale(image).convert("1", dither=Image.FLOYDSTEINBERG)
+
         if image.mode != "1":
             raise EPDError('only single bit images are supported')
 
         if image.size != self.size:
             raise EPDError('image size mismatch')
 
-        with open(os.path.join(self._epd_path, 'display'), 'r+b') as f:
-            for c in image.tostring():
-                b = ((ord(c) * 0x80200802L) & 0x0884422110L) * 0x0101010101L >> 32
-                f.write(chr(b & 0xff))
+        with open(os.path.join(self._epd_path, 'LE', 'display_inverse'), 'r+b') as f:
+            f.write(image.tostring())
 
         if self.auto:
             self.update()

@@ -42,7 +42,6 @@ def display_file(epd, file_name):
 
     image = Image.open(file_name)
     image = ImageOps.grayscale(image)
-    image = ImageOps.invert(image)
 
     # crop to the middle
     w,h = image.size

@@ -172,15 +172,6 @@ Pin Number   Description       Colour   Raspberry Pi
 
 # TODO / BUGS
 
-* Some bit reversed translation to remove the slow loop from the EPD.py.
-  This can be done much faster in C.  Will need some extra FUSE files
-
-* An inverted bitmap - this would remove the need to can the image invert
-  when displaying images.
-
-* Combination of the above tow items - need to think about the file naming in the
-  FUSE driver
-
 * A temperature file in the driver do that the external program can
   set the compensation.  Required since the Rasberry Pi does not have an analog input,
   or maybe the the userland programhas some other way to determin this.
