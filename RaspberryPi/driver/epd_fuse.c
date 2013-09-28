@@ -13,7 +13,7 @@
 // governing permissions and limitations under the License.
 
 
-#define VERSION 1
+#define VERSION 2
 
 #define STR1(x) #x
 #define STR(x) STR1(x)
@@ -56,11 +56,13 @@ static const char *current_inverted_path = "/current_inverse";  // the current s
 static const char *display_path          = "/display";          // the next image to display
 static const char *display_inverted_path = "/display_inverse";  // the next image to display
 static const char *command_path          = "/command";          // any write transfers display -> EPD and updates current
+static const char *temperature_path      = "/temperature";      // read/write temperature compensation setting
 
 static const char *spi_device = "/dev/spidev0.0";  // default Rasberry PI SPI device path
 
-
-static int temperature = 25;                       // for external temperature compensation (not yet!)
+// expect that external process changes this just before update command
+// by sending text string e.g. shell:  echo 19 > /dev/epd/temperature
+static int temperature = 25;                       // for external temperature compensation
 
 static const struct panel_struct {
 	const char *key;
@@ -154,6 +156,11 @@ static int display_getattr(const char *path, struct stat *stbuf) {
 		stbuf->st_nlink = 1;
 		stbuf->st_size = 1;
 
+	} else if (strcmp(path, temperature_path) == 0) {
+		stbuf->st_mode = S_IFREG | 0666;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = 4;
+
 	} else {
 		return display_subdir_getattr(path, stbuf);
 	}
@@ -176,6 +183,7 @@ static int display_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		filler(buf, display_inverted_path + 1, NULL, 0);
 		filler(buf, panel_path + 1, NULL, 0);
 		filler(buf, command_path + 1, NULL, 0);
+		filler(buf, temperature_path + 1, NULL, 0);
 		filler(buf, version_path + 1, NULL, 0);
 		return 0;
 	} else if (strcmp(path, "/BE") == 0 ||
@@ -195,7 +203,8 @@ static int display_open(const char *path, struct fuse_file_info *fi) {
 	bool write_allowed = false;
 
 	// read-write items
-	if (strcmp(path, command_path) == 0) {
+	if (strcmp(path, command_path) == 0 ||
+	    strcmp(path, temperature_path) == 0) {
 		write_allowed = true;
 	} else if (strcmp(path, panel_path) == 0 ||
 		   strcmp(path, version_path) == 0) {
@@ -246,7 +255,8 @@ static int display_create(const char *path, mode_t mode, struct fuse_file_info *
 	(void) mode;
 	(void) fi;
 
-	if (strcmp(path, command_path) == 0) {
+	if (strcmp(path, command_path) == 0 ||
+	    strcmp(path, temperature_path) == 0) {
 		return 0;
 	}
 
@@ -267,7 +277,8 @@ static int display_create(const char *path, mode_t mode, struct fuse_file_info *
 
 static int display_truncate(const char *path, off_t offset) {
 	(void) offset;
-	if (strcmp(path, command_path) == 0) {
+	if (strcmp(path, command_path) == 0 ||
+	    strcmp(path, temperature_path) == 0) {
 		return 0;
 	}
 
@@ -311,6 +322,16 @@ static int display_read(const char *path, char *buffer, size_t size, off_t offse
 		return buffer_read(buffer, size, offset, version_buffer, VERSION_SIZE, false, false);
 	} else if (strcmp(path, panel_path) == 0) {
 		return buffer_read(buffer, size, offset, panel->description, strlen(panel->description), false, false);
+	} else if (strcmp(path, temperature_path) == 0) {
+		int t = temperature;
+		if (t < -99) {
+			t = -99;
+		} else if  (t > 99) {
+			t = 99;
+		}
+		char t_buffer[16];
+		int length = snprintf(t_buffer, sizeof(t_buffer), "%3d\n", t);
+		return buffer_read(buffer, size, offset, t_buffer, length, false, false);
 	}
 
 	// test big/little endian
@@ -346,6 +367,15 @@ static int display_write(const char *path, const char *buffer, size_t size, off_
 	if (strcmp(path, command_path) == 0) {
 		if (size > 0) {
 			run_command(buffer[0]);
+		}
+		return size;
+	} else if (strcmp(path, temperature_path) == 0) {
+		if (size > 0) {
+			char *end = NULL;
+			long int n = strtol(buffer, &end, 0);
+			if (buffer != end && n >= -99 && n <= 99) {
+				temperature = (int)n;
+			}
 		}
 		return size;
 	}
