@@ -42,7 +42,7 @@ def demo(epd):
     # prepare for drawing
     draw = ImageDraw.Draw(image)
 
-    # three pixels in tol left corner
+    # three pixels in top left corner
     draw.point((0, 0), fill=BLACK)
     draw.point((1, 0), fill=BLACK)
     draw.point((0, 1), fill=BLACK)

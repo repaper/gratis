@@ -167,6 +167,8 @@ generation is quick at
 [https://dev.twitter.com/](https://dev.twitter.com/).  After creating
 the App,just click the button to create an access token.
 
+Use *Ctrl-C* to stop this program.
+
 ~~~~~
 sudo apt-get install python-setuptools
 sudo easy_install pip
@@ -178,6 +180,29 @@ cp tweepy_auth.py-SAMPLE tweepy_auth.py
 python TwitterDemo.py linux
 ~~~~~
 
+
+## Partial Demo
+
+Display random overlapping rectangles using partial update.  First
+argument is number of rectangle to generate before updating the EPD,
+second number is the number of frames to display before the program
+exits.
+
+~~~~~
+python PartialDemo.py 3 20
+~~~~~
+
+
+## Counter Demo
+
+Display a 4 digit hex counter uses partial update to only change the
+updated digits.
+
+Use *Ctrl-C* to stop this program.
+
+~~~~~
+python CounterDemo.py 3 20
+~~~~~
 
 
 # E-Ink Panel Board Connections

@@ -13,7 +13,7 @@
 // governing permissions and limitations under the License.
 
 
-#define VERSION 2
+#define VERSION 3
 
 #define STR1(x) #x
 #define STR(x) STR1(x)
@@ -552,6 +552,15 @@ static void run_command(const char c) {
 		EPD_set_temperature(epd, temperature);
 		EPD_begin(epd);
 		EPD_image(epd, (const uint8_t *)current_buffer, (const uint8_t *)display_buffer);
+		EPD_end(epd);
+
+		memcpy(current_buffer, display_buffer, sizeof(display_buffer));
+		break;
+
+	case 'P':  // partial update with contents of display
+		EPD_set_temperature(epd, temperature);
+		EPD_begin(epd);
+		EPD_partial_image(epd, (const uint8_t *)current_buffer, (const uint8_t *)display_buffer);
 		EPD_end(epd);
 
 		memcpy(current_buffer, display_buffer, sizeof(display_buffer));

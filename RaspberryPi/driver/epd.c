@@ -44,10 +44,10 @@ static void PWM_start(int pin);
 static void PWM_stop(int pin);
 static int temperature_to_factor_10x(int temperature);
 static void frame_fixed(EPD_type *epd, uint8_t fixed_value, EPD_stage stage);
-static void frame_data(EPD_type *epd, const uint8_t *image, EPD_stage stage);
+static void frame_data(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage);
 static void frame_fixed_repeat(EPD_type *epd, uint8_t fixed_value, EPD_stage stage);
-static void frame_data_repeat(EPD_type *epd, const uint8_t *image, EPD_stage stage);
-static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage);
+static void frame_data_repeat(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage);
+static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage);
 
 // panel configuration
 struct EPD_struct {
@@ -323,13 +323,13 @@ void EPD_end(EPD_type *epd) {
 	// dummy line and border
 	if (EPD_1_44 == epd->size) {
 		// only for 1.44" EPD
-		line(epd, 0x7fffu, 0, 0xaa, false, EPD_normal);
+		line(epd, 0x7fffu, 0, 0xaa, NULL, EPD_normal);
 
 		Delay_ms(250);
 
 	} else {
 		// all other display sizes
-		line(epd, 0x7fffu, 0, 0x55, false, EPD_normal);
+		line(epd, 0x7fffu, 0, 0x55, NULL, EPD_normal);
 
 		Delay_ms(25);
 
@@ -438,16 +438,25 @@ void EPD_clear(EPD_type *epd) {
 void EPD_image_0(EPD_type *epd, const uint8_t *image) {
 	frame_fixed_repeat(epd, 0xaa, EPD_compensate);
 	frame_fixed_repeat(epd, 0xaa, EPD_white);
-	frame_data_repeat(epd, image, EPD_inverse);
-	frame_data_repeat(epd, image, EPD_normal);
+	frame_data_repeat(epd, image, NULL, EPD_inverse);
+	frame_data_repeat(epd, image, NULL, EPD_normal);
 }
 
 // change from old image to new image
 void EPD_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image) {
-	frame_data_repeat(epd, old_image, EPD_compensate);
-	frame_data_repeat(epd, old_image, EPD_white);
-	frame_data_repeat(epd, new_image, EPD_inverse);
-	frame_data_repeat(epd, new_image, EPD_normal);
+	frame_data_repeat(epd, old_image, NULL, EPD_compensate);
+	frame_data_repeat(epd, old_image, NULL, EPD_white);
+	frame_data_repeat(epd, new_image, NULL, EPD_inverse);
+	frame_data_repeat(epd, new_image, NULL, EPD_normal);
+}
+
+// change from old image to new image
+void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image) {
+
+	frame_data_repeat(epd, old_image, new_image, EPD_compensate);
+	frame_data_repeat(epd, old_image, new_image, EPD_white);
+	frame_data_repeat(epd, new_image, old_image, EPD_inverse);
+	frame_data_repeat(epd, new_image, old_image, EPD_normal);
 }
 
 
@@ -486,14 +495,21 @@ static int temperature_to_factor_10x(int temperature) {
 
 static void frame_fixed(EPD_type *epd, uint8_t fixed_value, EPD_stage stage) {
 	for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
-		line(epd, l, 0, fixed_value, false, stage);
+		line(epd, l, NULL, fixed_value, NULL, stage);
 	}
 }
 
 
-static void frame_data(EPD_type *epd, const uint8_t *image, EPD_stage stage) {
-	for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
-		line(epd, l, &image[l * epd->bytes_per_line], 0, true, stage);
+static void frame_data(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage) {
+	if (NULL == mask) {
+		for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
+			line(epd, l, &image[l * epd->bytes_per_line], 0, NULL, stage);
+		}
+	} else {
+		for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
+			size_t n = l * epd->bytes_per_line;
+			line(epd, l, &image[n], 0, &mask[n], stage);
+		}
 	}
 }
 
@@ -518,7 +534,7 @@ static void frame_fixed_repeat(EPD_type *epd, uint8_t fixed_value, EPD_stage sta
 }
 
 
-static void frame_data_repeat(EPD_type *epd, const uint8_t *image, EPD_stage stage) {
+static void frame_data_repeat(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage) {
 	struct itimerspec its;
 	its.it_value.tv_sec = epd->factored_stage_time / 1000;
 	its.it_value.tv_nsec = (epd->factored_stage_time % 1000) * 1000000;
@@ -529,7 +545,7 @@ static void frame_data_repeat(EPD_type *epd, const uint8_t *image, EPD_stage sta
 		err(1, "timer_settime failed");
 	}
 	do {
-		frame_data(epd, image, stage);
+		frame_data(epd, image, mask, stage);
 		if (-1 == timer_gettime(epd->timer, &its)) {
 			err(1, "timer_gettime failed");
 		}
@@ -537,7 +553,7 @@ static void frame_data_repeat(EPD_type *epd, const uint8_t *image, EPD_stage sta
 }
 
 
-static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage) {
+static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
 
 	SPI_on(epd->spi);
 
@@ -564,9 +580,13 @@ static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixe
 
 	// even pixels
 	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
-		if (0 != data) {
+		if (NULL != data) {
 			uint8_t pixels = data[b - 1] & 0xaa;
-
+			uint8_t pixel_mask = 0xff;
+			if (NULL != mask) {
+				pixel_mask = (mask[b - 1] ^ pixels) & 0xaa;
+				pixel_mask |= pixel_mask >> 1;
+			}
 			switch(stage) {
 			case EPD_compensate:  // B -> W, W -> B (Current Image)
 				pixels = 0xaa | ((pixels ^ 0xaa) >> 1);
@@ -581,7 +601,7 @@ static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixe
 				pixels = 0xaa | (pixels >> 1);
 				break;
 			}
-			*p++ = pixels;
+			*p++ = (pixels & pixel_mask) | (~pixel_mask & 0x55);
 		} else {
 			*p++ = fixed_value;
 		}
@@ -598,9 +618,13 @@ static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixe
 
 	// odd pixels
 	for (uint16_t b = 0; b < epd->bytes_per_line; ++b) {
-		if (0 != data) {
+		if (NULL != data) {
 			uint8_t pixels = data[b] & 0x55;
-
+			uint8_t pixel_mask = 0xff;
+			if (NULL != mask) {
+				pixel_mask = (mask[b] ^ pixels) & 0x55;
+				pixel_mask |= pixel_mask << 1;
+			}
 			switch(stage) {
 			case EPD_compensate:  // B -> W, W -> B (Current Image)
 				pixels = 0xaa | (pixels ^ 0x55);
@@ -615,6 +639,8 @@ static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixe
 				pixels = 0xaa | pixels;
 				break;
 			}
+			pixels = (pixels & pixel_mask) | (~pixel_mask & 0x55);
+
 			uint8_t p1 = (pixels >> 6) & 0x03;
 			uint8_t p2 = (pixels >> 4) & 0x03;
 			uint8_t p3 = (pixels >> 2) & 0x03;

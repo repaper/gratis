@@ -11,6 +11,8 @@ LDFLAGS += -lrt
 
 PREFIX ?= /usr
 
+RM = rm -f
+
 
 .PHONY: all
 all: gpio_test epd_test epd_fuse
