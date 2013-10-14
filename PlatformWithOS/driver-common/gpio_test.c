@@ -22,15 +22,10 @@
 
 #include "gpio.h"
 
-//#define LED_BLUE GPIO_P1_11
-//#define LED_WHITE GPIO_P1_13
-//#define LED_BLUE GPIO_P1_16
-//#define LED_WHITE GPIO_P1_18
-#define LED_BLUE GPIO_P1_23
-#define LED_WHITE GPIO_P1_21
+// the platform specific I/O pins
+#include "gpio_test.h"
 
-#define LED_1 GPIO_P1_10
-#define LED_PWM GPIO_P1_12
+#define ENABLE_PWM 1
 
 
 int main(int argc, char *argv[]) {
@@ -44,36 +39,27 @@ int main(int argc, char *argv[]) {
 
 	GPIO_mode(LED_BLUE, GPIO_OUTPUT);
 	GPIO_mode(LED_WHITE, GPIO_OUTPUT);
-	GPIO_mode(LED_1, GPIO_OUTPUT);
 	GPIO_mode(LED_PWM, GPIO_PWM);
 
-#if 1
-	GPIO_write(LED_1, 1);
+#if ENABLE_PWM
+	// test with pwm
 	for (j = 0; j < 20; ++j) {
+		GPIO_write(LED_WHITE, 1);
 		for (i = 0; i < 1024; ++i) {
 			GPIO_pwm_write(LED_PWM, i);
 			usleep(1000);
 		}
+		GPIO_write(LED_WHITE, 0);
+		GPIO_write(LED_BLUE, 1);
 		for (i = 1023; i >= 0; --i) {
 			GPIO_pwm_write(LED_PWM, i);
 			usleep(1000);
 		}
+		GPIO_write(LED_BLUE, 0);
 	}
-	GPIO_write(LED_1, 0);
 
 #else
-#if 0
-	for (i = 0; i < 200; ++i) {
-		GPIO_write(LED_WHITE, 1);
-		usleep(100000);
-		GPIO_write(LED_BLUE, 1);
-		usleep(100000);
-		GPIO_write(LED_BLUE, 0);
-		usleep(100000);
-		GPIO_write(LED_WHITE, 0);
-		usleep(100000);
-	}
-#else
+	// simple non-pwm test
 	for (i = 0; i < 200; ++i) {
 		GPIO_write(LED_WHITE, 1);
 		GPIO_write(LED_BLUE, 0);
@@ -83,8 +69,8 @@ int main(int argc, char *argv[]) {
 		usleep(200000);
 	}
 #endif
-#endif
 
+	GPIO_pwm_write(LED_PWM, 0);
 	GPIO_write(LED_BLUE, 0);
 	GPIO_write(LED_WHITE, 0);
 	GPIO_teardown();

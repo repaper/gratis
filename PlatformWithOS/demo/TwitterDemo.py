@@ -14,6 +14,7 @@
 
 
 import sys
+import os
 import time
 import Image
 import ImageDraw
@@ -21,6 +22,7 @@ import ImageFont
 from EPD import EPD
 import tweepy
 import textwrap
+import socket
 
 # create this from tweepy_auth.py-sample
 import tweepy_auth
@@ -45,8 +47,38 @@ def main(argv):
     # prepare for drawing
     draw = ImageDraw.Draw(image)
 
-    #import socket
-    #socket.setdefaulttimeout(timeout)
+    # set a longer timeout on socket operations
+    socket.setdefaulttimeout(60)
+
+    # find some fonts
+    # fonts are in different places on Raspbian/Angstrom so search
+    possible_name_fonts = [
+#        '/usr/share/fonts/truetype/freefont/FreeSans.ttf',                # R.Pi
+        '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono-Bold.ttf',   # R.Pi
+        '/usr/share/fonts/truetype/freefont/FreeMono.ttf',                # R.Pi
+        '/usr/share/fonts/truetype/LiberationMono-Bold.ttf',              # B.B
+        '/usr/share/fonts/truetype/DejaVuSansMono-Bold.ttf'               # B.B
+    ]
+
+    possible_message_fonts = [
+        '/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf',      # R.Pi
+        '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf',            # R.Pi
+        '/usr/share/fonts/truetype/freefont/FreeMono.ttf',                # R.Pi
+        '/usr/share/fonts/truetype/LiberationSans-Regular.ttf',           # B.B
+        '/usr/share/fonts/truetype/DejaVuSans.ttf'                        # B.B
+    ]
+
+
+    name_font_name = find_font(possible_name_fonts)
+    if '' == name_font_name:
+        raise 'no name font file found'
+
+    message_font_name = find_font(possible_message_fonts)
+    if '' == message_font_name:
+        raise 'no message font file found'
+
+    name_font = ImageFont.truetype(name_font_name, 14)
+    message_font = ImageFont.truetype(message_font_name, 12)
 
     # start up tweepy streaming
 
@@ -56,36 +88,43 @@ def main(argv):
         auth = tweepy.OAuthHandler(tweepy_auth.CONSUMER_KEY, tweepy_auth.CONSUMER_SECRET)
         auth.set_access_token(tweepy_auth.ACCESS_TOKEN, tweepy_auth.ACCESS_TOKEN_SECRET)
 
-    listener = StreamMonitor(epd, image, draw)
+    listener = StreamMonitor(epd, image, draw, name_font, message_font)
     stream = tweepy.Stream(auth, listener)
     setTerms = argv
     # stream.sample()   # low bandwith public stream
     stream.filter(track=setTerms)
 
 
+def find_font(font_list):
+    """find a font file from a list of possible paths"""
+    for f in font_list:
+        if os.path.exists(f):
+            return f
+    return ''
+
 
 class StreamMonitor(tweepy.StreamListener):
+    """class to receive twitter message"""
 
-    def __init__(self, epd, image, draw, *args, **kwargs):
+    def __init__(self, epd, image, draw, name_font, message_font, *args, **kwargs):
         super(StreamMonitor, self).__init__(*args, **kwargs)
         self._epd = epd
         self._image = image
         self._draw = draw
+        self._name_font = name_font
+        self._message_font = message_font
 
     def on_status(self, status):
         screen_name = status.user.screen_name.encode('utf-8')
         text = status.text.encode('utf-8')
         print('@{u:s} Said:  {m:s}'.format(u=screen_name, m=text))
 
-        font_name = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', 14)
-        font = ImageFont.truetype('/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf', 12)
-
         w, h = self._image.size
         self._draw.rectangle((0, 0, w, h), fill=WHITE, outline=WHITE)
-        self._draw.text((20, 0), '@' + status.user.screen_name, fill=BLACK, font=font_name)
+        self._draw.text((20, 0), '@' + status.user.screen_name, fill=BLACK, font=self._name_font)
         y = 18
         for line in textwrap.wrap(status.text, 24):   # tweet(140) / 24 => 6 lines
-            self._draw.text((0, y), line, fill=BLACK, font=font)
+            self._draw.text((0, y), line, fill=BLACK, font=self._message_font)
             y = y + 12
 
         # display image on the panel

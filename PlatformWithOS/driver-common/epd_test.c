@@ -24,6 +24,9 @@
 #include "spi.h"
 #include "epd.h"
 
+#include "epd_io.h"
+
+
 // test images
 #include "aphrodite_2_0.xbm"
 #include "cat_2_0.xbm"
@@ -44,13 +47,6 @@ static uint8_t *images[] = {
 
 #define SIZE_OF_ARRAY(a) (sizeof(a) / sizeof((a)[0]))
 
-#define panel_on_pin  GPIO_P1_16
-#define border_pin    GPIO_P1_08
-#define discharge_pin GPIO_P1_10
-#define pwm_pin       GPIO_P1_12
-#define reset_pin     GPIO_P1_18
-#define busy_pin      GPIO_P1_22
-
 
 int main(int argc, char *argv[]) {
 
@@ -62,7 +58,7 @@ int main(int argc, char *argv[]) {
 		goto done;
 	}
 
-	SPI_type *spi = SPI_create("/dev/spidev0.0");
+	SPI_type *spi = SPI_create(SPI_DEVICE);
 	if (NULL == spi) {
 		rc = 1;
 		warn("SPI_setup failed");
@@ -107,7 +103,6 @@ int main(int argc, char *argv[]) {
 		EPD_end(epd);
 		sleep(5);
 	}
-
 
 	// release resources
 //done_epd:

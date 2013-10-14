@@ -14,6 +14,7 @@
 
 
 import sys
+import os
 import Image
 import ImageDraw
 import ImageFont
@@ -21,6 +22,26 @@ from EPD import EPD
 
 WHITE = 1
 BLACK = 0
+
+# fonts are in different places on Raspbian/Angstrom so search
+possible_fonts = [
+    '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono-Bold.ttf',   # R.Pi
+    '/usr/share/fonts/truetype/freefont/FreeMono.ttf',                # R.Pi
+    '/usr/share/fonts/truetype/LiberationMono-Bold.ttf',              # B.B
+    '/usr/share/fonts/truetype/DejaVuSansMono-Bold.ttf'               # B.B
+]
+
+
+FONT_FILE = ''
+for f in possible_fonts:
+    if os.path.exists(f):
+        FONT_FILE = f
+        break
+
+if '' == FONT_FILE:
+    raise 'no font file found'
+
+FONT_SIZE = 40
 
 MAX_START = 0xffff
 
@@ -54,8 +75,7 @@ def demo(epd, start):
     draw = ImageDraw.Draw(image)
     width, height = image.size
 
-    font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeMono.ttf', 40)
-    #font = ImageFont.truetype('/usr/share/fonts/truetype/droid/DroidSansMono.ttf', 40)
+    font = ImageFont.truetype(FONT_FILE, FONT_SIZE)
 
     counter = start & 0xffff
 
@@ -75,6 +95,6 @@ if "__main__" == __name__:
 
     try:
         main(sys.argv[1:])
-    except KeyboardInterrupt:   
+    except KeyboardInterrupt:
         sys.exit('interrupted')
         pass

@@ -1,30 +1,44 @@
 # Makefile
 
+PREFIX ?= /usr
+
+PLATFORM ?= ../RasberryPi
+
+
 FUSE_CFLAGS := $(shell pkg-config fuse --cflags)
 FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
 
 CFLAGS += ${FUSE_CFLAGS}
 CFLAGS += -Wall -Werror -std=gnu99
+CFLAGS += -I${PLATFORM}
 
 LDFLAGS += ${FUSE_LDFLAGS}
 LDFLAGS += -lrt
 
-PREFIX ?= /usr
-
 RM = rm -f
 
+
+VPATH = .:${PLATFORM}
 
 .PHONY: all
 all: gpio_test epd_test epd_fuse
 
+EPD_FUSE_CONF = ${PLATFORM}/epd-fuse.conf
+EPD_FUSE_SH = ${PLATFORM}/epd-fuse.sh
 
 .PHONY: install
 install: epd_fuse
 	install --group=root --mode=750 --owner=root epd_fuse "${PREFIX}/sbin"
-	install --group=root --mode=644 --owner=root epd-fuse.conf /etc/init
-	[ -e /etc/default/epd-fuse ] || install --group=root --mode=644 --owner=root epd-fuse.default /etc/default/epd-fuse
-	install --group=root --mode=755 --owner=root epd-fuse.sh /etc/init.d/epd-fuse
-	update-rc.d epd-fuse defaults
+	if [ -e "${EPD_FUSE_CONF}" ]  ; \
+	then \
+	  install --group=root --mode=644 --owner=root "${EPD_FUSE_CONF}" /etc/init ; \
+	fi
+	if [ -e "${EPD_FUSE_SH}" ] ; \
+	then \
+	  install --group=root --mode=755 --owner=root "${EPD_FUSE_SH}" /etc/init.d/epd-fuse ; \
+	  [ -e /etc/default/epd-fuse ] || install --group=root --mode=644 --owner=root epd-fuse.default /etc/default/epd-fuse ; \
+	  update-rc.d epd-fuse defaults ; \
+	fi
 
 .PHONY: remove
 remove:
@@ -68,8 +82,9 @@ epd_test: epd_test.o gpio.o spi.o epd.o
 
 
 # dependencies
-gpio_test.o: gpio.h
-epd_test.o: gpio.h spi.h epd.h
+gpio_test.o: gpio_test.h gpio.h
+epd_test.o: gpio.h epd_io.h spi.h epd.h
+epd_fuse.o: gpio.h epd_io.h spi.h epd.h
 
 gpio.o: gpio.h
 spi.o: spi.h

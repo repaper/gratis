@@ -175,7 +175,7 @@ EPD_type *EPD_create(EPD_size size,
 	epd->factored_stage_time = epd->stage_time;
 
 	// buffer for frame line
-	epd->line_buffer_size =  epd->bytes_per_line + epd->bytes_per_scan
+	epd->line_buffer_size = 2 * epd->bytes_per_line + epd->bytes_per_scan
 		+ 3; // command byte, border byte and filler byte
 
 	epd->line_buffer = malloc(epd->line_buffer_size);
@@ -191,6 +191,12 @@ EPD_type *EPD_create(EPD_size size,
 
 // deallocate memory
 void EPD_destroy(EPD_type *epd) {
+	if (NULL == epd) {
+		return;
+	}
+	if (NULL != epd->line_buffer) {
+		free(epd->line_buffer);
+	}
 	free(epd);
 }
 

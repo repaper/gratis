@@ -34,19 +34,12 @@
 #include "spi.h"
 #include "epd.h"
 
+#include "epd_io.h"
+
 
 static const char version_buffer[] = {STR(VERSION) "\n"};
 
 #define VERSION_SIZE (sizeof(version_buffer) - sizeof((char)'\0'))
-
-
-// GPIO setup
-#define panel_on_pin  GPIO_P1_16
-#define border_pin    GPIO_P1_08
-#define discharge_pin GPIO_P1_10
-#define pwm_pin       GPIO_P1_12
-#define reset_pin     GPIO_P1_18
-#define busy_pin      GPIO_P1_22
 
 
 static const char *version_path          = "/version";          // the program version string
@@ -58,7 +51,7 @@ static const char *display_inverted_path = "/display_inverse";  // the next imag
 static const char *command_path          = "/command";          // any write transfers display -> EPD and updates current
 static const char *temperature_path      = "/temperature";      // read/write temperature compensation setting
 
-static const char *spi_device = "/dev/spidev0.0";  // default Rasberry PI SPI device path
+static const char *spi_device = SPI_DEVICE;        // default SPI device path
 
 // expect that external process changes this just before update command
 // by sending text string e.g. shell:  echo 19 > /dev/epd/temperature

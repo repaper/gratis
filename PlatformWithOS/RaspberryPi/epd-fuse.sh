@@ -33,22 +33,21 @@ case $1 in
     mkdir -p "${EPD_MOUNTPOINT}"
     modprobe spi-bcm2708
     "${DAEMON}" --panel="${EPD_SIZE}" ${EPD_OPTS} "${EPD_MOUNTPOINT}"
-    status=$?
-    log_end_msg $status
+    log_end_msg "$?"
     ;;
   (stop)
     log_daemon_msg "Stopping EPD" "epd_fuse"
     umount -f "${EPD_MOUNTPOINT}"
-    log_end_msg $?
+    log_end_msg "$?"
     rm -f "${PIDFILE}"
     ;;
   (restart|force-reload)
-    $0 stop && sleep 2 && $0 start
+    "$0" stop && sleep 2 && "$0" start
     ;;
   (try-restart)
-    if $0 status > /dev/null
+    if "$0" status > /dev/null
     then
-      $0 restart
+      "$0" restart
     else
       exit 0
     fi

@@ -1,6 +1,6 @@
-# Raspberry Pi E-Ink Driver
+# Raspberry Pi / Beagle Bone Black E-Ink Driver
 
-# Driver Programs - Directory "driver"
+# Driver Programs - Directory "driver-common"
 
 * gpio_test - simple test for GPIO driver
 * epd_test - test program for direct driving EPD panel
@@ -13,24 +13,32 @@ These test programs should compile with no additional libraries, but
 the EPD driver needs the fuse development library installed.
 
 ~~~~~
+# Raspberry Pi
 sudo apt-get install libfuse-dev
+# Beagle Bone Black
+sudo opkg install libfuse-dev
 ~~~~~
 
 ### GPIO Test
 
-Connect two LEDs each with a limiting resistor (1k..2k); first
-resistor connects from `P1_10` to anode of LED1, second resistor
-connects from `P1_12` to anode of LED2, and both LED cathode connect
-to ground `P!_14`.  When the program is started LED1 will light and
-LED2 will brighten and dim under PWM control.  Both LEDs will turn off
-as program finishes (takes about a minute).  There are some other
-commented out LED flashing loops in this test.
+Connect three LEDs each with a limiting resistor (1k..2k); the
+resistor connects from an expansion connector pin to the anode of an
+LED.  Two of the LEDs will flash and the third will brighten and dim.
+
+Pin connections
+
+LED          R Pi    B B B    Description
+-----------  ------  -------  --------------------------
+LED_BLUE     P1_23   P9_15    Flashes on/off
+LED_WHITE    P1_21   P9_23    Fashes  off/on
+LED_PWM      P1_12   P9_14    Brightens and dims
+
 
 Build and run using:
 
 ~~~~~
-make gpio_test
-sudo ./gpio_test
+make rpi-gpio_test  # bb-gpio_test
+sudo ./driver-common/gpio_test
 ~~~~~
 
 
@@ -85,7 +93,7 @@ Build and run using:
 
 ~~~~~
 make epd_fuse
-sudo modprobe spi-bcm2708
+sudo modprobe spi-bcm2708  # not on Beagle Bone Black (note below)
 sudo mkdir /tmp/epd
 sudo ./epd_fuse --panel=2.0 /tmp/epd
 cat /tmp/epd/version
@@ -99,15 +107,16 @@ sudo umount -f /tmp/fuse
 rmdir /tmp/fuse
 ~~~~~
 
+Note: On the Beagle Bone firmware is loaded to enable the SPI
+
 
 # Starting EPD FUSE at Boot
 
-Need to install the launchd configuration in `/etc/init` and install
-the EPD FUSE program in /usr/sbin, there is a make target that does
-this.
+Need to install the startup script in `/etc/init.d` and install the
+EPD FUSE program in /usr/sbin, there is a make target that does this.
 
 ~~~~~
-sudo make install
+sudo make rpi-install   # OR bb-install
 sudo service epd-fuse start
 ls -l /dev/epd
 # to stop
@@ -122,7 +131,10 @@ sudo make remove
 These need the PIL library installed:
 
 ~~~~~
+# Raspberry Pi
 sudo apt-get install python-imaging
+# Beagle Bone Black
+sudo opkg install python-imaging
 ~~~~~
 
 
@@ -131,7 +143,7 @@ sudo apt-get install python-imaging
 Draw some lines, graphics and text
 
 ~~~~~
-python DrawDemo.py
+python demo/DrawDemo.py
 ~~~~~
 
 
@@ -153,8 +165,8 @@ if the aspect ration of the original image is not the same as the
 display.
 
 ~~~~~
-python ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/cat*
-python ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/d*.png
+python demo/ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/cat*
+python demo/ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/d*.png
 ~~~~~
 
 ## Twitter Demo
@@ -170,14 +182,24 @@ the App,just click the button to create an access token.
 Use *Ctrl-C* to stop this program.
 
 ~~~~~
+# Raspberry Pi
 sudo apt-get install python-setuptools
 sudo easy_install pip
+~~~~~
+
+~~~~~
+# Beagle Bone Black
+opkg install python-pip python-setuptools
+~~~~~
+
+~~~~~
+# All
 sudo pip install tweepy
 # setup the config
 cp tweepy_auth.py-SAMPLE tweepy_auth.py
 # *** edit the config
 # run the demo (this watches for linux)
-python TwitterDemo.py linux
+python demo/TwitterDemo.py linux
 ~~~~~
 
 
@@ -189,19 +211,21 @@ second number is the number of frames to display before the program
 exits.
 
 ~~~~~
-python PartialDemo.py 3 20
+python demo/PartialDemo.py 3 20
 ~~~~~
 
 
 ## Counter Demo
 
 Display a 4 digit hex counter uses partial update to only change the
-updated digits.
+updated digits.  This will look somewaht strange as the display inversion
+will make the counter appear to go through a sequence like:
+0000 0001 0000 0001 ...delay... 0001 0002 0001 0002
 
 Use *Ctrl-C* to stop this program.
 
 ~~~~~
-python CounterDemo.py 3 20
+python demo/CounterDemo.py 3 20
 ~~~~~
 
 
@@ -209,28 +233,28 @@ python CounterDemo.py 3 20
 
 This is for connection to the Evaluation board.
 
-Pin Number   Description       Colour   Raspberry Pi
-----------   ---------------   ------   -------------
-1.           Vcc 3V            Red      P1-01
+Pin Number   Description       Colour   Raspberry Pi           Beagle Bone Black
+----------   ---------------   ------   ---------------------  -------------------
+1.           Vcc 3V            Red      P1-01                  P9-03
 2.           *(LED1)*          White    -
 3.           *(UART_RX)*       Grey     -
 4.           *(UART_TX)*       Purple   -
 5.           *(SW2)*           Blue     -
-6.           Temperature       Green    - (need external ADC if required)
-7.           SPI\_CLK          Yellow   P1-23
-8.           BUSY              Orange   P1-22
-9.           PWM               Brown    P1-12
-10.          /RESET            Black    P1-18
-11.          PANEL\_ON         Red      P1-16
-12.          DISCHARGE         White    P1-10
-13.          BORDER_CONTROL    Grey     P1-08
-14.          SPI_MISO          Purple   P1-21
-15.          SPI_MOSI          Blue     P1-19
-16.          *(RST/SBWTDIO)*   Green    -           -            -
-17.          *(TEST/SBWTCK)*   Yellow   -           -            -
-18.          /FLASH\_CS        Orange   P1-26
-19.          /EPD\_CS          Brown    P1-24
-20.          GND               Black    P1-25
+6.           Temperature       Green    - (ext ADC required)   -?- P9-39 (not yet)
+7.           SPI\_CLK          Yellow   P1-23                  P9-22
+8.           BUSY              Orange   P1-22                  P9-27
+9.           PWM               Brown    P1-12                  P9-14
+10.          /RESET            Black    P1-18                  P9-25
+11.          PANEL\_ON         Red      P1-16                  P9-12
+12.          DISCHARGE         White    P1-10                  P9-23
+13.          BORDER_CONTROL    Grey     P1-08                  P9-15
+14.          SPI_MISO          Purple   P1-21                  P9-21
+15.          SPI_MOSI          Blue     P1-19                  P9-18
+16.          *(RST/SBWTDIO)*   Green    -                      -
+17.          *(TEST/SBWTCK)*   Yellow   -                      -
+18.          /FLASH\_CS        Orange   P1-26                  - Vcc P9-04
+19.          /EPD\_CS          Brown    P1-24                  P9-17
+20.          GND               Black    P1-25                  P9-01
 
 
 # TO DO / BUGS

@@ -58,7 +58,7 @@ SPI_type *SPI_create(const char *spi_path) {
 
 // release SPI fd (if open)
 bool SPI_destroy(SPI_type *spi) {
-	if (NULL == spi || spi->fd < 0) {
+	if (NULL == spi) {
 		return false;
 	}
 	close(spi->fd);
