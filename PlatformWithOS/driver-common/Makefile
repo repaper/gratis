@@ -42,10 +42,11 @@ install: epd_fuse
 
 .PHONY: remove
 remove:
-	update-rc.d epd-fuse remove
 	rm -f "${PREFIX}/sbin/epd_fuse"
 	rm -f /etc/init/epd-fuse.conf
 	rm -f /etc/init.d/epd-fuse
+	update-rc.d epd-fuse remove
+	[ -d /dev/epd ] && rmdir rmdir /dev/epd
 	echo NOT Removing: /etc/default/epd-fuse
 
 .PHONY: test-fuse
