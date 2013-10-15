@@ -25,5 +25,6 @@
 
 #define SPI_DEVICE    "/dev/spidev1.0"
 //#define SPI_DEVICE    "/dev/spidev1.1"
+#define SPI_BPS       2000000
 
 #endif

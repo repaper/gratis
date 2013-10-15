@@ -29,7 +29,7 @@ typedef struct SPI_struct SPI_type;
 // =========
 
 // enable SPI access SPI fd
-SPI_type *SPI_create(const char *spi_path);
+SPI_type *SPI_create(const char *spi_path, uint32_t bps);
 
 // release SPI fd
 bool SPI_destroy(SPI_type *spi);

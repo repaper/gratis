@@ -52,6 +52,7 @@ static const char *command_path          = "/command";          // any write tra
 static const char *temperature_path      = "/temperature";      // read/write temperature compensation setting
 
 static const char *spi_device = SPI_DEVICE;        // default SPI device path
+static const uint32_t spi_bps = SPI_BPS;           // default SPI device speed
 
 // expect that external process changes this just before update command
 // by sending text string e.g. shell:  echo 19 > /dev/epd/temperature
@@ -407,7 +408,7 @@ static void *display_init(struct fuse_conn_info *conn) {
 		goto done;
 	}
 
-	spi = SPI_create(spi_device);
+	spi = SPI_create(spi_device, spi_bps);
 	if (NULL == spi) {
 		warn("SPI_setup failed");
 		goto done_gpio;

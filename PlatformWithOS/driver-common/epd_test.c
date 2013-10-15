@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 		goto done;
 	}
 
-	SPI_type *spi = SPI_create(SPI_DEVICE);
+	SPI_type *spi = SPI_create(SPI_DEVICE, SPI_BPS);
 	if (NULL == spi) {
 		rc = 1;
 		warn("SPI_setup failed");
