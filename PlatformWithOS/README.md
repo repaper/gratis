@@ -51,9 +51,9 @@ installed.
 Build and run using:
 
 ~~~~~
-sudo modprobe spi-bcm2708
-make epd_test
-sudo ./epd_test
+sudo modprobe spi-bcm2708  # not needed for Beagle Bode Black
+make rpi-epd_test          # bb-epd_test
+sudo ./driver-common/epd_test
 ~~~~~
 
 ### EPD fuse
@@ -92,14 +92,14 @@ Notes:
 Build and run using:
 
 ~~~~~
-make epd_fuse
+make rpi-epd_fuse          # bb-epd_fuse
 sudo modprobe spi-bcm2708  # not on Beagle Bone Black (note below)
 sudo mkdir /tmp/epd
-sudo ./epd_fuse --panel=2.0 /tmp/epd
+sudo ./driver-common/epd_fuse --panel=2.0 /tmp/epd
 cat /tmp/epd/version
 cat /tmp/epd/panel
 echo C > /tmp/epd/command
-./xbm2bin < cat_2_0.xbm > /tmp/epd/display
+./driver-common/xbm2bin < cat_2_0.xbm > /tmp/epd/display
 echo U > /tmp/epd/command
 # try displaying other images
 # to shut down:
@@ -116,7 +116,7 @@ Need to install the startup script in `/etc/init.d` and install the
 EPD FUSE program in /usr/sbin, there is a make target that does this.
 
 ~~~~~
-sudo make rpi-install   # OR bb-install
+sudo make rpi-install   # bb-install
 sudo service epd-fuse start
 ls -l /dev/epd
 # to stop
