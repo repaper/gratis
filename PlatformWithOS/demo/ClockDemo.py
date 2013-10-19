@@ -19,6 +19,7 @@ import Image
 import ImageDraw
 import ImageFont
 from datetime import datetime
+import time
 from EPD import EPD
 
 WHITE = 1
@@ -75,12 +76,23 @@ def demo(epd):
     # clear the display buffer
     draw.rectangle((0, 0, width, height), fill=WHITE, outline=WHITE)
     previous_second = 0
+    previous_day = 0
 
     while True:
-        draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
-        now = datetime.today()
+        while True:
+            now = datetime.today()
+            if now.second % 5 == 0:
+                break
+            time.sleep(0.5)
+
+        if now.day != previous_day:
+            draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
+            draw.text((10, 55), '{y:04d}-{m:02d}-{d:02d}'.format(y=now.year, m=now.month, d=now.day), fill=BLACK, font=date_font)
+            previous_day = now.day
+        else:
+            draw.rectangle((5, 10, width - 5, 10 + CLOCK_FONT_SIZE), fill=WHITE, outline=WHITE)
+
         draw.text((5, 10), '{h:02d}:{m:02d}:{s:02d}'.format(h=now.hour, m=now.minute, s=now.second), fill=BLACK, font=clock_font)
-        draw.text((10, 55), '{y:04d}:{m:02d}:{d:02d}'.format(y=now.year, m=now.month, d=now.day), fill=BLACK, font=date_font)
 
         # display image on the panel
         epd.display(image)
