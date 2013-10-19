@@ -68,7 +68,7 @@ def main(argv):
 def demo(epd, start):
     """simple partial update demo - draw random shapes"""
 
-    # initiall set all white background
+    # initially set all white background
     image = Image.new('1', epd.size, WHITE)
 
     # prepare for drawing

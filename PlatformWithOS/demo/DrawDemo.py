@@ -36,7 +36,7 @@ def main(argv):
 def demo(epd):
     """simple drawing demo - black drawing on white background"""
 
-    # initiall set all white background
+    # initially set all white background
     image = Image.new('1', epd.size, WHITE)
 
     # prepare for drawing
