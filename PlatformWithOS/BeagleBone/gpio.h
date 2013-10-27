@@ -19,7 +19,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define GPIO_PIN(bank, pin) ((((bank) & 0xff) << 8) | ((pin) & 0xff))
+// assumes 32 bit GPIO ports
+#define GPIO_PIN(bank, pin) ((bank) * 32 + ((pin) & 0x1f))
 
 #define GPIO_PWM_PIN(n) (-2 - (n))
 

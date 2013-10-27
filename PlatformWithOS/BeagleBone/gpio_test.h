@@ -17,8 +17,14 @@
 
 #include "gpio.h"
 
-#define LED_BLUE GPIO_P9_15
-#define LED_WHITE GPIO_P9_23
+//#define LED_BLUE GPIO_P9_12
+//#define LED_WHITE GPIO_P9_15
+
+//#define LED_BLUE GPIO_P9_15
+//#define LED_WHITE GPIO_P9_23
+
+#define LED_BLUE GPIO_P9_26
+#define LED_WHITE GPIO_P9_27
 
 #define LED_PWM GPIO_P9_14
 

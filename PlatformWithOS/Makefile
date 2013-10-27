@@ -10,7 +10,7 @@ help:
 	@echo '   make rpi-install    = install fuse driver in PREFIX'
 	@echo '   make rpi-T          = build only target T'
 	@echo
-	@echo Beagle Bone
+	@echo BeagleBone
 	@echo '   make bb             = build all targets'
 	@echo '   make bb-install     = install fuse driver in PREFIX'
 	@echo '   make bb-T           = build only target T'

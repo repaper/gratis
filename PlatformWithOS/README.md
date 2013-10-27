@@ -1,10 +1,25 @@
-# Raspberry Pi / Beagle Bone Black E-Ink Driver
+#  E-Ink Driver for: Raspberry Pi / BeagleBone Black
 
 # Driver Programs - Directory "driver-common"
 
 * gpio_test - simple test for GPIO driver
 * epd_test - test program for direct driving EPD panel
 * epd_fuse - present EPD as a file for easy control
+
+
+## Extra item for BeagleBone
+
+The program uses device tree files to access the GPIOs, so
+Install the necessary firware files from: https://github.com/nomel/beaglebone
+
+~~~~~
+git clone https://github.com/nomel/beaglebone.git
+cp -p beaglebone/gpio-header/generated/gpio-P9.* /lib/firmware
+~~~~~
+
+Note: There is a README-BeagleBoneBlack.md that you should also read
+as it explains the update of the Angstomsystem on the SD Car in more
+detail.
 
 
 ## Compiling
@@ -15,7 +30,7 @@ the EPD driver needs the fuse development library installed.
 ~~~~~
 # Raspberry Pi
 sudo apt-get install libfuse-dev
-# Beagle Bone Black
+# BeagleBone Black
 sudo opkg install libfuse-dev
 ~~~~~
 
@@ -48,13 +63,21 @@ This will first clear the panel then display a series of images (all
 2.0" images from Arduino example).  This need the Linux SPI module
 installed.
 
-Build and run using:
+#### Raspberry Pi: Build and run using:
 
 ~~~~~
-sudo modprobe spi-bcm2708  # not needed for Beagle Bode Black
-make rpi-epd_test          # bb-epd_test
+sudo modprobe spi-bcm2708
+make rpi-epd_test
 sudo ./driver-common/epd_test
 ~~~~~
+
+#### BeagleBone Black: Build and run using:
+
+~~~~~
+make bb-epd_test
+sudo ./driver-common/epd_test
+~~~~~
+
 
 ### EPD fuse
 
@@ -93,7 +116,7 @@ Build and run using:
 
 ~~~~~
 make rpi-epd_fuse          # bb-epd_fuse
-sudo modprobe spi-bcm2708  # not on Beagle Bone Black (note below)
+sudo modprobe spi-bcm2708  # not on BeagleBone Black (note below)
 sudo mkdir /tmp/epd
 sudo ./driver-common/epd_fuse --panel=2.0 /tmp/epd
 cat /tmp/epd/version
@@ -107,7 +130,7 @@ sudo umount -f /tmp/fuse
 rmdir /tmp/fuse
 ~~~~~
 
-Note: On the Beagle Bone firmware is loaded to enable the SPI
+Note: On the BeagleBone firmware is loaded to enable the SPI
 
 
 # Starting EPD FUSE at Boot
@@ -133,7 +156,7 @@ These need the PIL library installed:
 ~~~~~
 # Raspberry Pi
 sudo apt-get install python-imaging
-# Beagle Bone Black
+# BeagleBone Black
 sudo opkg install python-imaging
 ~~~~~
 
@@ -188,7 +211,7 @@ sudo easy_install pip
 ~~~~~
 
 ~~~~~
-# Beagle Bone Black
+# BeagleBone Black
 opkg install python-pip python-setuptools
 ~~~~~
 
@@ -233,7 +256,7 @@ python demo/CounterDemo.py 3 20
 
 This is for connection to the Evaluation board.
 
-Pin Number   Description       Colour   Raspberry Pi           Beagle Bone Black
+Pin Number   Description       Colour   Raspberry Pi           BeagleBone Black
 ----------   ---------------   ------   ---------------------  -------------------
 1.           Vcc 3V            Red      P1-01                  P9-03
 2.           *(LED1)*          White    -
@@ -244,7 +267,7 @@ Pin Number   Description       Colour   Raspberry Pi           Beagle Bone Black
 7.           SPI\_CLK          Yellow   P1-23                  P9-22
 8.           BUSY              Orange   P1-22                  P9-27
 9.           PWM               Brown    P1-12                  P9-14
-10.          /RESET            Black    P1-18                  P9-25
+10.          /RESET            Black    P1-18                  P9-26
 11.          PANEL\_ON         Red      P1-16                  P9-12
 12.          DISCHARGE         White    P1-10                  P9-23
 13.          BORDER_CONTROL    Grey     P1-08                  P9-15

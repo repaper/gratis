@@ -20,7 +20,7 @@
 #define border_pin    GPIO_P9_15
 #define discharge_pin GPIO_P9_23
 #define pwm_pin       GPIO_P9_14
-#define reset_pin     GPIO_P9_25
+#define reset_pin     GPIO_P9_26
 #define busy_pin      GPIO_P9_27
 
 #define SPI_DEVICE    "/dev/spidev1.0"

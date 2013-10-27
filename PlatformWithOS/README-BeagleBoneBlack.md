@@ -1,6 +1,6 @@
-# Initially configuring Angstrom on the Beagle Bone black
+# Initially configuring Angstrom on the BeagleBone black
 
-The Beagle Bone Black is slightly more problematic to set up, so here
+The BeagleBone Black is slightly more problematic to set up, so here
 is a quick start guide:
 
 Starting from a freshly created SD card image.  power on the system
@@ -89,10 +89,27 @@ git config --global --replace-all http.sslVerify true
 git config --global --replace-all http.sslCAInfo /etc/ssl/certs/ca-certificates.crt
 ~~~~~
 
-Now clone the repository:
+Now clone the repaper repository:
 
 ~~~~~
 git clone https://github.com/repaper/gratis.git
+~~~~~
+
+Also clone the nomel reposoitory from https://github.com/nomel/beaglebone
+then install the necessary P9 firware files:
+
+~~~~~
+git clone https://github.com/nomel/beaglebone.git
+cp -p beaglebone/gpio-header/generated/gpio-P9.* /lib/firmware
+~~~~~
+
+Optional step:
+
+If you intend to make changes to use the P8 GPIO pin header then also
+add the P8 firmware files as follows:
+
+~~~~~
+cp -p beaglebone/gpio-header/generated/gpio-P8.* /lib/firmware
 ~~~~~
 
 
@@ -135,3 +152,8 @@ Try the python demo programs as described in the main README.md file
 
 The fuse driver will load at boot, so also try rebooting, logging in
 and running a python demo program to verify this.
+
+
+## Run demo programs
+
+As descriped in the main README.md
