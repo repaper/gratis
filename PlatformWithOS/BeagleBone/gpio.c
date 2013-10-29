@@ -42,13 +42,16 @@
 static char *slots = NULL;
 static char *ocp = NULL;
 
+
 // GPIO
 
 #define MAKE_PIN(_name, _bank, _pin)   \
 	[GPIO_PIN(_bank, _pin)] = {    \
 		.name = _name "\n",    \
+		.state = NULL,         \
 		.number = NULL,        \
 		.direction = NULL,     \
+		.active_low = NULL,    \
 		.value = NULL,         \
 		.fd = -1               \
 	}
@@ -648,7 +651,7 @@ static bool GPIO_enable(int pin) {
 			// up access assumes most read/write go to
 			// this as other items (like direction) are
 			// only changed oocaisionally.
-			gpio_info[pin].fd = open(gpio_info[pin].value, O_RDWR);
+			gpio_info[pin].fd = open(gpio_info[pin].value, O_RDWR | O_EXCL);
 			if (gpio_info[pin].fd < 0) {
 				break;  // failed
 			}
@@ -685,9 +688,9 @@ static bool GPIO_enable(int pin) {
 	if (NULL != gpio_info[pin].value) {
 		free(gpio_info[pin].value);
 		gpio_info[pin].value = NULL;
-	}	return NULL != gpio_info[pin].name;
+	}
 
-	return false; //failed
+	return false; // failed
 }
 
 
