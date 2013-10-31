@@ -55,10 +55,25 @@ time opkg upgrade
 ~~~~~
 
 It seems to be happening because the board has only limited RAM for
-temporary file systems and opkg does not clean up downloads that have
-already be installed.  Hopefully the second time will succeed and
-takes another hour.  i.e. a little ove two hours for the whole update
+temporary file systems and `opkg` does not clean up downloads that
+have already be installed.  Hopefully the second time will succeed and
+takes another hour.  i.e. a little over two hours for the whole update
 (depending on how early you catch the short write failure)
+
+On a second try starting from a fresh SD Image, which was first
+expanded to the full card the upgrade failed earlier and the
+`resolv.conf` was back at 127.0.0.1, so it was necessary to reset it;
+I used:
+
+~~~~~
+echo nameserver ${DNS_IP} > /etc/resolv.conf
+~~~~~
+
+(Note: This second try still suffered from the `wget: short write` and
+needed the upgrade restarting - though it eventually finished, was
+powered of, restarted and a final `opkg upgrade` showed no addition
+upgrades and no configuration errors.  The remaining steps went as
+detailed below and the epd_test program ran correctly.)
 
 
 # Reboot the system
