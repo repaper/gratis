@@ -48,8 +48,8 @@
 
 // Change this for different display size
 // supported sizes: 1_44 2_0 2_7
-// #define EPD_SIZE EPD_2_0
 #define EPD_SIZE EPD_2_0
+// #define EPD_SIZE EPD_2_7
 
 
 // current version number
@@ -97,12 +97,24 @@ const int Pin_SD_CS = 10;
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS, SPI);
+EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
 
 
 File index_file;
 File current_image;
 File next_image;
+
+
+// EPD use of SPI totally disrupts SPI settings
+// this attempts to replicate the SPI settings for SD card
+// Check it against your particular SD interface
+void set_spi_for_sdcard(void) {
+//	SPI.end();
+	SPI.begin();
+	SPI.setDataMode(SPI_MODE0);
+	SPI.setBitOrder(MSBFIRST);
+	SPI.setClockDivider(SPI_CLOCK_DIV128);
+}
 
 
 void open_index() {
@@ -179,31 +191,16 @@ int get_image() {
 	return seconds;
 }
 
-// ensure clock is ok for EPD
-// as any SD operation alters the SPI configuration
-void set_spi_for_epd() {
-	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
-	SPI.setClockDivider(SPI_CLOCK_DIV4);
-}
-
-
 // read a block from the current image
 void next_image_reader(void *buffer, uint32_t address, uint16_t length) {
-	byte *my_buffer = (byte *)buffer;
-	for(uint16_t i = 0; i < length; i++){
-		next_image.seek(address + i);
-		*my_buffer++ = next_image.read();
-	}
-	set_spi_for_epd();  // ensure SPI OK for EPD
+	set_spi_for_sdcard();
+	next_image.seek(address);
+	next_image.read(buffer, length);
 }
 void current_image_reader(void *buffer, uint32_t address, uint16_t length){
-	byte *my_buffer = (byte *)buffer;
-	for (uint16_t i = 0; i < length; ++i){
-		current_image.seek(address + i);
-		*my_buffer++ = current_image.read();
-	}
-	set_spi_for_epd();  // ensure SPI OK for EPD
+	set_spi_for_sdcard();
+	current_image.seek(address);
+	current_image.read(buffer, length);
 }
 
 
@@ -228,11 +225,6 @@ void setup() {
 	digitalWrite(Pin_EPD_CS, LOW);
 	digitalWrite(Pin_FLASH_CS, HIGH);
 
-	SPI.begin();
-	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
-	SPI.setClockDivider(SPI_CLOCK_DIV4);
-
 #if !defined(__MSP430_CPU__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
@@ -244,7 +236,7 @@ void setup() {
 	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
 	Serial.println();
 
-	FLASH.begin(Pin_FLASH_CS, SPI);
+	FLASH.begin(Pin_FLASH_CS);
 	if (FLASH.available()) {
 		Serial.println("FLASH chip detected OK");
 	} else {
@@ -286,7 +278,6 @@ void loop() {
 	int seconds = get_image();
 
 	//*** maybe need to ensure clock is ok for EPD
-	set_spi_for_epd();
 
 	EPD.begin(); // power up the EPD panel
 	EPD.setFactor(temperature); // adjust for current temperature
@@ -311,6 +302,8 @@ void loop() {
 		break;
 	}
 	EPD.end();   // power down the EPD panel
+
+	set_spi_for_sdcard();
 
 	// wait for 5 seconds
 	for (int x = 0; x < seconds; ++x) {
