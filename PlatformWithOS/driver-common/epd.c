@@ -329,7 +329,7 @@ void EPD_end(EPD_type *epd) {
 	// dummy line and border
 	if (EPD_1_44 == epd->size) {
 		// only for 1.44" EPD
-		line(epd, 0x7fffu, 0, 0xaa, NULL, EPD_normal);
+		line(epd, 0x7fffu, 0, 0x55, NULL, EPD_normal);
 
 		Delay_ms(250);
 
