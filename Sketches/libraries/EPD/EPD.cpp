@@ -244,7 +244,7 @@ void EPD_Class::end() {
 	// dummy line and border
 	if (EPD_1_44 == this->size) {
 		// only for 1.44" EPD
-		this->line(0x7fffu, 0, 0xaa, false, EPD_normal);
+		this->line(0x7fffu, 0, 0x55, false, EPD_normal);
 
 		Delay_ms(250);
 
