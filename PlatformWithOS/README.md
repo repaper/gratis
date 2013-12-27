@@ -241,7 +241,7 @@ python demo/PartialDemo.py 3 20
 ## Counter Demo
 
 Display a 4 digit hex counter uses partial update to only change the
-updated digits.  This will look somewaht strange as the display inversion
+updated digits.  This will look somewhat strange as the display inversion
 will make the counter appear to go through a sequence like:
 0000 0001 0000 0001 ...delay... 0001 0002 0001 0002
 
