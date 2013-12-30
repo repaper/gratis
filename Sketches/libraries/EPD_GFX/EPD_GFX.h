@@ -52,7 +52,7 @@ public:
 	void end();
 
 	// set a single pixel in new_image
-	void drawPixel(int x, int y, unsigned int colour) {
+	void drawPixel(int16_t x, int16_t y, uint16_t colour) {
 		int bit = x & 0x07;
 		int byte = x / 8 + y * (pixel_width / 8);
 		int mask = 0x01 << bit;
