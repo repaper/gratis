@@ -68,11 +68,14 @@ serial port (9600 8N1).  Functions include XBM upload to to the SPI
 FLASH chip on the EPD evaluation board, display image from this FLASH
 and several other functions.
 
-Use the `h` command on the serial port (9600 8N1) to obtain a list
-of commands.
+Use the `h` command on the serial port (9600 8N1) to obtain a list of
+commands.  Some of the commands are shown like `e<ss>` this *<ss>*
+represents a two digit FLASH sector number in the range *00..ff* (a
+total of 256 sectors).  The 1.44" and 2.0" display images take one sector
+but the 2.7" displays take two ajacent sectors.
 
 When using the serial monitor on Arduino/Energia IDE any command that
-take a hex number as parameter need a `<space>` character after it, as
+take a hex number as parameter needs a `<space>` character after it, as
 the **Send** button will not automatically add a CR/LF.  For single
 letter commands like the `t` temperature sensor read just type the
 character and click **Send**.
@@ -82,6 +85,18 @@ command removes an image and the `i` command displays an image.
 e.g. if the current image was from sector 30 and you wanted to change
 to sector 43 then type `r30<space>i43<space>` into the serial monitor
 and click **Send**.
+
+The upload command `u` need a terminal emulator with ASCII upload
+capability or the ability to resond to a paste of the entire contents
+of an XBM file.  Also note that the `u` command does not erase the
+sector before uploading.  To use the upload to upload an XBM into
+sector 3b for example type `u3b<space>` then start the ASCII upload or
+paste the contents of the XBM file into the terminal window on upload
+completion an image size message is displayed.
+
+The image stoare is compatible with the flash_loader sketch as
+describe below and that program can be used to cycle through a set of
+images uploaded by this program.
 
 
 ## Flash Loader Sketch
