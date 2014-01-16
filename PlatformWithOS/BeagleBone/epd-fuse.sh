@@ -44,14 +44,14 @@ DAEMON=/usr/sbin/epd_fuse
 
 test -x "${DAEMON}" || exit 5
 
-# default configuration (change /etc/default/epd_fuse, not these)
+# default configuration (change /etc/default/epd-fuse, not these)
 EPD_MOUNTPOINT=/dev/epd
 EPD_SIZE=2.0
 EPD_OPTS='-o allow_other -o default_permissions'
 
-if [ -r /etc/default/epd_fuse ]
+if [ -r /etc/default/epd-fuse ]
 then
-  . /etc/default/epd_fuse
+  . /etc/default/epd-fuse
 fi
 
 case $1 in
