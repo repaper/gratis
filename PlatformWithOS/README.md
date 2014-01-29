@@ -118,7 +118,7 @@ Build and run using:
 make rpi-epd_fuse          # bb-epd_fuse
 sudo modprobe spi-bcm2708  # not on BeagleBone Black (note below)
 sudo mkdir /tmp/epd
-sudo ./driver-common/epd_fuse --panel=2.0 /tmp/epd
+sudo ./driver-common/epd_fuse --panel=2.0 -o allow_other -o default_permissions /tmp/epd
 cat /tmp/epd/version
 cat /tmp/epd/panel
 echo C > /tmp/epd/command
