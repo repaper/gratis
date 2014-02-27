@@ -31,6 +31,18 @@ supported and this needs [Java](http://java.com) to be installed.
 
 # Example Programs
 
+**IMPORTANT NOTES for COG V2**
+
+1. The programs below only support the COG V1 using the `EPD` library.
+2. There is preliminary support for COG V2 by the `EPD2` library
+   since the driving sequence is very different.
+3. There is an initial translation of `demo` into `demo2`.
+4. The COG V2 can be used with current extension board
+5. The COG V2 does not use PWM - this can be disconnected from
+   the LaunchPad/Arduino.
+
+---
+
 The example programs support both the Arduino (Atmel AVR) and the
 Energia (TI LaunchPad with MSP430G2553).
 
@@ -40,7 +52,7 @@ This code does the following:
 1. Convert PROGMEM types to normal types for the TI MCU since it has a unified
    address space.
 
-1. Adjust the I/O pins definitions and ADC reference for differences between
+2. Adjust the I/O pins definitions and ADC reference for differences between
    the two platforms.
 
 ## Demo Sketch
@@ -64,15 +76,15 @@ fit on this platform.
 > Link to the [command source](https://github.com/repaper/gratis/tree/master/Sketches/command).
 
 A command-line example that accepts single character command from the
-serial port (9600 8N1).  Functions include XBM upload to to the SPI
-FLASH chip on the EPD evaluation board, display image from this FLASH
-and several other functions.
+serial port (9600 8N1).  Functions include XBM upload to the SPI FLASH
+chip on the EPD evaluation board, display image from this FLASH and
+several other functions.
 
 Use the `h` command on the serial port (9600 8N1) to obtain a list of
 commands.  Some of the commands are shown like `e<ss>` this *<ss>*
 represents a two digit FLASH sector number in the range *00..ff* (a
 total of 256 sectors).  The 1.44" and 2.0" display images take one sector
-but the 2.7" displays take two ajacent sectors.
+but the 2.7" displays take two adjacent sectors.
 
 When using the serial monitor on Arduino/Energia IDE any command that
 take a hex number as parameter needs a `<space>` character after it, as
@@ -87,15 +99,15 @@ to sector 43 then type `r30<space>i43<space>` into the serial monitor
 and click **Send**.
 
 The upload command `u` need a terminal emulator with ASCII upload
-capability or the ability to resond to a paste of the entire contents
+capability or the ability to respond to a paste of the entire contents
 of an XBM file.  Also note that the `u` command does not erase the
 sector before uploading.  To use the upload to upload an XBM into
 sector 3b for example type `u3b<space>` then start the ASCII upload or
 paste the contents of the XBM file into the terminal window on upload
 completion an image size message is displayed.
 
-The image stoare is compatible with the flash_loader sketch as
-describe below and that program can be used to cycle through a set of
+The image stored is compatible with the flash_loader sketch as
+described below and that program can be used to cycle through a set of
 images uploaded by this program.
 
 
@@ -105,7 +117,7 @@ images uploaded by this program.
 
 this program has two modes of operation:
 
-1. Copy a #inculded image to the FLASH chip on the eval board.  define
+1. Copy a #included image to the FLASH chip on the eval board.  define
    the image name and the destination sector.  After programming the
    image will be displayed
 
@@ -113,7 +125,7 @@ this program has two modes of operation:
    A list of sector numbers an millisecod delay times defined by the
    `DISPLAY_LIST` macro to enable this mode.  In this mode the flash
    programming does not occur.  The images are stored in the same
-   forma as the command program above, so any images uploaded by it
+   format as the command program above, so any images uploaded by it
    can be displayed by this program
 
 
@@ -156,7 +168,7 @@ the Command: `tail -n +4 "${xbm}" | xxd -r -p > "${bin}"` Where the
 variables `xbm` represents the XBM source file and `bin`
 represents the binary output file name.  This results in the bytes in
 the binary file having the same values as the hex numbers in the XBM
-file.  Note that the Arduino SD code uses the 8.3 filename format so
+file.  Note that the Arduino SD code uses the 8.3 file name format so
 choose a compatible name e.g. `cat.20`
 
 Portability - This should work on other Arduinos that have an SD or
@@ -173,8 +185,9 @@ Pin 10 as in AlaMode case.
   these directly.  The Command program can use these files for its
   upload command.
 * **FLASH** - Driver for the SPI FLASH chip on the EPD eval board.
-* **EPD** - E-Ink Panel driver.
-* **EPD_GFX** - This subclasses the
+* **EPD** - E-Ink Panel driver (COG V1).
+* **EPD2** - E-Ink Panel driver (COG V2) *experimental*.
+* **EPD_GFX** - This sub-classes the
   [Adafruit_GFX library](https://github.com/adafruit/Adafruit-GFX-Library)
   which needs to be downloaded an installed in to the libraries folder
   an named **Adafruit_GFX**.  **IMPORTANT** - This library module needs at
