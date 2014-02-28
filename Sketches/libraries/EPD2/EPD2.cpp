@@ -427,7 +427,7 @@ void EPD_Class::frame_fixed_13(uint8_t value, EPD_stage stage) {
 }
 
 
-void EPD_Class::frame_data_13(PROGMEM const uint8_t *image, EPD_stage stage) {
+void EPD_Class::frame_data_13(PROGMEM const uint8_t *image, EPD_stage stage, bool read_progmem) {
 
 	int repeat;
 	int step;
@@ -454,39 +454,49 @@ void EPD_Class::frame_data_13(PROGMEM const uint8_t *image, EPD_stage stage) {
 				} else if (0 == offset && n == repeat - 1) {
 					this->line(pos, 0, 0x00, false, EPD_normal);
 				} else {
-					this->line(pos, &image[pos * this->bytes_per_line], 0, true, stage);
+					this->line(pos, &image[pos * this->bytes_per_line], 0, read_progmem, stage);
 				}
 			}
 		}
 	}
 }
 
-#if 0
-void EPD_Class::frame_data(PROGMEM const uint8_t *image, EPD_stage stage) {
-	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
-		this->line(line, &image[line * this->bytes_per_line], 0, true, stage);
+
+void EPD_Class::frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stage) {
+	uint8_t buffer[264 / 8]; // allows for 2.70" panel
+	int repeat;
+	int step;
+	int block;
+	if (EPD_inverse == stage) {  // stage 1
+		repeat = this->compensation->stage1_repeat;
+		step = this->compensation->stage1_step;
+		block = this->compensation->stage1_block;
+	} else {                     // stage 3
+		repeat = this->compensation->stage3_repeat;
+		step = this->compensation->stage3_step;
+		block = this->compensation->stage3_block;
+	}
+
+	int total_lines = this->lines_per_display;
+
+	for (int n = 0; n < repeat; ++n) {
+
+		for (int line = step - block; line < total_lines + step; line += step) {
+			for (int offset = 0; offset < block; ++offset) {
+				int pos = line + offset;
+				if (pos < 0 || pos > total_lines) {
+					this->line(0x7fffu, 0, 0x00, false, EPD_normal);
+				} else if (0 == offset && n == repeat - 1) {
+					this->line(pos, 0, 0x00, false, EPD_normal);
+				} else {
+					reader(buffer, address + pos * this->bytes_per_line, this->bytes_per_line);
+					this->line(pos, buffer, 0, false, stage);
+				}
+			}
+		}
 	}
 }
-#endif
 
-
-#if defined(EPD_ENABLE_EXTRA_SRAM)
-void EPD_Class::frame_sram(const uint8_t *image, EPD_stage stage) {
-	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
-		this->line(line, &image[line * this->bytes_per_line], 0, false, stage);
-	}
-}
-#endif
-
-#if 0
-void EPD_Class::frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage) {
-	static uint8_t buffer[264 / 8];
-	for (uint8_t line = 0; line < this->lines_per_display; ++line) {
-		reader(buffer, address + line * this->bytes_per_line, this->bytes_per_line);
-		this->line(line, buffer, 0, false, stage);
-	}
-}
-#endif
 
 void EPD_Class::frame_stage2() {
 	for (int i = 0; i < this->compensation->stage2_repeat; ++i) {
@@ -495,47 +505,6 @@ void EPD_Class::frame_stage2() {
 	}
 }
 
-#if 0
-void EPD_Class::frame_fixed_repeat(uint8_t fixed_value, EPD_stage stage) {
-	int repeat = (EPD_inverse == stage) ? this->compensation->stage1_repeat : this->compensation->stage3_repeat;
-	for (int i = 0; i < repeat; ++i) {
-		this->frame_fixed(fixed_value);
-	}
-}
-
-void EPD_Class::frame_data_repeat(PROGMEM const uint8_t *image, EPD_stage stage) {
-	int repeat = (EPD_inverse == stage) ? this->compensation->stage1_repeat : this->compensation->stage3_repeat;
-	for (int i = 0; i < repeat; ++i) {
-		this->frame_data(image, stage);
-	}
-}
-#endif
-
-#if defined(EPD_ENABLE_EXTRA_SRAM)
-void EPD_Class::frame_sram_repeat(const uint8_t *image, EPD_stage stage) {
-	long stage_time = this->factored_stage_time;
-	do {
-		unsigned long t_start = millis();
-		this->frame_sram(image, stage);
-		unsigned long t_end = millis();
-		if (t_end > t_start) {
-			stage_time -= t_end - t_start;
-		} else {
-			stage_time -= t_start - t_end + 1 + ULONG_MAX;
-		}
-	} while (stage_time > 0);
-}
-#endif
-
-
-#if 0
-void EPD_Class::frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage) {
-	int repeat = (EPD_inverse == stage) ? this->compensation->stage1_repeat : this->compensation->stage3_repeat;
-	for (int i = 0; i < repeat; ++i) {
-		this->frame_cb(address, reader, stage);
-	}
-}
-#endif
 
 void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
 		     bool read_progmem, EPD_stage stage, uint8_t border_byte) {

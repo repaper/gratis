@@ -121,12 +121,9 @@ public:
 
 	// change from old image to new image (SRAM version)
 	void image_sram(const uint8_t *image_data) {
-		this->frame_sram_repeat(image_data, EPD_inverse);
-		this->frame_fixed(0xff);
-		this->frame_fixed(0xaa);
-		this->frame_fixed(0xff);
-		this->frame_fixed(0xaa);
-		this->frame_sram_repeat(image_data, EPD_normal);
+		this->frame_sram_13(image_data, EPD_inverse, false);
+		this->frame_stage2();
+		this->frame_sram_13(image_data, EPD_normal, false);
 	}
 #endif
 
@@ -135,23 +132,14 @@ public:
 
 	// single frame refresh
 	void frame_fixed_timed(uint8_t fixed_value, long stage_time);
-#if 0
-	void frame_data(PROGMEM const uint8_t *image_data, EPD_stage stage);
-#if defined(EPD_ENABLE_EXTRA_SRAM)
-	void frame_sram(const uint8_t *image_data, EPD_stage stage);
-#endif
-	void frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage);
-#endif
+
 	// the B/W toggle stage
 	void frame_stage2();
 
 	// stages 1/3 functions
 	void frame_fixed_13(uint8_t fixed_value, EPD_stage stage);
-	void frame_data_13(PROGMEM const uint8_t *image_data, EPD_stage stage);
-#if defined(EPD_ENABLE_EXTRA_SRAM)
-	void frame_sram_repeat(const uint8_t *image_data, EPD_stage stage);
-#endif
-//	void frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage);
+	void frame_data_13(PROGMEM const uint8_t *image_data, EPD_stage stage, bool read_progmem = true);
+	void frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// single line display - very low-level
 	// also has to handle AVR progmem
