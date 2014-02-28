@@ -188,6 +188,26 @@ void FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
 }
 
 
+#if !defined(__MSP430_CPU__)
+void FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *buffer, uint16_t length) {
+	while (this->is_busy()) {
+	}
+
+	digitalWrite(this->CS, LOW);
+	Delay_us(10);
+	SPI.transfer(FLASH_PP);
+	SPI.transfer(address >> 16);
+	SPI.transfer(address >> 8);
+	SPI.transfer(address);
+	for (PROGMEM const uint8_t *p = (PROGMEM const uint8_t *)buffer; length != 0; ++p, --length) {
+		uint8_t the_byte = pgm_read_byte_near(p);
+		SPI.transfer(the_byte);
+	}
+	this->spi_teardown();
+}
+#endif
+
+
 void FLASH_Class::sector_erase(uint32_t address) {
 	while (this->is_busy()) {
 	}

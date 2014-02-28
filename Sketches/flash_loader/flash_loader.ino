@@ -251,7 +251,8 @@ void loop() {
 		break;
 
 	case 1:         // next image
-		uint32_t address = display_list[display_index].sector << 12;
+		uint32_t address = display_list[display_index].sector;
+		address <<= 12;
 		Serial.print("Address = 0x");
 		Serial.println(address, HEX);
 		delay_counts = display_list[display_index].delay_ms;
@@ -307,7 +308,7 @@ static void flash_read(void *buffer, uint32_t address, uint16_t length) {
 
 #if !defined(DISPLAY_LIST)
 // program image into FLASH
-static void flash_program(uint16_t sector, const void *buffer, uint16_t length) {
+static void flash_program(uint16_t sector, PROGMEM const void *buffer, uint16_t length) {
 	Serial.print("FLASH: program sector = ");
 	Serial.println(sector, DEC);
 	Serial.print("       from memory @ 0x");
@@ -315,7 +316,7 @@ static void flash_program(uint16_t sector, const void *buffer, uint16_t length) 
 	Serial.print("  total bytes: ");
 	Serial.println(length, DEC);
 
-	uint32_t address = sector << FLASH_SECTOR_SHIFT;
+	uint32_t address = (uint32_t)(sector) << FLASH_SECTOR_SHIFT;
 
 	// erase required sectors
 	for (int i = 0; i < length; i += FLASH_SECTOR_SIZE, address += FLASH_SECTOR_SIZE) {
@@ -326,8 +327,8 @@ static void flash_program(uint16_t sector, const void *buffer, uint16_t length) 
 	}
 
 	// writable pages are FLASH_PAGE_SIZE bytes
-	const uint8_t *p = (const uint8_t *)buffer;
-	for (address = sector << FLASH_SECTOR_SHIFT; length >= FLASH_PAGE_SIZE;
+	PROGMEM const uint8_t *p = (PROGMEM const uint8_t *)buffer;
+	for (address = (uint32_t)(sector) << FLASH_SECTOR_SHIFT; length >= FLASH_PAGE_SIZE;
 	     length -= FLASH_PAGE_SIZE, address += FLASH_PAGE_SIZE, p += FLASH_PAGE_SIZE) {
 		Serial.print("FLASH: write @ 0x");
 		Serial.print(address, HEX);
@@ -336,7 +337,7 @@ static void flash_program(uint16_t sector, const void *buffer, uint16_t length) 
 		Serial.print("  bytes: 0x");
 		Serial.println(FLASH_PAGE_SIZE, HEX);
 		FLASH.write_enable();
-		FLASH.write(address, p, FLASH_PAGE_SIZE);
+		FLASH.write_from_progmem(address, p, FLASH_PAGE_SIZE);
 	}
 	// write any remaining partial page
 	if (length > 0) {
@@ -347,7 +348,7 @@ static void flash_program(uint16_t sector, const void *buffer, uint16_t length) 
 		Serial.print("  bytes: 0x");
 		Serial.println(length, HEX);
 		FLASH.write_enable();
-		FLASH.write(address, p, length);
+		FLASH.write_from_progmem(address, p, length);
 	}
 
 	// turn off write - just to be safe
