@@ -191,7 +191,7 @@ void setup() {
 #endif
 	Serial.println();
 	Serial.println();
-	Serial.println("COG2 Demo version: " DEMO_VERSION);
+	Serial.println("Demo G2 version: " DEMO_VERSION);
 	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
 	Serial.println();
 
@@ -240,22 +240,17 @@ void loop() {
 	case 0:         // clear the screen
 		EPD.clear();
 		state = 1;
-		delay_counts = 5;  // reduce delay so first image come up quickly
+		delay_counts = 2;  // reduce delay so first image come up quickly
 		break;
 
-	case 1:         // clear -> text
+	case 1:         // first image
 		EPD.image(IMAGE_1_BITS);
-		++state;
+		++state;  //next image
 		break;
 
-	case 2:         // text -> picture
+	case 2:         // second image
 		EPD.image(IMAGE_2_BITS);
-		++state;
-		break;
-
-	case 3:        // picture -> text
-		EPD.image(IMAGE_1_BITS);
-		state = 2;  // back to picture next time
+		++state = 1;  // back to first image
 		break;
 	}
 	EPD.end();   // power down the EPD panel
