@@ -427,7 +427,7 @@ void EPD_Class::frame_fixed_13(uint8_t value, EPD_stage stage) {
 }
 
 
-void EPD_Class::frame_data_13(PROGMEM const uint8_t *image, EPD_stage stage, bool read_progmem) {
+void EPD_Class::frame_data_13(const uint8_t *image, EPD_stage stage, bool read_progmem) {
 
 	int repeat;
 	int step;

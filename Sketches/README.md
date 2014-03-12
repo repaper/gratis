@@ -34,10 +34,10 @@ supported and this needs [Java](http://java.com) to be installed.
 **IMPORTANT NOTES for COG V2**
 
 1. The programs below only support the COG V1 using the `EPD` library.
-2. There is preliminary support for COG V2 by the `EPD2` library
+2. There is preliminary support for COG V2 by the `EPD2` and `EPD2_GFX` libraries
    since the driving sequence is very different.
 3. There are initial translations of `demo` into `demo2`,
-   also `command2` and `flash_loader2` from corresponding originals.
+   also `command2`, `flash_loader2` and `thermo2` from corresponding originals.
 4. The COG V2 can be used with current extension board
 5. The COG V2 does not use PWM - this can be disconnected from
    the LaunchPad/Arduino.

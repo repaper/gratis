@@ -111,21 +111,19 @@ public:
 	}
 
 	// output an image (PROGMEM data)
-	void image(PROGMEM const uint8_t *image_data) {
+	void image(const uint8_t *image_data) {
 		this->frame_data_13(image_data, EPD_inverse);
 		this->frame_stage2();
 		this->frame_data_13(image_data, EPD_normal);
 	}
 
-#if defined(EPD_ENABLE_EXTRA_SRAM)
-
 	// change from old image to new image (SRAM version)
 	void image_sram(const uint8_t *image_data) {
-		this->frame_sram_13(image_data, EPD_inverse, false);
+		this->frame_data_13(image_data, EPD_inverse, false);
 		this->frame_stage2();
-		this->frame_sram_13(image_data, EPD_normal, false);
+		this->frame_data_13(image_data, EPD_normal, false);
 	}
-#endif
+
 
 	// Low level API calls
 	// ===================
@@ -138,7 +136,7 @@ public:
 
 	// stages 1/3 functions
 	void frame_fixed_13(uint8_t fixed_value, EPD_stage stage);
-	void frame_data_13(PROGMEM const uint8_t *image_data, EPD_stage stage, bool read_progmem = true);
+	void frame_data_13(const uint8_t *image_data, EPD_stage stage, bool read_progmem = true);
 	void frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// single line display - very low-level
