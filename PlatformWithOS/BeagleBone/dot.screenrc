@@ -1,0 +1,22 @@
+# .screenrc
+
+startup_message off
+
+defutf8 on
+msgwait 1
+
+chdir
+chdir gratis/PlatformWithOS
+screen -t platform       0 
+
+chdir
+chdir gratis/PlatformWithOS/demo
+screen -t demo           1
+
+caption always "%?%{ Wk}%-Lw%?%{Rk}%n*%f %t%?(%u)%?%?%{Wk}%+Lw%? %{Rk}%=%c %{rk}%d/%M/%Y"
+
+hardstatus string "%{+b Rk}(%{-b g}$LOGNAME@%H%{+b R}) (%{-b g}%C %a%{+b R}) %{-b g} %n %t %h"
+#hardstatus alwayslastline "%{+b kr}[ %H ] %{ky} Load: %l %-=%{kb} %c  %d.%m.%Y"
+#hardstatus alwayslastline "%{+b kr}[ %H ] %{kw} Load: %l %-=%  %{kb} %c:%s  %d.%m.%Y "
+
+select 0
