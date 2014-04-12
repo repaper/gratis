@@ -62,7 +62,6 @@ EPD_Class::EPD_Class(EPD_size size,
 	// display size dependant items
 	{
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xff, 0x00};
-		static uint8_t gs[] = {0x72, 0x03};
 		this->channel_select = cs;
 		this->channel_select_length = sizeof(cs);
 	}
