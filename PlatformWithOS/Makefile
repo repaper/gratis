@@ -1,9 +1,14 @@
 # Makefile
 
+COG_VERSION ?= V1
+
 .PHONY: help
 help:
 	@echo
 	@echo Please use the platform specific targets:
+	@echo
+	@echo COG version setting: add COG_VERSION=V1 or COG_VERSION=V2 to make
+	@echo currently: COG_VERSION=${COG_VERSION}
 	@echo
 	@echo Raspberry Pi:
 	@echo '   make rpi            = build all targets'
@@ -27,15 +32,15 @@ help:
 
 .PHONY: rpi raspberrypi
 rpi raspberrypi:
-	make PLATFORM=../RaspberryPi -C driver-common
+	make PLATFORM=../RaspberryPi COG_VERSION=${COG_VERSION} -C driver-common
 
 rpi-%:
-	make PLATFORM=../RaspberryPi -C driver-common $*
+	make PLATFORM=../RaspberryPi COG_VERSION=${COG_VERSION} -C driver-common $*
 
 
 .PHONY: bb beaglebone
 bb beaglebone:
-	make PLATFORM=../BeagleBone -C driver-common
+	make PLATFORM=../BeagleBone COG_VERSION=${COG_VERSION} -C driver-common
 
 bb-%:
-	make PLATFORM=../BeagleBone -C driver-common $*
+	make PLATFORM=../BeagleBone COG_VERSION=${COG_VERSION} -C driver-common $*

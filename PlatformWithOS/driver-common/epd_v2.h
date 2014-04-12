@@ -12,8 +12,8 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-#if !defined(EPD_V1_H)
-#define EPD_V1_H 1
+#if !defined(EPD_V2_H)
+#define EPD_V2_H 1
 
 #include "spi.h"
 
@@ -23,8 +23,14 @@ typedef enum {
 	EPD_2_7          // 264 x 176
 } EPD_size;
 
-typedef struct EPD_struct EPD_type;
+typedef enum {           // error codes
+	EPD_OK,
+	EPD_UNSUPPORTED_COG,
+	EPD_PANEL_BROKEN,
+	EPD_DC_FAILED
+} EPD_error;
 
+typedef struct EPD_struct EPD_type;
 
 
 // functions
@@ -35,7 +41,6 @@ EPD_type *EPD_create(EPD_size size,
 		     int panel_on_pin,
 		     int border_pin,
 		     int discharge_pin,
-		     int pwm_pin,
 		     int reset_pin,
 		     int busy_pin,
 		     SPI_type *spi);
@@ -50,21 +55,17 @@ void EPD_set_temperature(EPD_type *epd, int temperature);
 void EPD_begin(EPD_type *epd);
 void EPD_end(EPD_type *epd);
 
+// ok/erro status
+EPD_error EPD_status(EPD_type *epd);
+
 // items below must be bracketed by begin/end
 // ==========================================
 
 // clear the screen
 void EPD_clear(EPD_type *epd);
 
-// assuming a clear (white) screen output an image
-void EPD_image_0(EPD_type *epd, const uint8_t *image);
-
 // change from old image to new image
-void EPD_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image);
-
-// change from old image to new image
-// only updating changed pixels
-void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image);
+void EPD_image(EPD_type *epd, const uint8_t *mage);
 
 
 #endif

@@ -75,7 +75,11 @@ bool SPI_destroy(SPI_type *spi) {
 void SPI_on(SPI_type *spi) {
 	const uint8_t buffer[1] = {0};
 
+#if EPD_COG_VERSION == 1
 	set_spi_mode(spi, SPI_MODE_2);
+#else
+	set_spi_mode(spi, SPI_MODE_0);
+#endif
 	SPI_send(spi, buffer, sizeof(buffer));
 }
 
@@ -105,6 +109,24 @@ void SPI_send(SPI_type *spi, const void *buffer, size_t length) {
 
 	if (-1 == ioctl(spi->fd, SPI_IOC_MESSAGE(1), transfer_buffer)) {
 		warn("SPI: send failure");
+	}
+}
+
+// send a data block to SPI and return last bytes returned by slave
+// will only change CS if the SPI_CS bits are set
+void SPI_read(SPI_type *spi, const void *buffer, void *received, size_t length) {
+	struct spi_ioc_transfer transfer_buffer[1];
+
+	transfer_buffer[0].tx_buf = (unsigned long)(buffer);
+	transfer_buffer[0].rx_buf = (unsigned long)(received);
+	transfer_buffer[0].len = length;
+	transfer_buffer[0].delay_usecs = 10;
+	transfer_buffer[0].speed_hz = spi->bps;
+	transfer_buffer[0].bits_per_word = 8;
+	transfer_buffer[0].cs_change = 0;
+
+	if (-1 == ioctl(spi->fd, SPI_IOC_MESSAGE(1), transfer_buffer)) {
+		warn("SPI: read failure");
 	}
 }
 

@@ -32,7 +32,13 @@
 
 #include "gpio.h"
 #include "spi.h"
-#include "epd.h"
+#if EPD_COG_VERSION == 1
+#include "epd_v1.h"
+#elif EPD_COG_VERSION == 2
+#include "epd_v2.h"
+#else
+#error "unsupported COG version"
+#endif
 
 #include "epd_io.h"
 
@@ -58,6 +64,9 @@ static const uint32_t spi_bps = SPI_BPS;           // default SPI device speed
 // by sending text string e.g. shell:  echo 19 > /dev/epd/temperature
 static int temperature = 25;                       // for external temperature compensation
 
+#define MAKE_STRING_HELPER(s) #s
+#define MAKE_STRING(s) MAKE_STRING_HELPER(s)
+
 static const struct panel_struct {
 	const char *key;
 	const char *description;
@@ -66,9 +75,9 @@ static const struct panel_struct {
 	const int height;
 	const int byte_count;
 } panels[] = {
-	{"1.44", "EPD 1.44 128x96\n", EPD_1_44, 128, 96, 128 * 98 / 8},
-	{"2.0", "EPD 2.0 200x96\n", EPD_2_0, 200, 96, 200 * 96 / 8},
-	{"2.7", "EPD 2.7 264x176\n", EPD_2_7, 264, 176, 264 * 176 / 8},
+	{"1.44", "EPD 1.44 128x96 COG " MAKE_STRING(EPD_COG_VERSION) "\n", EPD_1_44, 128, 96, 128 * 98 / 8},
+	{"2.0", "EPD 2.0 200x96 COG " MAKE_STRING(EPD_COG_VERSION) "\n", EPD_2_0, 200, 96, 200 * 96 / 8},
+	{"2.7", "EPD 2.7 264x176 COG " MAKE_STRING(EPD_COG_VERSION) "\n", EPD_2_7, 264, 176, 264 * 176 / 8},
 	{NULL, NULL, 0, 0, 0, 0}  // must be last entry
 };
 
@@ -417,7 +426,9 @@ static void *display_init(struct fuse_conn_info *conn) {
 	GPIO_mode(panel_on_pin, GPIO_OUTPUT);
 	GPIO_mode(border_pin, GPIO_OUTPUT);
 	GPIO_mode(discharge_pin, GPIO_OUTPUT);
+#if EPD_COG_VERSION == 1
 	GPIO_mode(pwm_pin, GPIO_PWM);
+#endif
 	GPIO_mode(reset_pin, GPIO_OUTPUT);
 	GPIO_mode(busy_pin, GPIO_INPUT);
 
@@ -425,7 +436,9 @@ static void *display_init(struct fuse_conn_info *conn) {
 			 panel_on_pin,
 			 border_pin,
 			 discharge_pin,
+#if EPD_COG_VERSION == 1
 			 pwm_pin,
+#endif
 			 reset_pin,
 			 busy_pin,
 			 spi);
@@ -536,6 +549,9 @@ static void run_command(const char c) {
 	case 'C':  // clear the display
 		EPD_set_temperature(epd, temperature);
 		EPD_begin(epd);
+		if (EPD_OK != EPD_status(epd)) {
+			warn("EPD_begin failed");
+		}
 		EPD_clear(epd);
 		EPD_end(epd);
 
@@ -545,7 +561,14 @@ static void run_command(const char c) {
 	case 'U':  // update with contents of display
 		EPD_set_temperature(epd, temperature);
 		EPD_begin(epd);
+		if (EPD_OK != EPD_status(epd)) {
+			warn("EPD_begin failed");
+		}
+#if EPD_COG_VERSION == 1
 		EPD_image(epd, (const uint8_t *)current_buffer, (const uint8_t *)display_buffer);
+#else
+		EPD_image(epd, (const uint8_t *)display_buffer);
+#endif
 		EPD_end(epd);
 
 		memcpy(current_buffer, display_buffer, sizeof(display_buffer));
@@ -554,7 +577,15 @@ static void run_command(const char c) {
 	case 'P':  // partial update with contents of display
 		EPD_set_temperature(epd, temperature);
 		EPD_begin(epd);
+		if (EPD_OK != EPD_status(epd)) {
+			warn("EPD_begin failed");
+		}
+#if EPD_COG_VERSION == 1
 		EPD_partial_image(epd, (const uint8_t *)current_buffer, (const uint8_t *)display_buffer);
+#else
+		// no partial so just normal display
+		EPD_image(epd, (const uint8_t *)display_buffer);
+#endif
 		EPD_end(epd);
 
 		memcpy(current_buffer, display_buffer, sizeof(display_buffer));

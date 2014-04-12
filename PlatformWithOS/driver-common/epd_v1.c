@@ -24,7 +24,7 @@
 
 #include "gpio.h"
 #include "spi.h"
-#include "epd.h"
+#include "epd_v1.h"
 
 // delays - more consistent naming
 #define Delay_ms(ms) usleep(1000 * (ms))
@@ -38,6 +38,16 @@
 // inline arrays
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
 #define CU8(...) (ARRAY(const uint8_t, __VA_ARGS__))
+
+
+// types
+typedef enum {           // Image pixel -> Display pixel
+	EPD_compensate,  // B -> W, W -> B (Current Image)
+	EPD_white,       // B -> N, W -> W (Current Image)
+	EPD_inverse,     // B -> N, W -> B (New Image)
+	EPD_normal       // B -> B, W -> W (New Image)
+} EPD_stage;
+
 
 // function prototypes
 static void PWM_start(int pin);

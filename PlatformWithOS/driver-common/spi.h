@@ -46,4 +46,8 @@ void SPI_off(SPI_type *spi);
 // will only change CS if the SPI_CS bits are set
 void SPI_send(SPI_type *spi, const void *buffer, size_t length);
 
+// send a data block to SPI and return last bytes returned by slave
+// will only change CS if the SPI_CS bits are set
+void SPI_read(SPI_type *spi, const void *buffer, void *received, size_t length);
+
 #endif

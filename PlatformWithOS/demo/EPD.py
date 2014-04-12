@@ -44,13 +44,14 @@ to use:
 """
 
 
-    PANEL_RE = re.compile('^([A-Za-z]+)\s+(\d+\.\d+)\s+(\d+)x(\d+)\s*$', flags=0)
+    PANEL_RE = re.compile('^([A-Za-z]+)\s+(\d+\.\d+)\s+(\d+)x(\d+)\s+COG\s+(\d+)\s*$', flags=0)
 
     def __init__(self, *args, **kwargs):
         self._epd_path = '/dev/epd'
         self._width = 200
         self._height = 96
         self._panel = 'EPD 2.0'
+        self._cog = 0
         self._auto = False
 
         if len(args) > 0:
@@ -72,6 +73,7 @@ to use:
             self._panel = m.group(1) + ' ' + m.group(2)
             self._width = int(m.group(3))
             self._height = int(m.group(4))
+            self._cog = int(m.group(5))
 
         if self._width < 1 or self._height < 1:
             raise EPDError('invalid panel geometry')
@@ -96,6 +98,10 @@ to use:
     @property
     def version(self):
         return self._version
+
+    @property
+    def cog(self):
+        return self._cog
 
     @property
     def auto(self):

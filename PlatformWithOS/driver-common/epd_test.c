@@ -22,7 +22,13 @@
 
 #include "gpio.h"
 #include "spi.h"
-#include "epd.h"
+#if EPD_COG_VERSION == 1
+#include "epd_v1.h"
+#elif EPD_COG_VERSION == 2
+#include "epd_v2.h"
+#else
+#error "unsupported COG version"
+#endif
 
 #include "epd_io.h"
 
@@ -68,7 +74,9 @@ int main(int argc, char *argv[]) {
 	GPIO_mode(panel_on_pin, GPIO_OUTPUT);
 	GPIO_mode(border_pin, GPIO_OUTPUT);
 	GPIO_mode(discharge_pin, GPIO_OUTPUT);
+#if  EPD_COG_VERSION == 1
 	GPIO_mode(pwm_pin, GPIO_PWM);
+#endif
 	GPIO_mode(reset_pin, GPIO_OUTPUT);
 	GPIO_mode(busy_pin, GPIO_INPUT);
 
@@ -76,7 +84,9 @@ int main(int argc, char *argv[]) {
 				   panel_on_pin,
 				   border_pin,
 				   discharge_pin,
+#if  EPD_COG_VERSION == 1
 				   pwm_pin,
+#endif
 				   reset_pin,
 				   busy_pin,
 				   spi);
@@ -95,11 +105,15 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < SIZE_OF_ARRAY(images); ++i) {
 		EPD_begin(epd);
+#if EPD_COG_VERSION == 1
 		if (0 == i) {
 			EPD_image_0(epd, images[i]);
 		} else {
 			EPD_image(epd, images[i - 1], images[i]);
 		}
+#else
+		EPD_image(epd, images[i]);
+#endif
 		EPD_end(epd);
 		sleep(5);
 	}

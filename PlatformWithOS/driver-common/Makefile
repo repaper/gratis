@@ -3,7 +3,7 @@
 PREFIX ?= /usr
 
 PLATFORM ?= ../RasberryPi
-
+COG_VERSION ?= V1
 
 FUSE_CFLAGS := $(shell pkg-config fuse --cflags)
 FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
@@ -11,6 +11,20 @@ FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
 CFLAGS += ${FUSE_CFLAGS}
 CFLAGS += -Wall -Werror -std=gnu99
 CFLAGS += -I${PLATFORM}
+
+ifeq ($(strip ${COG_VERSION}),V1)
+CFLAGS += -DEPD_COG_VERSION=1
+EPD_H = epd_v1.h
+EPD_O = epd_v1.o
+else
+ifeq ($(strip ${COG_VERSION}),V2)
+CFLAGS += -DEPD_COG_VERSION=2
+EPD_H = epd_v2.h
+EPD_O = epd_v2.o
+else
+$(error unsupported COG_VERSION=${COG_VERSION})
+endif
+endif
 
 LDFLAGS += ${FUSE_LDFLAGS}
 LDFLAGS += -lrt
@@ -68,8 +82,8 @@ test-fuse:
 
 # build the fuse driver
 CLEAN_FILES += epd-fuse
-epd_fuse: epd_fuse.o gpio.o spi.o epd.o
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" epd_fuse.o gpio.o spi.o epd.o
+epd_fuse: epd_fuse.o gpio.o spi.o ${EPD_O}
+	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" epd_fuse.o gpio.o spi.o ${EPD_O}
 
 
 # build simple GPIO test program
@@ -79,18 +93,18 @@ gpio_test: gpio_test.o gpio.o
 
 # build EPD test program
 CLEAN_FILES += epd_test
-epd_test: epd_test.o gpio.o spi.o epd.o
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" epd_test.o gpio.o spi.o epd.o
+epd_test: epd_test.o gpio.o spi.o ${EPD_O}
+	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" epd_test.o gpio.o spi.o ${EPD_O}
 
 
 # dependencies
 gpio_test.o: gpio_test.h gpio.h
-epd_test.o: gpio.h epd_io.h spi.h epd.h
-epd_fuse.o: gpio.h epd_io.h spi.h epd.h
+epd_test.o: gpio.h epd_io.h spi.h ${EPD_H}
+epd_fuse.o: gpio.h epd_io.h spi.h #{EPD_H}
 
 gpio.o: gpio.h
 spi.o: spi.h
-epd.o: spi.h gpio.h epd.h
+${EPD_O}: spi.h gpio.h ${EPD_H}
 
 
 # clean up
