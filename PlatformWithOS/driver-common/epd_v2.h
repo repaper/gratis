@@ -55,7 +55,7 @@ void EPD_set_temperature(EPD_type *epd, int temperature);
 void EPD_begin(EPD_type *epd);
 void EPD_end(EPD_type *epd);
 
-// ok/erro status
+// ok/error status
 EPD_error EPD_status(EPD_type *epd);
 
 // items below must be bracketed by begin/end

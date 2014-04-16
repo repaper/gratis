@@ -211,7 +211,7 @@ EPD_error EPD_status(EPD_type *epd) {
 }
 
 
-//
+// starts an EPD sequence
 void EPD_begin(EPD_type *epd) {
 
 	// assume OK

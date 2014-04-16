@@ -23,6 +23,10 @@ typedef enum {
 	EPD_2_7          // 264 x 176
 } EPD_size;
 
+typedef enum {           // error codes
+	EPD_OK,
+} EPD_error;
+
 typedef struct EPD_struct EPD_type;
 
 
@@ -49,6 +53,9 @@ void EPD_set_temperature(EPD_type *epd, int temperature);
 // sequence start/end
 void EPD_begin(EPD_type *epd);
 void EPD_end(EPD_type *epd);
+
+// ok/error status
+EPD_error EPD_status(EPD_type *epd);
 
 // items below must be bracketed by begin/end
 // ==========================================

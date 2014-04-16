@@ -76,6 +76,9 @@ struct EPD_struct {
 	int bytes_per_line;
 	int bytes_per_scan;
 	int filler;
+
+	EPD_error status;
+
 	const uint8_t *channel_select;
 	size_t channel_select_length;
 	const uint8_t *gate_source;
@@ -211,8 +214,16 @@ void EPD_destroy(EPD_type *epd) {
 }
 
 
-//
+// read current status
+EPD_error EPD_status(EPD_type *epd) {
+	return epd->status;
+}
+
+// starts an EPD sequence
 void EPD_begin(EPD_type *epd) {
+
+	// assume OK
+	epd->status = EPD_OK;
 
 	// power up sequence
 	digitalWrite(epd->EPD_Pin_RESET, LOW);
