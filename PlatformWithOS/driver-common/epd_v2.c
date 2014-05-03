@@ -189,6 +189,9 @@ EPD_type *EPD_create(EPD_size size,
 		return NULL;
 	}
 
+	// ensure I/O is all set to ZERO
+	power_off(epd);
+
 	return epd;
 }
 

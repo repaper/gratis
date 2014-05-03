@@ -50,6 +50,7 @@ typedef enum {           // Image pixel -> Display pixel
 
 
 // function prototypes
+static void power_off(EPD_type *epd);
 static void PWM_start(int pin);
 static void PWM_stop(int pin);
 static int temperature_to_factor_10x(int temperature);
@@ -197,6 +198,9 @@ EPD_type *EPD_create(EPD_size size,
 		warn("falled to allocate EPD line buffer");
 		return NULL;
 	}
+
+	// ensure I/O is all set to ZERO
+	power_off(EPD_type *epd);
 
 	return epd;
 }
@@ -433,6 +437,12 @@ void EPD_end(EPD_type *epd) {
 	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
 	Delay_us(10);
+
+	power_off(epd);
+}
+
+
+static void power_off(EPD_type *epd) {
 
 	// turn of power and all signals
 	digitalWrite(epd->EPD_Pin_RESET, LOW);
