@@ -1,0 +1,89 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		epd-clock
+# Required-Start:	epd-fuse ntp
+# Required-Stop:	epd-fuse
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	EPD Clock
+### END INIT INFO
+
+set -e
+
+# /etc/init.d/epd-clock: start and stop the EPD Clock
+# notes:
+# 1. copy this file to /etc/init.d
+# 2. run: update-rc.d epd-clock defaults
+# 3. create "etc/default/epd-clock" with settings (see below)
+
+test -x /usr/bin/python || exit 0
+
+umask 022
+
+# default configuration
+# + create /etc/default/epd-clock and add appropriate lines
+# + do not change these lines
+CLOCK_USER=debian
+CLOCK_GROUP=debian
+CLOCK_PY="/home/${CLOCK_USER}/gratis/PlatformWithOS/demo/Clock27.py"
+CLOCK_PID_FILE=/var/run/epd-clock.pid
+
+if test -f /etc/default/epd-clock
+then
+    . /etc/default/epd-clock
+fi
+
+. /lib/lsb/init-functions
+
+export PATH="${PATH:+$PATH:}:/usr/sbin:/sbin"
+
+
+clock_start() {
+  log_daemon_msg "Starting EPD Clock" "epd-clock" || true
+  if start-stop-daemon --start \
+      --chuid "${CLOCK_USER}:${CLOCK_GROUP}" --quiet --background --oknodo \
+      --make-pidfile --pidfile "${CLOCK_PID_FILE}" \
+      --exec /usr/bin/python -- ${CLOCK_PY}
+  then
+    log_end_msg 0 || true
+  else
+    log_end_msg 1 || true
+  fi
+}
+
+clock_stop() {
+  log_daemon_msg "Stopping EPD Clock" "epd-clock" || true
+  if start-stop-daemon --stop --quiet --oknodo --pidfile "${CLOCK_PID_FILE}"
+  then
+    log_end_msg 0 || true
+    rm -f "${CLOCK_PID_FILE}"
+  else
+    log_end_msg 1 || true
+  fi
+}
+
+case "$1" in
+  start)
+    clock_start
+    ;;
+  stop)
+    clock_stop
+    ;;
+
+  restart)
+    clock_stop
+    sleep 5
+    clock_start
+    ;;
+
+  status)
+    status_of_proc -p "${CLOCK_PID_FILE}" /usr/sbin/epd-clock epd-clock && exit 0 || exit $?
+    ;;
+
+  *)
+    log_action_msg "Usage: /etc/init.d/epd-clock {start|stop|restart|status}" || true
+    exit 1
+esac
+
+exit 0
