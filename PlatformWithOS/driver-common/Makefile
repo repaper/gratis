@@ -4,6 +4,7 @@ PREFIX ?= /usr
 
 PLATFORM ?= ../RasberryPi
 COG_VERSION ?= V1
+EPD_IO ?= epd_io.h
 
 FUSE_CFLAGS := $(shell pkg-config fuse --cflags)
 FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
@@ -11,6 +12,7 @@ FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
 CFLAGS += ${FUSE_CFLAGS}
 CFLAGS += -Wall -Werror -std=gnu99
 CFLAGS += -I${PLATFORM}
+CFLAGS += -DEPD_IO='"${EPD_IO}"'
 
 ifeq ($(strip ${COG_VERSION}),V1)
 CFLAGS += -DEPD_COG_VERSION=1
@@ -99,8 +101,8 @@ epd_test: epd_test.o gpio.o spi.o ${EPD_O}
 
 # dependencies
 gpio_test.o: gpio_test.h gpio.h
-epd_test.o: gpio.h epd_io.h spi.h ${EPD_H}
-epd_fuse.o: gpio.h epd_io.h spi.h #{EPD_H}
+epd_test.o: gpio.h ${EPD_IO} spi.h ${EPD_H}
+epd_fuse.o: gpio.h ${EPD_IO} spi.h ${EPD_H}
 
 gpio.o: gpio.h
 spi.o: spi.h

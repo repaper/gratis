@@ -1,4 +1,4 @@
-// Copyright 2013 Pervasive Displays, Inc.
+// Copyright 2013-2014 Pervasive Displays, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@
 #error "unsupported COG version"
 #endif
 
-#include "epd_io.h"
+#include EPD_IO
 
 
 static const char version_buffer[] = {STR(VERSION) "\n"};
