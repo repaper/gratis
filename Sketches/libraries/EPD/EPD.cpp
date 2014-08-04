@@ -128,7 +128,7 @@ void EPD_Class::begin() {
 	SPI_on();
 
 	PWM_start(this->EPD_Pin_PWM);
-	Delay_ms(5);
+	Delay_ms(25);                       // Allow time for PWN to start up
 	digitalWrite(this->EPD_Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
 

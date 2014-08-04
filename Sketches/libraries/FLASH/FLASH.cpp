@@ -57,7 +57,7 @@ enum {
 
 
 // the default FLASH device
-FLASH_Class FLASH(12);
+FLASH_Class FLASH(9);
 
 
 FLASH_Class::FLASH_Class(int chip_select_pin) : CS(chip_select_pin) {
@@ -110,7 +110,7 @@ bool FLASH_Class::available(void) {
 void FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
 	this->spi_setup();
 	digitalWrite(this->CS, LOW);
-	Delay_us(10);
+	Delay_us(1000);                     // FLASH wake up delay
 	SPI.transfer(FLASH_RDID);
 	*maufacturer = SPI.transfer(FLASH_NOP);
 	uint8_t id_high = SPI.transfer(FLASH_NOP);
@@ -121,7 +121,9 @@ void FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
 
 
 void FLASH_Class::read(void *buffer, uint32_t address, uint16_t length) {
-	this->spi_setup();
+	while (this->is_busy()) {           // wait for last action to finish
+	}
+
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
 	SPI.transfer(FLASH_FAST_READ);
