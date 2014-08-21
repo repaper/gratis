@@ -238,7 +238,7 @@ void EPD_begin(EPD_type *epd) {
 	SPI_on(epd->spi);
 
 	PWM_start(epd->EPD_Pin_PWM);
-	Delay_ms(5);
+	Delay_ms(25);
 	digitalWrite(epd->EPD_Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
 
