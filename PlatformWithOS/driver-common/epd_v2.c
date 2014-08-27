@@ -34,6 +34,11 @@
 #define digitalRead(pin) GPIO_read(pin)
 #define digitalWrite(pin, value) GPIO_write(pin, value)
 
+// values for border byte
+#define BORDER_BYTE_BLACK 0xff
+#define BORDER_BYTE_WHITE 0xaa
+#define BORDER_BYTE_NULL  0x00
+
 
 // inline arrays
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
@@ -54,8 +59,11 @@ static void frame_fixed_timed(EPD_type *epd, uint8_t fixed_value, long stage_tim
 static void frame_fixed_13(EPD_type *epd, uint8_t value, EPD_stage stage);
 static void frame_data_13(EPD_type *epd, const uint8_t *image, EPD_stage stage);
 static void frame_stage2(EPD_type *epd);
+static void nothing_frame(EPD_type *epd);
+static void dummy_line(EPD_type *epd);
+static void border_dummy_line(EPD_type *epd);
 static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value,
-		     EPD_stage stage, uint8_t border_byte);
+		     EPD_stage stage, uint8_t border_byte, bool set_voltage_limit);
 
 // type for temperature compensation
 typedef struct {
@@ -88,6 +96,8 @@ struct EPD_struct {
 
 	const uint8_t *channel_select;
 	size_t channel_select_length;
+
+	uint8_t voltage_level;
 
 	const compensation_type *compensation;
 	uint16_t temperature_offset;
@@ -139,6 +149,7 @@ EPD_type *EPD_create(EPD_size size,
 	epd->dots_per_line = 128;
 	epd->bytes_per_line = 128 / 8;
 	epd->bytes_per_scan = 96 / 4;
+	epd->voltage_level = 0x03;
 
 	EPD_set_temperature(epd, 25);
 
@@ -163,6 +174,7 @@ EPD_type *EPD_create(EPD_size size,
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0xe0, 0x00};
 		epd->channel_select = cs;
 		epd->channel_select_length = sizeof(cs);
+		epd->voltage_level = 0x03;
 		break;
 	}
 
@@ -174,6 +186,7 @@ EPD_type *EPD_create(EPD_size size,
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xfe, 0x00, 0x00};
 		epd->channel_select = cs;
 		epd->channel_select_length = sizeof(cs);
+		epd->voltage_level = 0x00;
 		break;
 	}
 	}
@@ -352,23 +365,18 @@ void EPD_begin(EPD_type *epd) {
 
 void EPD_end(EPD_type *epd) {
 
-	// dummy line and border
+	nothing_frame(epd);
+
+	if (EPD_1_44 == epd->size || EPD_2_0 == epd->size) {
+		border_dummy_line(epd);
+	}
+	dummy_line(epd);
+
 	if (EPD_2_7 == epd->size) {
-		// only for 2.70" EPD
-		Delay_ms(25);
+		// only pulse border pin for 2.70" EPD
 		digitalWrite(epd->EPD_Pin_BORDER, LOW);
-		Delay_ms(250);
-		digitalWrite(epd->EPD_Pin_BORDER, HIGH);
-
-	} else {
-
-		// for 2.00"
-		one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, 0xff);
-		Delay_ms(40);
-		one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, 0xaa);
 		Delay_ms(200);
-		one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, 0x00);
-		Delay_ms(25);
+		digitalWrite(epd->EPD_Pin_BORDER, HIGH);
 	}
 
 	SPI_on(epd->spi);
@@ -392,13 +400,15 @@ void EPD_end(EPD_type *epd) {
 	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
 	SPI_send(epd->spi, CU8(0x72, 0x05), 2);
 
-	// power off positive charge pump
+	// power off charge pump Vcom
 	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	SPI_send(epd->spi, CU8(0x72, 0x0e), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x03), 2);
 
-	// power off Vcom charge pump
+	// power off charge pump neg voltage
 	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	SPI_send(epd->spi, CU8(0x72, 0x02), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
+
+	Delay_ms(240);
 
 	// power off all charge pumps
 	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
@@ -406,17 +416,17 @@ void EPD_end(EPD_type *epd) {
 
 	// turn of osc
 	SPI_send(epd->spi, CU8(0x70, 0x07), 2);
-	SPI_send(epd->spi, CU8(0x72, 0x0d), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
 
 	// discharge internal on
 	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
 	SPI_send(epd->spi, CU8(0x72, 0x83), 2);
 
-	Delay_ms(120);
+	Delay_ms(30);
 
 	// discharge internal off
-	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
+	//SPI_send(epd->spi, CU8(0x70, 0x04), 2);
+	//SPI_send(epd->spi, CU8(0x72, 0x00), 2);
 
 	power_off(epd);
 }
@@ -432,13 +442,9 @@ static void power_off(EPD_type *epd) {
 	// ensure SPI MOSI and CLOCK are Low before CS Low
 	SPI_off(epd->spi);
 
-	// pulse discharge pin
-	for (int i = 0; i < 10; ++i) {
-		Delay_ms(10);
-		digitalWrite(epd->EPD_Pin_DISCHARGE, HIGH);
-		Delay_ms(10);
-		digitalWrite(epd->EPD_Pin_DISCHARGE, LOW);
-	}
+	digitalWrite(epd->EPD_Pin_DISCHARGE, HIGH);
+	Delay_ms(150);
+	digitalWrite(epd->EPD_Pin_DISCHARGE, LOW);
 }
 
 
@@ -524,7 +530,7 @@ static void frame_fixed_timed(EPD_type *epd, uint8_t fixed_value, long stage_tim
 	}
 	do {
 		for (uint8_t line = 0; line < epd->lines_per_display ; ++line) {
-			one_line(epd, line, 0, fixed_value, EPD_normal, 0x00);
+			one_line(epd, line, 0, fixed_value, EPD_normal, BORDER_BYTE_NULL, false);
 		}
 
 		if (-1 == timer_gettime(epd->timer, &its)) {
@@ -557,11 +563,11 @@ static void frame_fixed_13(EPD_type *epd, uint8_t value, EPD_stage stage) {
 			for (int offset = 0; offset < block; ++offset) {
 				int pos = line + offset;
 				if (pos < 0 || pos > total_lines) {
-					one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, 0x00);
+					one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
 				} else if (0 == offset && n == repeat - 1) {
-					one_line(epd, pos, 0, 0x00, EPD_normal, 0x00);
+					one_line(epd, pos, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
 				} else {
-					one_line(epd, pos, 0, value, stage, 0x00);
+					one_line(epd, pos, 0, value, stage, BORDER_BYTE_NULL, false);
 				}
 			}
 		}
@@ -592,11 +598,11 @@ static void frame_data_13(EPD_type *epd, const uint8_t *image, EPD_stage stage) 
 			for (int offset = 0; offset < block; ++offset) {
 				int pos = line + offset;
 				if (pos < 0 || pos > total_lines) {
-					one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, 0x00);
+					one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
 				} else if (0 == offset && n == repeat - 1) {
-					one_line(epd, pos, 0, 0x00, EPD_normal, 0x00);
+					one_line(epd, pos, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
 				} else {
-					one_line(epd, pos, &image[pos * epd->bytes_per_line], 0, stage, 0x00);
+					one_line(epd, pos, &image[pos * epd->bytes_per_line], 0, stage, BORDER_BYTE_NULL, false);
 				}
 			}
 		}
@@ -612,10 +618,36 @@ static void frame_stage2(EPD_type *epd) {
 }
 
 
+static void nothing_frame(EPD_type *epd) {
+	for (int line = 0; line < epd->lines_per_display; ++line) {
+		one_line(epd, line, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, true);
+	}
+}
+
+
+static void dummy_line(EPD_type *epd) {
+	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, true);
+}
+
+
+static void border_dummy_line(EPD_type *epd) {
+	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_BLACK, false);
+	Delay_ms(40);
+	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_WHITE, false);
+	Delay_ms(200);
+}
+
+
 static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value,
-	  EPD_stage stage, uint8_t border_byte) {
+		     EPD_stage stage, uint8_t border_byte, bool set_voltage_limit) {
 
 	SPI_on(epd->spi);
+
+	if (set_voltage_limit) {
+		// charge pump voltage level reduce voltage shift
+		SPI_send(epd->spi, CU8(0x70, 0x04), 2);
+		SPI_send(epd->spi, CU8(0x72, epd->voltage_level), 2);
+	}
 
 	// send data
 	SPI_send(epd->spi, CU8(0x70, 0x0a), 2);
@@ -683,9 +715,9 @@ static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t 
 	// send the accumulated line buffer
 	SPI_send(epd->spi, epd->line_buffer, p - epd->line_buffer);
 
-	// output data to panel
+	// turn on OE
 	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
-	SPI_send(epd->spi, CU8(0x72, 0x2f), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x07), 2);
 
 	SPI_off(epd->spi);
 }
