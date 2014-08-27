@@ -188,6 +188,7 @@ void setup() {
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
+	delay(20);  // allows terminal time to sync
 #endif
 	Serial.println();
 	Serial.println();
