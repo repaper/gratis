@@ -47,22 +47,29 @@ typedef enum {           // error codes
 	EPD_DC_FAILED
 } EPD_error;
 
+// values for border byte
+const uint8_t EPD_BORDER_BYTE_BLACK = 0xff;
+const uint8_t EPD_BORDER_BYTE_WHITE = 0xaa;
+const uint8_t EPD_BORDER_BYTE_NULL  = 0x00;
+
 typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class {
 private:
-	int EPD_Pin_EPD_CS;
 	int EPD_Pin_PANEL_ON;
 	int EPD_Pin_BORDER;
 	int EPD_Pin_DISCHARGE;
 	int EPD_Pin_RESET;
 	int EPD_Pin_BUSY;
+	int EPD_Pin_EPD_CS;
 
 	EPD_size size;
 	uint16_t lines_per_display;
 	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
 	uint16_t bytes_per_scan;
+
+	uint8_t voltage_level;
 
 	EPD_error status;
 
@@ -87,6 +94,9 @@ private:
 	EPD_Class(const EPD_Class &f);  // prevent copy
 
 	void power_off();
+	void nothing_frame();
+	void dummy_line();
+	void border_dummy_line();
 
 public:
 	// power up and power down the EPD panel
@@ -142,7 +152,7 @@ public:
 	// single line display - very low-level
 	// also has to handle AVR progmem
 	void line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
-		  bool read_progmem, EPD_stage stage = EPD_normal, uint8_t border_byte = 0x00);
+		  bool read_progmem, EPD_stage stage = EPD_normal, uint8_t border_byte = EPD_BORDER_BYTE_NULL, bool set_voltage_limit = false);
 
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();

@@ -28,6 +28,10 @@
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
 #define CU8(...) (ARRAY(const uint8_t, __VA_ARGS__))
 
+// values for border byte
+#define BORDER_BYTE_BLACK 0xff
+#define BORDER_BYTE_WHITE 0xaa
+#define BORDER_BYTE_NULL  0x00
 
 static void SPI_on();
 static void SPI_off();
@@ -56,6 +60,7 @@ EPD_Class::EPD_Class(EPD_size size,
 	this->dots_per_line = 128;
 	this->bytes_per_line = 128 / 8;
 	this->bytes_per_scan = 96 / 4;
+	this->voltage_level = 0x03;
 
 	this->setFactor(); // ensure default temperature
 
@@ -80,6 +85,7 @@ EPD_Class::EPD_Class(EPD_size size,
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0xe0, 0x00};
 		this->channel_select = cs;
 		this->channel_select_length = sizeof(cs);
+		this->voltage_level = 0x03;
 		break;
 	}
 
@@ -91,6 +97,7 @@ EPD_Class::EPD_Class(EPD_size size,
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xfe, 0x00, 0x00};
 		this->channel_select = cs;
 		this->channel_select_length = sizeof(cs);
+		this->voltage_level = 0x00;
 		break;
 	}
 	}
@@ -279,23 +286,18 @@ void EPD_Class::begin() {
 
 void EPD_Class::end() {
 
-	// dummy line and border
+	this->nothing_frame();
+
+	if (EPD_1_44 == this->size || EPD_2_0 == this->size) {
+		this->border_dummy_line();
+	}
+	this->dummy_line();
+
 	if (EPD_2_7 == this->size) {
-		// only for 2.70" EPD
-		Delay_ms(25);
+		// only pulse border pin for 2.70" EPD
 		digitalWrite(this->EPD_Pin_BORDER, LOW);
-		Delay_ms(250);
-		digitalWrite(this->EPD_Pin_BORDER, HIGH);
-
-	} else {
-
-		// for 2.00"
-		this->line(0x7fffu, 0, 0x00, false, EPD_normal, 0xff);
-		Delay_ms(40);
-		this->line(0x7fffu, 0, 0x00, false, EPD_normal, 0xaa);
 		Delay_ms(200);
-		this->line(0x7fffu, 0, 0x00, false, EPD_normal);
-		Delay_ms(25);
+		digitalWrite(this->EPD_Pin_BORDER, HIGH);
 	}
 
 	SPI_on();
@@ -317,13 +319,15 @@ void EPD_Class::end() {
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x05), 2);
 
-	// power off positive charge pump
+	// power off charge pump Vcom
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x05), 2);
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x0e), 2);
+	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x03), 2);
 
-	// power off Vcom charge pump
+	// power off charge pump neg voltage
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x05), 2);
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x02), 2);
+	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x01), 2);
+
+	Delay_ms(240);
 
 	// power off all charge pumps
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x05), 2);
@@ -331,17 +335,17 @@ void EPD_Class::end() {
 
 	// turn of osc
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x07), 2);
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x0d), 2);
+	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x01), 2);
 
 	// discharge internal on
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x83), 2);
 
-	Delay_ms(120);
+	Delay_ms(30);
 
 	// discharge internal off
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x00), 2);
+	//SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
+	//SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x00), 2);
 
 	power_off();
 }
@@ -357,12 +361,9 @@ void EPD_Class::power_off() {
 	digitalWrite(this->EPD_Pin_EPD_CS, LOW);
 
 	// pulse discharge pin
-	for (int i = 0; i < 10; ++i) {
-		Delay_ms(10);
-		digitalWrite(this->EPD_Pin_DISCHARGE, HIGH);
-		Delay_ms(10);
-		digitalWrite(this->EPD_Pin_DISCHARGE, LOW);
-	}
+	digitalWrite(this->EPD_Pin_DISCHARGE, HIGH);
+	Delay_ms(150);
+	digitalWrite(this->EPD_Pin_DISCHARGE, LOW);
 }
 
 
@@ -498,17 +499,43 @@ void EPD_Class::frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stag
 
 
 void EPD_Class::frame_stage2() {
-	for (int i = 0; i < this->compensation->stage2_repeat; ++i) {
+	for (uint16_t i = 0; i < this->compensation->stage2_repeat; ++i) {
 		this->frame_fixed_timed(0xff, this->compensation->stage2_t1);
 		this->frame_fixed_timed(0xaa, this->compensation->stage2_t2);
 	}
 }
 
 
+void EPD_Class::nothing_frame() {
+	for (uint16_t line = 0; line < this->lines_per_display; ++line) {
+		this->line(line, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_NULL, true);
+	}
+}
+
+
+void EPD_Class::dummy_line() {
+	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_NULL, true);
+}
+
+
+void EPD_Class::border_dummy_line() {
+	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_BLACK, false);
+	Delay_ms(40);
+	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_WHITE, false);
+	Delay_ms(200);
+}
+
 void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
-		     bool read_progmem, EPD_stage stage, uint8_t border_byte) {
+		     bool read_progmem, EPD_stage stage, uint8_t border_byte,
+		     bool set_voltage_limit) {
 
 	SPI_on();
+
+	if (set_voltage_limit) {
+		// charge pump voltage level reduce voltage shift
+		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
+		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, this->voltage_level), 2);
+	}
 
 	// send data
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x0a), 2);
