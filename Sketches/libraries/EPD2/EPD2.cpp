@@ -36,7 +36,6 @@
 static void SPI_on();
 static void SPI_off();
 static void SPI_put(uint8_t c);
-static void SPI_put_wait(uint8_t c, int busy_pin);
 static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 
@@ -106,6 +105,10 @@ EPD_Class::EPD_Class(EPD_size size,
 
 
 void  EPD_Class::setFactor(int temperature) {
+	// stage1: repeat, step, block
+	// stage2: repeat, t1, t2
+	// stage3: repeat, step, block
+
 	static const EPD_Class::compensation_type compensation_144[3] = {
 		{ 2, 6, 42,   4, 392, 392,   2, 6, 42 },  //  0 ... 10 Celcius
 		{ 4, 2, 16,   4, 155, 155,   4, 2, 16 },  // 10 ... 40 Celcius
@@ -120,7 +123,7 @@ void  EPD_Class::setFactor(int temperature) {
 
 	static const EPD_Class::compensation_type compensation_270[3] = {
 		{ 2, 8, 64,   4, 392, 392,   2, 8, 64 },  //  0 ... 10 Celcius
-		{ 2, 8, 64,   4, 196, 196,   2, 8, 64 },  // 10 ... 40 Celcius
+		{ 2, 4, 32,   4, 196, 196,   2, 4, 32 },  // 10 ... 40 Celcius
 		{ 4, 8, 64,   4, 196, 196,   4, 8, 64 }   // 40 ... 50 Celcius
 	};
 
@@ -271,14 +274,14 @@ void EPD_Class::begin() {
 		}
 	}
 	if (!dc_ok) {
+		// output enable to disable
+		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
+		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x40), 2);
+
 		this->status = EPD_DC_FAILED;
 		this->power_off();
 		return;
 	}
-
-	// output enable to disable
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x40), 2);
 
 	SPI_off();
 }
@@ -291,6 +294,7 @@ void EPD_Class::end() {
 	if (EPD_1_44 == this->size || EPD_2_0 == this->size) {
 		this->border_dummy_line();
 	}
+
 	this->dummy_line();
 
 	if (EPD_2_7 == this->size) {
@@ -351,6 +355,7 @@ void EPD_Class::end() {
 }
 
 void EPD_Class::power_off() {
+
 	// turn of power and all signals
 	digitalWrite(this->EPD_Pin_RESET, LOW);
 	digitalWrite(this->EPD_Pin_PANEL_ON, LOW);
@@ -379,7 +384,7 @@ void EPD_Class::frame_fixed_timed(uint8_t fixed_value, long stage_time) {
 	do {
 		unsigned long t_start = millis();
 		for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
-			this->line(line, 0, fixed_value, false);
+			this->line(this->lines_per_display - line - 1, 0, fixed_value, false);
 		}
 		unsigned long t_end = millis();
 		if (t_end > t_start) {
@@ -411,15 +416,29 @@ void EPD_Class::frame_fixed_13(uint8_t value, EPD_stage stage) {
 
 	for (int n = 0; n < repeat; ++n) {
 
-		for (int line = step - block; line < total_lines + step; line += step) {
-			for (int offset = 0; offset < block; ++offset) {
-				int pos = line + offset;
-				if (pos < 0 || pos > total_lines) {
-					this->line(0x7fffu, 0, 0x00, false, EPD_normal);
-				} else if (0 == offset && n == repeat - 1) {
-					this->line(pos, 0, 0x00, false, EPD_normal);
+		int block_begin = 0;
+		int block_end = 0;
+
+		while (block_begin < total_lines) {
+
+			block_end += step;
+			block_begin = block_end - block;
+			if (block_begin < 0) {
+				block_begin = 0;
+			} else if (block_begin >= total_lines) {
+				break;
+			}
+
+			bool full_block = (block_end - block_begin == block);
+
+			for (int line = block_begin; line < block_end; ++line) {
+				if (line >= total_lines) {
+					break;
+				}
+				if (full_block && (line < (block_begin + step))) {
+					this->line(line, 0, 0x00, false, EPD_normal);
 				} else {
-					this->line(pos, 0, value, false, stage);
+					this->line(line, 0, value, false, EPD_normal);
 				}
 			}
 		}
@@ -446,15 +465,29 @@ void EPD_Class::frame_data_13(const uint8_t *image, EPD_stage stage, bool read_p
 
 	for (int n = 0; n < repeat; ++n) {
 
-		for (int line = step - block; line < total_lines + step; line += step) {
-			for (int offset = 0; offset < block; ++offset) {
-				int pos = line + offset;
-				if (pos < 0 || pos > total_lines) {
-					this->line(0x7fffu, 0, 0x00, false, EPD_normal);
-				} else if (0 == offset && n == repeat - 1) {
-					this->line(pos, 0, 0x00, false, EPD_normal);
+		int block_begin = 0;
+		int block_end = 0;
+
+		while (block_begin < total_lines) {
+
+			block_end += step;
+			block_begin = block_end - block;
+			if (block_begin < 0) {
+				block_begin = 0;
+			} else if (block_begin >= total_lines) {
+				break;
+			}
+
+			bool full_block = (block_end - block_begin == block);
+
+			for (int line = block_begin; line < block_end; ++line) {
+				if (line >= total_lines) {
+					break;
+				}
+				if (full_block && (line < (block_begin + step))) {
+					this->line(line, 0, 0x00, false, EPD_normal);
 				} else {
-					this->line(pos, &image[pos * this->bytes_per_line], 0, read_progmem, stage);
+					this->line(line, &image[line * this->bytes_per_line], 0x00, read_progmem, stage);
 				}
 			}
 		}
@@ -481,16 +514,30 @@ void EPD_Class::frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stag
 
 	for (int n = 0; n < repeat; ++n) {
 
-		for (int line = step - block; line < total_lines + step; line += step) {
-			for (int offset = 0; offset < block; ++offset) {
-				int pos = line + offset;
-				if (pos < 0 || pos > total_lines) {
-					this->line(0x7fffu, 0, 0x00, false, EPD_normal);
-				} else if (0 == offset && n == repeat - 1) {
-					this->line(pos, 0, 0x00, false, EPD_normal);
+		int block_begin = 0;
+		int block_end = 0;
+
+		while (block_begin < total_lines) {
+
+			block_end += step;
+			block_begin = block_end - block;
+			if (block_begin < 0) {
+				block_begin = 0;
+			} else if (block_begin >= total_lines) {
+				break;
+			}
+
+			bool full_block = (block_end - block_begin == block);
+
+			for (int line = block_begin; line < block_end; ++line) {
+				if (line >= total_lines) {
+					break;
+				}
+				if (full_block && (line < (block_begin + step))) {
+					this->line(line, 0, 0x00, false, EPD_normal);
 				} else {
-					reader(buffer, address + pos * this->bytes_per_line, this->bytes_per_line);
-					this->line(pos, buffer, 0, false, stage);
+					reader(buffer, address + line * this->bytes_per_line, this->bytes_per_line);
+					this->line(line, buffer, 0, false, stage);
 				}
 			}
 		}
@@ -519,116 +566,118 @@ void EPD_Class::dummy_line() {
 
 
 void EPD_Class::border_dummy_line() {
-	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_BLACK, false);
+	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_BLACK);
 	Delay_ms(40);
-	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_WHITE, false);
+	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_WHITE);
 	Delay_ms(200);
 }
+
 
 void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
 		     bool read_progmem, EPD_stage stage, uint8_t border_byte,
 		     bool set_voltage_limit) {
 
-	SPI_on();
+       SPI_on();
 
-	if (set_voltage_limit) {
-		// charge pump voltage level reduce voltage shift
-		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
-		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, this->voltage_level), 2);
-	}
+       if (set_voltage_limit) {
+	       // charge pump voltage level reduce voltage shift
+	       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
+	       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, this->voltage_level), 2);
+       }
 
-	// send data
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x0a), 2);
+       // send data
+       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x0a), 2);
 
-	Delay_us(10);
+       Delay_us(10);
 
-	// CS low
-	digitalWrite(this->EPD_Pin_EPD_CS, LOW);
-	SPI_put_wait(0x72, this->EPD_Pin_BUSY);
+       // CS low
+       digitalWrite(this->EPD_Pin_EPD_CS, LOW);
+       SPI_put(0x72);
 
-	// border byte
-	SPI_put_wait(border_byte, this->EPD_Pin_BUSY);
+       // border byte
+       SPI_put(border_byte);
 
-	// odd pixels
-	for (uint16_t b = this->bytes_per_line; b > 0; --b) {
-		if (0 != data) {
+       // odd pixels
+       for (uint16_t b = this->bytes_per_line; b > 0; --b) {
+	       if (0 != data) {
 #if defined(__MSP430_CPU__)
-			uint8_t pixels = data[b - 1] & 0x55;
+		       uint8_t pixels = data[b - 1];
 #else
-			// AVR has multiple memory spaces
-			uint8_t pixels;
-			if (read_progmem) {
-				pixels = pgm_read_byte_near(data + b - 1) & 0x55;
-			} else {
-				pixels = data[b - 1] & 0x55;
-			}
+		       // AVR has multiple memory spaces
+		       uint8_t pixels;
+		       if (read_progmem) {
+			       pixels = pgm_read_byte_near(data + b - 1);
+		       } else {
+			       pixels = data[b - 1];
+		       }
 #endif
-			switch(stage) {
-			case EPD_inverse:      // B -> W, W -> B
-				pixels = 0xaa | (pixels ^ 0x55);
-				break;
-			case EPD_normal:       // B -> B, W -> W
-				pixels = 0xaa | pixels;
-				break;
-			}
-			SPI_put_wait(pixels, this->EPD_Pin_BUSY);
-		} else {
-			SPI_put_wait(fixed_value, this->EPD_Pin_BUSY);
-		}
-	}
+		       switch(stage) {
+		       case EPD_inverse:      // B -> W, W -> B
+			       pixels ^= 0xff;
+			       break;
+		       case EPD_normal:       // B -> B, W -> W
+			       break;
+		       }
+		       pixels = 0xaa | pixels;
+		       SPI_put(pixels);
+	       } else {
+		       SPI_put(fixed_value);
+	       }
+       }
 
-	// scan line
-	int scan_pos = (this->lines_per_display - line - 1) / 4;
-	int scan_shift = 2 * (line & 0x03);
-	for (uint16_t b = 0; b < this->bytes_per_scan; ++b) {
-		if (scan_pos == b) {
-			SPI_put_wait(0x03 << scan_shift, this->EPD_Pin_BUSY);
-		} else {
-			SPI_put_wait(0x00, this->EPD_Pin_BUSY);
-		}
-	}
+       // scan line
+       int scan_pos = (this->lines_per_display - line - 1) >> 2;
+       int scan_shift = (line & 0x03) << 1;
+       for (int b = 0; b < this->bytes_per_scan; ++b) {
+	       if (scan_pos == b) {
+		       SPI_put(0x03 << scan_shift);
+	       } else {
+		       SPI_put(0x00);
+	       }
+       }
 
-	// even pixels
-	for (uint16_t b = 0; b < this->bytes_per_line; ++b) {
-		if (0 != data) {
+       // even pixels
+       for (uint16_t b = 0; b < this->bytes_per_line; ++b) {
+	       if (0 != data) {
 #if defined(__MSP430_CPU__)
-			uint8_t pixels = data[b] & 0xaa;
+		       uint8_t pixels = data[b];
 #else
-			// AVR has multiple memory spaces
-			uint8_t pixels;
-			if (read_progmem) {
-				pixels = pgm_read_byte_near(data + b) & 0xaa;
-			} else {
-				pixels = data[b] & 0xaa;
-			}
+		       // AVR has multiple memory spaces
+		       uint8_t pixels;
+		       if (read_progmem) {
+			       pixels = pgm_read_byte_near(data + b);
+		       } else {
+			       pixels = data[b];
+		       }
 #endif
-			switch(stage) {
-			case EPD_inverse:      // B -> W, W -> B (Current Image)
-				pixels = 0xaa | ((pixels ^ 0xaa) >> 1);
-				break;
-			case EPD_normal:       // B -> B, W -> W (New Image)
-				pixels = 0xaa | (pixels >> 1);
-				break;
-			}
-			uint8_t p1 = (pixels >> 6) & 0x03;
-			uint8_t p2 = (pixels >> 4) & 0x03;
-			uint8_t p3 = (pixels >> 2) & 0x03;
-			uint8_t p4 = (pixels >> 0) & 0x03;
-			pixels = (p1 << 0) | (p2 << 2) | (p3 << 4) | (p4 << 6);
-			SPI_put_wait(pixels, this->EPD_Pin_BUSY);
-		} else {
-			SPI_put_wait(fixed_value, this->EPD_Pin_BUSY);
-		}
-	}
+		       switch(stage) {
+		       case EPD_inverse:      // B -> W, W -> B (Current Image)
+			       pixels ^= 0xff;
+			       break;
+		       case EPD_normal:       // B -> B, W -> W (New Image)
+			       break;
+		       }
+		       pixels >>= 1;
+		       pixels |= 0xaa;
 
-	// CS high
-	digitalWrite(this->EPD_Pin_EPD_CS, HIGH);
+		       pixels = ((pixels & 0xc0) >> 6)
+			       | ((pixels & 0x30) >> 2)
+			       | ((pixels & 0x0c) << 2)
+			       | ((pixels & 0x03) << 6);
+		       SPI_put(pixels);
+	       } else {
+		       SPI_put(fixed_value);
+	       }
+       }
 
-	// output data to panel
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
-	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x07), 2);
+       // CS high
+       digitalWrite(this->EPD_Pin_EPD_CS, HIGH);
 
-	SPI_off();
+       // output data to panel
+       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
+       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x07), 2);
+
+       SPI_off();
 }
 
 
@@ -661,19 +710,8 @@ static void SPI_put(uint8_t c) {
 }
 
 
-static void SPI_put_wait(uint8_t c, int busy_pin) {
-
-	SPI_put(c);
-
-	// wait for COG ready
-	while (HIGH == digitalRead(busy_pin)) {
-	}
-}
-
-
 static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 	// CS low
-	Delay_us(10);
 	digitalWrite(cs_pin, LOW);
 
 	// send all data
@@ -687,11 +725,9 @@ static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 
 static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 	// CS low
-	Delay_us(10);
 	digitalWrite(cs_pin, LOW);
 
 	uint8_t rbuffer[4];
-	int i = 0;
 	uint8_t result = 0;
 
 	// send all data
