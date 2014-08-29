@@ -34,21 +34,21 @@
 
 
 // test images
-#include "aphrodite_2_0.xbm"
-#include "cat_2_0.xbm"
-#include "saturn_2_0.xbm"
-#include "text_hello_2_0.xbm"
-#include "text_image_2_0.xbm"
-#include "venus_2_0.xbm"
+#include "aphrodite_2_7.xbm"
+#include "cat_2_7.xbm"
+#include "saturn_2_7.xbm"
+#include "text_hello_2_7.xbm"
+#include "text_image_2_7.xbm"
+#include "venus_2_7.xbm"
 
 
 static uint8_t *images[] = {
-	aphrodite_2_0_bits,
-	cat_2_0_bits,
-	saturn_2_0_bits,
-	text_hello_2_0_bits,
-	text_image_2_0_bits,
-	venus_2_0_bits
+	aphrodite_2_7_bits,
+	cat_2_7_bits,
+	saturn_2_7_bits,
+	text_hello_2_7_bits,
+	text_image_2_7_bits,
+	venus_2_7_bits
 };
 
 #define SIZE_OF_ARRAY(a) (sizeof(a) / sizeof((a)[0]))
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 	GPIO_mode(reset_pin, GPIO_OUTPUT);
 	GPIO_mode(busy_pin, GPIO_INPUT);
 
-	EPD_type *epd = EPD_create(EPD_2_0,
+	EPD_type *epd = EPD_create(EPD_2_7,
 				   panel_on_pin,
 				   border_pin,
 				   discharge_pin,
@@ -97,13 +97,17 @@ int main(int argc, char *argv[]) {
 		goto done_spi;
 	}
 
-
+#if 0
 	// EPD display
+	printf("clear display\n");
 	EPD_begin(epd);
 	EPD_clear(epd);
 	EPD_end(epd);
+#endif
 
+	printf("images start\n");
 	for (int i = 0; i < SIZE_OF_ARRAY(images); ++i) {
+		printf("image = %d\n", i);
 		EPD_begin(epd);
 #if EPD_COG_VERSION == 1
 		if (0 == i) {

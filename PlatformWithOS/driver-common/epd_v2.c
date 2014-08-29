@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
@@ -63,7 +64,7 @@ static void nothing_frame(EPD_type *epd);
 static void dummy_line(EPD_type *epd);
 static void border_dummy_line(EPD_type *epd);
 static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value,
-		     EPD_stage stage, uint8_t border_byte, bool set_voltage_limit);
+		     EPD_stage stage, uint8_t border_byte);
 
 // type for temperature compensation
 typedef struct {
@@ -192,15 +193,19 @@ EPD_type *EPD_create(EPD_size size,
 	}
 
 	// buffer for frame line
-	epd->line_buffer_size = 2 * epd->bytes_per_line + epd->bytes_per_scan
-		+ 3; // command byte, border byte and filler byte
+	epd->line_buffer_size = 2 * epd->bytes_per_line
+		+ epd->bytes_per_scan
+		+ 2; // command byte, border byte
 
-	epd->line_buffer = malloc(epd->line_buffer_size);
+	epd->line_buffer = malloc(epd->line_buffer_size + 4096);
 	if (NULL == epd->line_buffer) {
 		free(epd);
 		warn("falled to allocate EPD line buffer");
 		return NULL;
 	}
+
+	// ensure zero
+	memset(epd->line_buffer, 0x00, epd->line_buffer_size);
 
 	// ensure I/O is all set to ZERO
 	power_off(epd);
@@ -350,16 +355,13 @@ void EPD_begin(EPD_type *epd) {
 		}
 	}
 	if (!dc_ok) {
+		// output enable to disable
+		SPI_send(epd->spi, CU8(0x70, 0x02), 2);
+		SPI_send(epd->spi, CU8(0x72, 0x40), 2);
 		epd->status = EPD_DC_FAILED;
 		power_off(epd);
 		return;
 	}
-
-	// output enable to disable
-	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
-	SPI_send(epd->spi, CU8(0x72, 0x40), 2);
-
-	SPI_off(epd->spi);
 }
 
 
@@ -378,8 +380,6 @@ void EPD_end(EPD_type *epd) {
 		Delay_ms(200);
 		digitalWrite(epd->EPD_Pin_BORDER, HIGH);
 	}
-
-	SPI_on(epd->spi);
 
 	// check DC/DC
 	uint8_t receive_buffer[2];
@@ -449,6 +449,11 @@ static void power_off(EPD_type *epd) {
 
 
 void EPD_set_temperature(EPD_type *epd, int temperature) {
+
+	// stage1: repeat, step, block
+	// stage2: repeat, t1, t2
+	// stage3: repeat, step, block
+
 	static const compensation_type compensation_144[3] = {
 		{ 2, 6, 42,   4, 392, 392,   2, 6, 42 },  //  0 ... 10 Celcius
 		{ 4, 2, 16,   4, 155, 155,   4, 2, 16 },  // 10 ... 40 Celcius
@@ -463,7 +468,7 @@ void EPD_set_temperature(EPD_type *epd, int temperature) {
 
 	static const compensation_type compensation_270[3] = {
 		{ 2, 8, 64,   4, 392, 392,   2, 8, 64 },  //  0 ... 10 Celcius
-		{ 2, 8, 64,   4, 196, 196,   2, 8, 64 },  // 10 ... 40 Celcius
+		{ 2, 4, 32,   4, 196, 196,   2, 4, 32 },  // 10 ... 40 Celcius
 		{ 4, 8, 64,   4, 196, 196,   4, 8, 64 }   // 40 ... 50 Celcius
 	};
 
@@ -528,15 +533,16 @@ static void frame_fixed_timed(EPD_type *epd, uint8_t fixed_value, long stage_tim
 	if (-1 == timer_settime(epd->timer, 0, &its, NULL)) {
 		err(1, "timer_settime failed");
 	}
+
 	do {
 		for (uint8_t line = 0; line < epd->lines_per_display ; ++line) {
-			one_line(epd, line, 0, fixed_value, EPD_normal, BORDER_BYTE_NULL, false);
+			one_line(epd, epd->lines_per_display - line - 1, 0, fixed_value, EPD_normal, BORDER_BYTE_NULL);
 		}
 
 		if (-1 == timer_gettime(epd->timer, &its)) {
 			err(1, "timer_gettime failed");
 		}
-	} while (its.it_value.tv_sec > 0 && its.it_value.tv_nsec > 0);
+	} while ((its.it_value.tv_sec > 0) || (its.it_value.tv_nsec > 0));
 }
 
 
@@ -559,15 +565,29 @@ static void frame_fixed_13(EPD_type *epd, uint8_t value, EPD_stage stage) {
 
 	for (int n = 0; n < repeat; ++n) {
 
-		for (int line = step - block; line < total_lines + step; line += step) {
-			for (int offset = 0; offset < block; ++offset) {
-				int pos = line + offset;
-				if (pos < 0 || pos > total_lines) {
-					one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
-				} else if (0 == offset && n == repeat - 1) {
-					one_line(epd, pos, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
+		int block_begin = 0;
+		int block_end = 0;
+
+		while (block_begin < total_lines) {
+
+			block_end += step;
+			block_begin = block_end - block;
+			if (block_begin < 0) {
+				block_begin = 0;
+			} else if (block_begin >= total_lines) {
+				break;
+			}
+
+			bool full_block = (block_end - block_begin == block);
+
+			for (int line = block_begin; line < block_end; ++line) {
+				if (line >= total_lines) {
+					break;
+				}
+				if (full_block && (line < (block_begin + step))) {
+					one_line(epd, line, 0, 0x00, stage, BORDER_BYTE_NULL);
 				} else {
-					one_line(epd, pos, 0, value, stage, BORDER_BYTE_NULL, false);
+					one_line(epd, line, 0, value, stage, BORDER_BYTE_NULL);
 				}
 			}
 		}
@@ -594,15 +614,29 @@ static void frame_data_13(EPD_type *epd, const uint8_t *image, EPD_stage stage) 
 
 	for (int n = 0; n < repeat; ++n) {
 
-		for (int line = step - block; line < total_lines + step; line += step) {
-			for (int offset = 0; offset < block; ++offset) {
-				int pos = line + offset;
-				if (pos < 0 || pos > total_lines) {
-					one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
-				} else if (0 == offset && n == repeat - 1) {
-					one_line(epd, pos, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, false);
+		int block_begin = 0;
+		int block_end = 0;
+
+		while (block_begin < total_lines) {
+
+			block_end += step;
+			block_begin = block_end - block;
+			if (block_begin < 0) {
+				block_begin = 0;
+			} else if (block_begin >= total_lines) {
+				break;
+			}
+
+			bool full_block = (block_end - block_begin == block);
+
+			for (int line = block_begin; line < block_end; ++line) {
+				if (line >= total_lines) {
+					break;
+				}
+				if (full_block && (line < (block_begin + step))) {
+					one_line(epd, line, 0, 0x00, stage, BORDER_BYTE_NULL);
 				} else {
-					one_line(epd, pos, &image[pos * epd->bytes_per_line], 0, stage, BORDER_BYTE_NULL, false);
+					one_line(epd, line, &image[line * epd->bytes_per_line], 0x00, stage, BORDER_BYTE_NULL);
 				}
 			}
 		}
@@ -620,104 +654,90 @@ static void frame_stage2(EPD_type *epd) {
 
 static void nothing_frame(EPD_type *epd) {
 	for (int line = 0; line < epd->lines_per_display; ++line) {
-		one_line(epd, line, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, true);
+
+		// charge pump voltage level reduce voltage shift
+		SPI_send(epd->spi, CU8(0x70, 0x04), 2);
+		SPI_send(epd->spi, CU8(0x72, epd->voltage_level), 2);
+
+		one_line(epd, line, 0, 0x00, EPD_normal, BORDER_BYTE_NULL);
 	}
 }
 
 
 static void dummy_line(EPD_type *epd) {
-	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL, true);
+	// charge pump voltage level reduce voltage shift
+	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
+	SPI_send(epd->spi, CU8(0x72, epd->voltage_level), 2);
+	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_NULL);
 }
 
 
 static void border_dummy_line(EPD_type *epd) {
-	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_BLACK, false);
+	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_BLACK);
 	Delay_ms(40);
-	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_WHITE, false);
+	one_line(epd, 0x7fffu, 0, 0x00, EPD_normal, BORDER_BYTE_WHITE);
 	Delay_ms(200);
 }
 
 
 static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value,
-		     EPD_stage stage, uint8_t border_byte, bool set_voltage_limit) {
+		     EPD_stage stage, uint8_t border_byte) {
 
-	SPI_on(epd->spi);
-
-	if (set_voltage_limit) {
-		// charge pump voltage level reduce voltage shift
-		SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-		SPI_send(epd->spi, CU8(0x72, epd->voltage_level), 2);
-	}
-
-	// send data
-	SPI_send(epd->spi, CU8(0x70, 0x0a), 2);
-
-	Delay_us(10);
-
-	// send data command byte
+	// set up data buffer
 	uint8_t *p = epd->line_buffer;
 	*p++ = 0x72;
 
 	// border byte
 	*p++ = border_byte;
 
-	// odd pixels
-	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
-		if (0 != data) {
-			uint8_t pixels = data[b - 1] & 0x55;
+	// the vaious display segments
+	uint8_t *odd = p + epd->bytes_per_line;  // reversed addressing
+	uint8_t *scan = odd;
+	uint8_t *even = scan + epd->bytes_per_scan;
+
+	// pixels
+	if (0 != data) {
+		for (uint16_t b = 0; b < epd->bytes_per_line; ++b) {
+			uint8_t pixels = data[b];
 			switch(stage) {
 			case EPD_inverse:      // B -> W, W -> B
-				pixels = 0xaa | (pixels ^ 0x55);
+				pixels ^= 0xff;
 				break;
 			case EPD_normal:       // B -> B, W -> W
-				pixels = 0xaa | pixels;
 				break;
 			}
-			*p++ = pixels;
-		} else {
-			*p++ = fixed_value;
+
+			*--odd = 0xaa | pixels;
+
+			pixels >>= 1;
+			pixels |= 0xaa;
+
+			*even++ = ((pixels & 0xc0) >> 6)
+				| ((pixels & 0x30) >> 2)
+				| ((pixels & 0x0c) << 2)
+				| ((pixels & 0x03) << 6);
 		}
+	} else {
+		memset(p, fixed_value, epd->bytes_per_line);
+		memset(even, fixed_value, epd->bytes_per_line);
 	}
 
 	// scan line
-	int scan_pos = (epd->lines_per_display - line - 1) / 4;
-	int scan_shift = 2 * (line & 0x03);
-	for (uint16_t b = 0; b < epd->bytes_per_scan; ++b) {
-		if (scan_pos == b) {
-			*p++ = 0x03 << scan_shift;
-		} else {
-			*p++ = 0x00;
-		}
-	}
-
-	// even pixels
-	for (uint16_t b = 0; b < epd->bytes_per_line; ++b) {
-		if (0 != data) {
-			uint8_t pixels = data[b] & 0xaa;
-			switch(stage) {
-			case EPD_inverse:      // B -> W, W -> B (Current Image)
-				pixels = 0xaa | ((pixels ^ 0xaa) >> 1);
-				break;
-			case EPD_normal:       // B -> B, W -> W (New Image)
-				pixels = 0xaa | (pixels >> 1);
-				break;
-			}
-			uint8_t p1 = (pixels >> 6) & 0x03;
-			uint8_t p2 = (pixels >> 4) & 0x03;
-			uint8_t p3 = (pixels >> 2) & 0x03;
-			uint8_t p4 = (pixels >> 0) & 0x03;
-			*p++ = (p1 << 0) | (p2 << 2) | (p3 << 4) | (p4 << 6);
-		} else {
-			*p++ = fixed_value;
-		}
+	int scan_pos = 0;
+	if (line < epd->lines_per_display) {
+		scan_pos = (epd->lines_per_display - line - 1) >> 2;
+		int scan_shift = (line & 0x03) << 1;
+		scan[scan_pos] = 0x03 << scan_shift;
 	}
 
 	// send the accumulated line buffer
-	SPI_send(epd->spi, epd->line_buffer, p - epd->line_buffer);
+	SPI_send(epd->spi, CU8(0x70, 0x0a), 2);
+	SPI_send(epd->spi, epd->line_buffer, epd->line_buffer_size);
+
+	// restore scan buffer
+	scan[scan_pos] = 0x00;
 
 	// turn on OE
 	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
 	SPI_send(epd->spi, CU8(0x72, 0x07), 2);
-
-	SPI_off(epd->spi);
 }

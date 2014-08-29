@@ -24,6 +24,6 @@
 #define busy_pin      GPIO_P1_22
 
 #define SPI_DEVICE    "/dev/spidev0.0"
-#define SPI_BPS       5000000
+#define SPI_BPS       8000000
 
 #endif
