@@ -1,7 +1,9 @@
 # Makefile
 
-COG_VERSION ?= V1
+COG_VERSION ?= NOT-SET
 EPD_IO ?= epd_io.h
+
+SUPPORTED_VERSIONS = V1 V2
 
 .PHONY: help
 help:
@@ -34,18 +36,41 @@ help:
 	@echo 2. if not root must use sudo when installing
 	@echo
 
+.PHONY: all
+all: help
+
+.PHONY: cog-error
+cog-error:
+	@echo
+	@echo ERROR: COG_VERSION was not set, please set to one of: ${SUPPORTED_VERSIONS}
+	@echo
+
+.PHONY: version-check
+ifeq (,$(strip ${COG_VERSION}))
+version-check: cog-error help
+	@false
+else
+ifeq (NOT-SET,$(strip ${COG_VERSION}))
+version-check: cog-error help
+	@false
+else
+version-check:
+	@true
+endif
+endif
+
 
 .PHONY: rpi raspberrypi
-rpi raspberrypi:
+rpi raspberrypi: version-check
 	make PLATFORM=../RaspberryPi COG_VERSION="${COG_VERSION}" EPD_IO="${EPD_IO}" -C driver-common
 
-rpi-%:
+rpi-%: version-check
 	make PLATFORM=../RaspberryPi COG_VERSION="${COG_VERSION}" EPD_IO="${EPD_IO}" -C driver-common $*
 
 
 .PHONY: bb beaglebone
-bb beaglebone:
+bb beaglebone: version-check
 	make PLATFORM=../BeagleBone COG_VERSION="${COG_VERSION}" EPD_IO="${EPD_IO}" -C driver-common
 
-bb-%:
+bb-%: version-check
 	make PLATFORM=../BeagleBone COG_VERSION="${COG_VERSION}" EPD_IO="${EPD_IO}" -C driver-common $*
