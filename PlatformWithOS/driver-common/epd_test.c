@@ -17,6 +17,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 #include <unistd.h>
 #include <err.h>
 
@@ -32,8 +34,23 @@
 
 #include EPD_IO
 
+// 1.44" test images
+#include "aphrodite_1_44.xbm"
+#include "cat_1_44.xbm"
+#include "saturn_1_44.xbm"
+#include "text_hello_1_44.xbm"
+#include "text_image_1_44.xbm"
+#include "venus_1_44.xbm"
 
-// test images
+// 2.0" test images
+#include "aphrodite_2_0.xbm"
+#include "cat_2_0.xbm"
+#include "saturn_2_0.xbm"
+#include "text_hello_2_0.xbm"
+#include "text_image_2_0.xbm"
+#include "venus_2_0.xbm"
+
+// 2.7" test images
 #include "aphrodite_2_7.xbm"
 #include "cat_2_7.xbm"
 #include "saturn_2_7.xbm"
@@ -42,7 +59,25 @@
 #include "venus_2_7.xbm"
 
 
-static uint8_t *images[] = {
+static const uint8_t *images_1_44[] = {
+	aphrodite_1_44_bits,
+	cat_1_44_bits,
+	saturn_1_44_bits,
+	text_hello_1_44_bits,
+	text_image_1_44_bits,
+	venus_1_44_bits
+};
+
+static const uint8_t *images_2_0[] = {
+	aphrodite_2_0_bits,
+	cat_2_0_bits,
+	saturn_2_0_bits,
+	text_hello_2_0_bits,
+	text_image_2_0_bits,
+	venus_2_0_bits
+};
+
+static const uint8_t *images_2_7[] = {
 	aphrodite_2_7_bits,
 	cat_2_7_bits,
 	saturn_2_7_bits,
@@ -53,10 +88,54 @@ static uint8_t *images[] = {
 
 #define SIZE_OF_ARRAY(a) (sizeof(a) / sizeof((a)[0]))
 
+// print usage message and exit
+static void usage(const char *program_name, const char *message, ...) {
 
+	if (NULL != message) {
+		va_list ap;
+		va_start(ap, message);
+		printf("error: ");
+		vprintf(message, ap);
+		printf("\n");
+		va_end(ap);
+	}
+	if (NULL != program_name) {
+		program_name = "epd_test";
+	}
+
+	printf("usage: %s [ 1.44 | 2.0 | 2.7 ]\n", program_name);
+	exit(1);
+}
+
+// the main test program
 int main(int argc, char *argv[]) {
 
 	int rc = 0;
+	EPD_size display_size = EPD_1_44;
+	const uint8_t *const *images = images_1_44;
+	int image_count = SIZE_OF_ARRAY(images_1_44);
+
+	if (argc < 2) {
+		usage(argv[0], "missing argument");
+	} else if (argc > 2) {
+		usage(argv[0], "extraneous extra arguments");
+	}
+
+	if (0 == strcmp("1.44", argv[1]) || 0 == strcmp("1_44", argv[1])) {
+		display_size = EPD_1_44;
+		images = images_1_44;
+		image_count = SIZE_OF_ARRAY(images_1_44);
+	} else if (0 == strcmp("2.0", argv[1]) || 0 == strcmp("2_0", argv[1])) {
+		display_size = EPD_2_0;
+		images = images_2_0;
+		image_count = SIZE_OF_ARRAY(images_2_0);
+	} else if (0 == strcmp("2.7", argv[1]) || 0 == strcmp("2_7", argv[1])) {
+		display_size = EPD_2_7;
+		images = images_2_7;
+		image_count = SIZE_OF_ARRAY(images_2_7);
+	} else {
+		usage(argv[0], "unknown display size: %s", argv[1]);
+	}
 
 	if (!GPIO_setup()) {
 		rc = 1;
@@ -80,7 +159,7 @@ int main(int argc, char *argv[]) {
 	GPIO_mode(reset_pin, GPIO_OUTPUT);
 	GPIO_mode(busy_pin, GPIO_INPUT);
 
-	EPD_type *epd = EPD_create(EPD_2_7,
+	EPD_type *epd = EPD_create(display_size,
 				   panel_on_pin,
 				   border_pin,
 				   discharge_pin,
@@ -106,7 +185,7 @@ int main(int argc, char *argv[]) {
 #endif
 
 	printf("images start\n");
-	for (int i = 0; i < SIZE_OF_ARRAY(images); ++i) {
+	for (int i = 0; i < image_count; ++i) {
 		printf("image = %d\n", i);
 		EPD_begin(epd);
 #if EPD_COG_VERSION == 1
@@ -119,7 +198,9 @@ int main(int argc, char *argv[]) {
 		EPD_image(epd, images[i]);
 #endif
 		EPD_end(epd);
-		sleep(5);
+		if (i < image_count - 1) {
+			sleep(5);
+		}
 	}
 
 	// release resources
