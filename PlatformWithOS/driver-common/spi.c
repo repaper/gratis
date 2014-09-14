@@ -102,7 +102,7 @@ void SPI_send(SPI_type *spi, const void *buffer, size_t length) {
 	transfer_buffer[0].tx_buf = (unsigned long)(buffer);
 	transfer_buffer[0].rx_buf = 0;  // nothing to receive
 	transfer_buffer[0].len = length;
-	transfer_buffer[0].delay_usecs = 0;
+	transfer_buffer[0].delay_usecs = 2;
 	transfer_buffer[0].speed_hz = spi->bps;
 	transfer_buffer[0].bits_per_word = 8;
 	transfer_buffer[0].cs_change = 1;
@@ -120,7 +120,7 @@ void SPI_read(SPI_type *spi, const void *buffer, void *received, size_t length) 
 	transfer_buffer[0].tx_buf = (unsigned long)(buffer);
 	transfer_buffer[0].rx_buf = (unsigned long)(received);
 	transfer_buffer[0].len = length;
-	transfer_buffer[0].delay_usecs = 0;
+	transfer_buffer[0].delay_usecs = 2;
 	transfer_buffer[0].speed_hz = spi->bps;
 	transfer_buffer[0].bits_per_word = 8;
 	transfer_buffer[0].cs_change = 1;
@@ -134,28 +134,12 @@ void SPI_read(SPI_type *spi, const void *buffer, void *received, size_t length) 
 // internal functions
 // ==================
 
-static void set_spi_mode(SPI_type *spi, uint8_t mode) {
+static void set_spi_mode(SPI_type *spi, uint8_t in_mode) {
 
+	uint8_t mode = in_mode;
 	uint8_t bits = 8;
 	uint8_t lsb_first = 0;
 	uint32_t speed_hz = spi->bps;
-
-	// RD
-	if (-1 == ioctl(spi->fd, SPI_IOC_RD_MODE, &mode)) {
-		err(1,"SPI: cannot set SPI_IOC_RD_MODE  =%d", mode);
-	}
-
-	if (-1 == ioctl(spi->fd, SPI_IOC_RD_BITS_PER_WORD, &bits)) {
-		err(1,"SPI: cannot set SPI_IOC_RD_BITS_PER_WORD = %d", bits);
-	}
-
-	if (-1 == ioctl(spi->fd, SPI_IOC_RD_LSB_FIRST, &lsb_first)) {
-		err(1,"SPI: cannot set SPI_IOC_RD_LSB_FIRST = %d", lsb_first);
-	}
-
-	if (-1 == ioctl(spi->fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed_hz)) {
-		err(1,"SPI: cannot set SPI_IOC_RD_MAX_SPEED_HZ = %d", speed_hz);
-	}
 
 	// WR
 	if (-1 == ioctl(spi->fd, SPI_IOC_WR_MODE, &mode)) {
