@@ -21,7 +21,11 @@
 #if defined(__AVR__)
 #include <avr/pgmspace.h>
 #else
+
+#ifndef PROGMEM
 #define PROGMEM
+#endif
+
 #endif
 
 // if more SRAM available (8 kBytes)
