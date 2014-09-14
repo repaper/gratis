@@ -33,8 +33,8 @@
 #define BORDER_BYTE_WHITE 0xaa
 #define BORDER_BYTE_NULL  0x00
 
-static void SPI_on();
-static void SPI_off();
+static void SPI_on(void);
+static void SPI_off(void);
 static void SPI_put(uint8_t c);
 static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
@@ -153,7 +153,7 @@ void  EPD_Class::setFactor(int temperature) {
 }
 
 
-void EPD_Class::begin() {
+void EPD_Class::begin(void) {
 
 	// assume ok
 	this->status = EPD_OK;
@@ -287,7 +287,7 @@ void EPD_Class::begin() {
 }
 
 
-void EPD_Class::end() {
+void EPD_Class::end(void) {
 
 	this->nothing_frame();
 
@@ -354,7 +354,7 @@ void EPD_Class::end() {
 	power_off();
 }
 
-void EPD_Class::power_off() {
+void EPD_Class::power_off(void) {
 
 	// turn of power and all signals
 	digitalWrite(this->EPD_Pin_RESET, LOW);
@@ -545,7 +545,7 @@ void EPD_Class::frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stag
 }
 
 
-void EPD_Class::frame_stage2() {
+void EPD_Class::frame_stage2(void) {
 	for (uint16_t i = 0; i < this->compensation->stage2_repeat; ++i) {
 		this->frame_fixed_timed(0xff, this->compensation->stage2_t1);
 		this->frame_fixed_timed(0xaa, this->compensation->stage2_t2);
@@ -553,19 +553,19 @@ void EPD_Class::frame_stage2() {
 }
 
 
-void EPD_Class::nothing_frame() {
+void EPD_Class::nothing_frame(void) {
 	for (uint16_t line = 0; line < this->lines_per_display; ++line) {
 		this->line(line, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_NULL, true);
 	}
 }
 
 
-void EPD_Class::dummy_line() {
+void EPD_Class::dummy_line(void) {
 	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_NULL, true);
 }
 
 
-void EPD_Class::border_dummy_line() {
+void EPD_Class::border_dummy_line(void) {
 	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_BLACK);
 	Delay_ms(40);
 	this->line(0x7fffu, 0, 0x00, false, EPD_normal, EPD_BORDER_BYTE_WHITE);
@@ -681,7 +681,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
 }
 
 
-static void SPI_on() {
+static void SPI_on(void) {
 	SPI.end();
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
@@ -693,7 +693,7 @@ static void SPI_on() {
 }
 
 
-static void SPI_off() {
+static void SPI_off(void) {
 	// SPI.begin();
 	// SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);

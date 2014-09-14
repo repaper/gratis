@@ -24,14 +24,14 @@ private:
 	S5813A_Class(const S5813A_Class &f);  // prevent copy
 
 public:
-	int read();
-	long readVoltage();  // returns micro volts
+	int read(void);
+	long readVoltage(void);  // returns micro volts
 
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
 	void begin(int input_pin);
-	void end();
+	void end(void);
 
 	S5813A_Class(int input_pin);
 

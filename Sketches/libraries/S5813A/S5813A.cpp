@@ -85,20 +85,20 @@ void S5813A_Class::begin(int input_pin) {
 }
 
 
-void S5813A_Class::end() {
+void S5813A_Class::end(void) {
 }
 
 
 // return sensor output voltage in uV
 // not the ADC value, but the value that should be measured on the
 // sensor output pin
-long S5813A_Class::readVoltage() {
+long S5813A_Class::readVoltage(void) {
 	long vADC = analogRead(this->temperature_pin);
 	return REV_PD((vADC * ADC_MAXIMUM_uV) / ADC_COUNTS);
 }
 
 
 // return temperature as integer in Celcius
-int S5813A_Class::read() {
+int S5813A_Class::read(void) {
 	return Tstart_C + ((this->readVoltage() - Vstart_uV) / Vslope_uV);
 }

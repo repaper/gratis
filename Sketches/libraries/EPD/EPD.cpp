@@ -32,8 +32,8 @@
 static void PWM_start(int pin);
 static void PWM_stop(int pin);
 
-static void SPI_on();
-static void SPI_off();
+static void SPI_on(void);
+static void SPI_off(void);
 static void SPI_put(uint8_t c);
 static void SPI_put_wait(uint8_t c, int busy_pin);
 static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
@@ -116,7 +116,7 @@ EPD_Class::EPD_Class(EPD_size size,
 }
 
 
-void EPD_Class::begin() {
+void EPD_Class::begin(void) {
 
 	// power up sequence
 	digitalWrite(this->EPD_Pin_RESET, LOW);
@@ -128,7 +128,7 @@ void EPD_Class::begin() {
 	SPI_on();
 
 	PWM_start(this->EPD_Pin_PWM);
-	Delay_ms(25);                       // Allow time for PWN to start up
+	Delay_ms(25);                       // Allow time for PWM to start
 	digitalWrite(this->EPD_Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
 
@@ -236,7 +236,7 @@ void EPD_Class::begin() {
 }
 
 
-void EPD_Class::end() {
+void EPD_Class::end(void) {
 
 	// dummy frame
 	this->frame_fixed(0x55, EPD_normal);
@@ -591,7 +591,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 }
 
 
-static void SPI_on() {
+static void SPI_on(void) {
 	SPI.end();
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
@@ -603,7 +603,7 @@ static void SPI_on() {
 }
 
 
-static void SPI_off() {
+static void SPI_off(void) {
 	// SPI.begin();
 	// SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);

@@ -23,7 +23,7 @@
 #include "EPD2_GFX.h"
 
 
-void EPD_GFX::begin() {
+void EPD_GFX::begin(void) {
 	int temperature = this->S5813A.read();
 
 	// erase display
@@ -37,7 +37,7 @@ void EPD_GFX::begin() {
 }
 
 
-void EPD_GFX::display() {
+void EPD_GFX::display(void) {
 	int temperature = this->S5813A.read();
 
 	// erase old, display new

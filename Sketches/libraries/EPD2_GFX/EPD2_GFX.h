@@ -47,8 +47,8 @@ public:
 		EPD(epd), S5813A(s5813a) {
 	}
 
-	void begin();
-	void end();
+	void begin(void);
+	void end(void);
 
 	// set a single pixel in new_image
 	void drawPixel(int16_t x, int16_t y, uint16_t colour) {
@@ -63,7 +63,7 @@ public:
 	}
 
 	// update panel
-	void display();
+	void display(void);
 };
 
 

@@ -72,15 +72,15 @@ private:
 
 public:
 	// power up and power down the EPD panel
-	void begin();
-	void end();
+	void begin(void);
+	void end(void);
 
 	void setFactor(int temperature = 25) {
 		this->factored_stage_time = this->stage_time * this->temperature_to_factor_10x(temperature) / 10;
 	}
 
 	// clear display (anything -> white)
-	void clear() {
+	void clear(void) {
 		this->frame_fixed_repeat(0xff, EPD_compensate);
 		this->frame_fixed_repeat(0xff, EPD_white);
 		this->frame_fixed_repeat(0xaa, EPD_inverse);

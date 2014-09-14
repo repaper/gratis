@@ -50,7 +50,7 @@ public:
 
 	// Arduino has separate memory spaces, but MSP430 does not
 #if defined(__MSP430_CPU__)
-	// just alis the function name
+	// just alias the function name
 	inline void write_from_progmem(uint32_t address, const void *buffer, uint16_t length) {
 		this->write(address, buffer, length);
 	}
@@ -64,7 +64,7 @@ public:
 	// inline static void detachInterrupt();
 
 	void begin(int chip_select_pin);
-	void end();
+	void end(void);
 
 	FLASH_Class(int chip_select_pin);
 

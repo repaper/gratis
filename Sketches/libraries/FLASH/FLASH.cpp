@@ -71,11 +71,11 @@ void FLASH_Class::begin(int chip_select_pin) {
 }
 
 
-void FLASH_Class::end() {
+void FLASH_Class::end(void) {
 }
 
 // configure the SPI for FLASH access
-void FLASH_Class::spi_setup() {
+void FLASH_Class::spi_setup(void) {
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE3);
@@ -90,7 +90,7 @@ void FLASH_Class::spi_setup() {
 }
 
 // shutdown SPI after FLASH access
-void FLASH_Class::spi_teardown() {
+void FLASH_Class::spi_teardown(void) {
 	Delay_us(50);
 	digitalWrite(this->CS, HIGH);
 	SPI.end();
