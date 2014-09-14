@@ -121,7 +121,7 @@ void setup() {
 	digitalWrite(Pin_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
-#if !defined(__MSP430_CPU__)
+#if defined(__AVR__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}

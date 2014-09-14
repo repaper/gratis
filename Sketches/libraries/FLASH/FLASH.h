@@ -48,8 +48,8 @@ public:
 	void write_disable(void);
 	void write(uint32_t address, const void *buffer, uint16_t length);
 
-	// Arduino has separate memory spaces, but MSP430 does not
-#if defined(__MSP430_CPU__)
+	// Arduino has separate memory spaces, but MSP430, ARM do not
+#if !defined(__AVR__)
 	// just alias the function name
 	inline void write_from_progmem(uint32_t address, const void *buffer, uint16_t length) {
 		this->write(address, buffer, length);

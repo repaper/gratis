@@ -190,7 +190,7 @@ void FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
 }
 
 
-#if !defined(__MSP430_CPU__)
+#if defined(__AVR__)
 void FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *buffer, uint16_t length) {
 	while (this->is_busy()) {
 	}

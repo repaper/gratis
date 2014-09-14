@@ -600,7 +600,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
        // odd pixels
        for (uint16_t b = this->bytes_per_line; b > 0; --b) {
 	       if (0 != data) {
-#if defined(__MSP430_CPU__)
+#if !defined(__AVR__)
 		       uint8_t pixels = data[b - 1];
 #else
 		       // AVR has multiple memory spaces
@@ -639,7 +639,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
        // even pixels
        for (uint16_t b = 0; b < this->bytes_per_line; ++b) {
 	       if (0 != data) {
-#if defined(__MSP430_CPU__)
+#if !defined(__AVR__)
 		       uint8_t pixels = data[b];
 #else
 		       // AVR has multiple memory spaces

@@ -18,10 +18,10 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#if defined(__MSP430_CPU__)
-#define PROGMEM
-#else
+#if defined(__AVR__)
 #include <avr/pgmspace.h>
+#else
+#define PROGMEM
 #endif
 
 // if more SRAM available (8 kBytes)
