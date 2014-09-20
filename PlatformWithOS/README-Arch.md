@@ -1,9 +1,9 @@
 # Using arch Linux
 
-**This need to be re-checked**
+**This need to be re-checked on Beaglebone Black**
 
-This was only briefly tested on the Beaglebone Black.  This ought to
-work with Arch on Raspberry Pi (**untested**).
+This was only briefly tested on the Beaglebone Black.  This also
+works with Arch on Raspberry Pi.
 
 
 # Initial SD Card creation
@@ -30,22 +30,29 @@ system is consistent and latest kernel is running.
 
 ~~~~~
 pacman -Syu
+sync
 reboot
 ~~~~~
 
 After start-up login as root again Install whatever utilites, editor,
-shells you would normally use:
+shells you would normally use; ntp for time correction etc.
 
 ~~~~~
-pacman -S mg zsh curl rsync
+pacman -S mg zsh curl rsync ntp
 ~~~~~
 
 Install git, development and fuse libraries:
 
 ~~~~~
-pacman -S git base-devel libfuse
+# when propted for package selection press Enter for "all"
+pacman -S git base-devel fuse
 ~~~~~
 
+Install python2 imaging libraries (PIL) and some fonts
+
+~~~~~
+pacman -S python-imaging ttf-dejavu
+~~~~~
 
 # Create a user to use for EPD development
 
@@ -53,9 +60,9 @@ Create a user for development, I like to set its shell to zsh.
 
 ~~~~~
 # EITHER use the default shell (likely to be bash)
-adduser -c 'E-Ink devlopment' -G root,wheel,adm -m -U repaper
+useradd -c 'E-Ink devlopment' -G root,wheel,adm -m -U repaper
 # OR to use zsh as the user shell
-adduser -c 'E-Ink devlopment' -G root,wheel,adm -m -U -s /usr/bin/zsh repaper
+useradd -c 'E-Ink Development' -G root,wheel,adm -m -U -s /usr/bin/zsh repaper
 ~~~~~
 
 You may wish to change `root` and `repaper` passwords at this point.
@@ -65,7 +72,36 @@ passwd root
 passwd repaper
 ~~~~~
 
-Perhaps even set up ssh authorisation:
+## Enable sudo access
+
+Enable sudo for the repaper user; the initial user creation added
+repaper to the wheel group, but this need to be enabled in
+/etc/sudoers.
+
+~~~~~
+visudo -f /etc/sudoers
+~~~~~
+
+Find the wheel line by typing: `/%wheel`
+Press *Enter*
+The line initialilly looks like:
+
+~~~~~
+# %wheel ALL=(ALL) ALL
+~~~~~
+
+Type a *zero* followed by two **x**s  i.e.: `0xx`
+(this is: home cursor and two delete chars)
+
+The line will now look like:
+
+~~~~~
+%wheel ALL=(ALL) ALL
+~~~~~
+
+Exit and save the file *excape* *colon* **x** *Enter*
+
+## Perhaps even set up ssh authorisation:
 
 ~~~~~
 su -l repaper    # login as repaper
@@ -87,6 +123,13 @@ Now use `scp` to copy any shell or editor configuration files from the host
 scp -p ~/.zshrc ~/.mg repaper@beaglebone:
 #* it maybe necessary to use IP address (replace with your correct IP address)
 scp -p ~/.zshrc ~/.mg repaper@192.168.1.123:
+~~~~~
+
+See the ExampleScripts/README.md for a sampe tmux configuration
+
+~~~~~
+# to install tmux
+pacman -S tmux
 ~~~~~
 
 # Creating the EPD driver
@@ -127,26 +170,35 @@ Install the necessary libraries and compile
 ~~~~~
 cd gratis/PlatformWithOS
 make help   # follow the various make options
-# e.g.
+# e.g. for Beaglebone Black  (or rpi instead of bb)
 make COG_VERSION=V2 bb-clean bb
 # run the test program (in this case a 2.7" panel was connected)
 sudo ./driver-common/epd_test 2.7
 # the panel should cycle through several images
+~~~~~
+
+## Setup systemd configuration
+
+Arch is using systemd and the this part is sysv init typs of startup script
+
+~~~~~
+sudo cp ./driver-common/epd_fuse /usr/sbin/
+sudo cp ./driver-common/epd-*.service /usr/lib/systemd/system/
 #
-# install the epd driver
-sudo make COG_VERSION=V2 bb-install
-# Remember to edit the configuration (and set the correct panel size)
-sudo mg /etc/default/epd-fuse
-# start the driver
-sudo service epd-fuse start
-# run demo
-python demo/DrawDemo.py
-~~~~~
-
-Note that once the demo has run successfully, please reboot, login and
-check the fuse driver was loaded:
-
-~~~~~
+# Ensure correct panel size in config: (use your editor: vi vim mg nano
+$EDITOR /usr/lib/systemd/system/epd-fuse.service
+#
+# ensure systemd picks up changes in: /usr/lib/systemd/system/
+systemctl daemon-reload
+#
+systemctl list-unit-files |grep -i epd
+# response:
+#   epd-fuse.service                       disabled
+#
+# enable and start the driver
+systemctl enable epd-fuse.service
+systemctl start epd-fuse
+#
 cat /dev/epd/panel
 # this should display panel size and COG version
 #
@@ -154,4 +206,27 @@ cat /dev/epd/panel
 echo 'C' > /dev/epd/command
 ~~~~~
 
-Any of the demos should now be runnable.
+## Try the DrawDemo
+
+This will fail because `import Image` wil not find the PIL module
+so fix the imports: need to look like: `from PIL import Image`
+
+~~~~~
+sed -i.bak 's/^import Image/from PIL import Image/' demo/*.py
+~~~~~
+
+~~~~~
+python2 demo/DrawDemo.py
+~~~~~
+
+Note that once the demo has run successfully, please reboot, login and
+check the fuse driver was loaded:
+
+~~~~~
+cat /dev/epd/panel
+echo 'C' > /dev/epd/command
+cd gratis/PlatformWithOS
+python2 demo/DrawDemo.py
+~~~~~
+
+Any of the other demos should now be runnable.

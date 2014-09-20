@@ -1,0 +1,19 @@
+[Unit]
+Description=A Fuse driver for the Repaper.org EPD
+Wants=epd-mountpoint.service
+After=epd-mountpoint.service
+After=network.target
+
+[Service]
+Type=forking
+PrivateDevices=no
+SyslogLevel=err
+
+# make sure panel size matches installed EPD panel
+ExecStart=/usr/sbin/epd_fuse --panel=2.0 -o allow_other -o default_permissions /dev/epd
+ExecStop=/usr/bin/umount /dev/epd
+KillSignal=SIGQUIT
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
