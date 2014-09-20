@@ -230,3 +230,15 @@ python2 demo/DrawDemo.py
 ~~~~~
 
 Any of the other demos should now be runnable.
+
+
+# Note starting NTP
+
+~~~~~
+sudo pacman -S ntp   ## if not already installed
+sudo systemctl enable ntpd
+sudo systemctl enable ntpdate
+sudo systemctl start ntpdate
+sudo systemctl start ntpd
+sudo ntpq -nc peers 127.0.0.1
+~~~~~
