@@ -1,9 +1,14 @@
-# Using arch Linux
-
-**This need to be re-checked on Beaglebone Black**
+# Using Arch Linux
 
 This was only briefly tested on the Beaglebone Black.  This also
 works with Arch on Raspberry Pi.
+
+**Problems**
+
+1. **This need to be re-checked on Beaglebone Black**
+2. **Find a solution to the PIL problem**
+    * Debian uses `import Image`
+    * Arch needs `from PIL import Image`
 
 
 # Initial SD Card creation
@@ -208,7 +213,7 @@ echo 'C' > /dev/epd/command
 
 ## Try the DrawDemo
 
-This will fail because `import Image` wil not find the PIL module
+This will fail because `import Image` will not find the PIL module
 so fix the imports: need to look like: `from PIL import Image`
 
 ~~~~~
@@ -229,16 +234,63 @@ cd gratis/PlatformWithOS
 python2 demo/DrawDemo.py
 ~~~~~
 
-Any of the other demos should now be runnable.
+Any of the other demos should now be functional.
 
 
-# Note starting NTP
+# Note starting NTP and timezone
+
+Below are brief notes to set up NTP and the timezone; useful to try
+the clock demos - e.g. to have EPD clock in some other zone.  As
+configured the system will be UTC.
+
+For detailed instructions consult the excellent Arch Linux Wiki, the
+time page has an entry for timezone:
+
+https://wiki.archlinux.org/index.php/time#Time_zone
+
+
+## NTP
+
+If not already installed install the NTP daemon:
 
 ~~~~~
-sudo pacman -S ntp   ## if not already installed
+sudo pacman -S ntp
+~~~~~
+
+Enable and start the NTP system:
+
+~~~~~
 sudo systemctl enable ntpd
 sudo systemctl enable ntpdate
 sudo systemctl start ntpdate
 sudo systemctl start ntpd
+~~~~~
+
+Check if operating - may need to repeat to see how synchronisation is
+progressing:
+
+~~~~~
 sudo ntpq -nc peers 127.0.0.1
+~~~~~
+
+## Timezone
+
+View current timezone status
+
+~~~~~
+sudo timedatectl status
+~~~~~
+
+List available current timezone, then scroll through the list to
+find a suitable one.  (Type 'Q' to exit)
+
+~~~~~
+sudo timedatectl list-timezones
+~~~~~
+
+Set the desired timezone and check the date to see if it is correct.
+
+~~~~~
+sudo timedatectl set-timezone Asia/Taipei
+date
 ~~~~~
