@@ -13,8 +13,8 @@
 # governing permissions and limitations under the License.
 
 
-import Image
-import ImageOps
+from PIL import Image
+from PIL import ImageOps
 import re
 import os
 

@@ -6,9 +6,6 @@ works with Arch on Raspberry Pi.
 **Problems**
 
 1. **This need to be re-checked on Beaglebone Black**
-2. **Find a solution to the PIL problem**
-    * Debian uses `import Image`
-    * Arch needs `from PIL import Image`
 
 
 # Initial SD Card creation
@@ -212,13 +209,6 @@ echo 'C' > /dev/epd/command
 ~~~~~
 
 ## Try the DrawDemo
-
-This will fail because `import Image` will not find the PIL module
-so fix the imports: need to look like: `from PIL import Image`
-
-~~~~~
-sed -i.bak 's/^import Image/from PIL import Image/' demo/*.py
-~~~~~
 
 ~~~~~
 python2 demo/DrawDemo.py

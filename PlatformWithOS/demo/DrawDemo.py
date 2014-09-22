@@ -14,8 +14,8 @@
 
 
 import sys
-import Image
-import ImageDraw
+from PIL import Image
+from PIL import ImageDraw
 from EPD import EPD
 
 WHITE = 1

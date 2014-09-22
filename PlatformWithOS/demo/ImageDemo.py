@@ -16,8 +16,8 @@
 import sys
 import os
 import time
-import Image
-import ImageOps
+from PIL import Image
+from PIL import ImageOps
 from EPD import EPD
 
 
