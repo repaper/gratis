@@ -54,6 +54,8 @@ Install python2 imaging libraries (PIL) and some fonts
 
 ~~~~~
 pacman -S python-imaging ttf-dejavu
+# Clock27.py uses:
+pacman -S ttf-freefont
 ~~~~~
 
 # Create a user to use for EPD development
@@ -188,18 +190,18 @@ sudo cp ./driver-common/epd_fuse /usr/sbin/
 sudo cp ./driver-common/epd-*.service /usr/lib/systemd/system/
 #
 # Ensure correct panel size in config: (use your editor: vi vim mg nano
-$EDITOR /usr/lib/systemd/system/epd-fuse.service
+sudo $EDITOR /usr/lib/systemd/system/epd-fuse.service
 #
 # ensure systemd picks up changes in: /usr/lib/systemd/system/
-systemctl daemon-reload
+sudo systemctl daemon-reload
 #
-systemctl list-unit-files |grep -i epd
+sudo systemctl list-unit-files |grep -i epd
 # response:
 #   epd-fuse.service                       disabled
 #
 # enable and start the driver
-systemctl enable epd-fuse.service
-systemctl start epd-fuse
+sudo systemctl enable epd-fuse.service
+sudo systemctl start epd-fuse
 #
 cat /dev/epd/panel
 # this should display panel size and COG version
