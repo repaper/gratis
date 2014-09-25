@@ -1,8 +1,0 @@
-[Unit]
-Description=A Fuse mouintpoint the Repaper.org EPD
-ConditionPathExists=|!/dev/epd
-
-[Service]
-ExecStart=/usr/bin/mkdir --mode=0777 /dev/epd
-Type=oneshot
-RemainAfterExit=yes

@@ -1,7 +1,5 @@
 [Unit]
 Description=A Fuse driver for the Repaper.org EPD
-Wants=epd-mountpoint.service
-After=epd-mountpoint.service
 After=network.target
 
 [Service]
@@ -10,7 +8,10 @@ PrivateDevices=no
 SyslogLevel=err
 
 # make sure panel size matches installed EPD panel
-ExecStart=/usr/sbin/epd_fuse --panel=2.0 -o allow_other -o default_permissions /dev/epd
+Environment=EPD_MOUNTPOINT=/dev/epd EPD_SIZE=2.0 "EPD_OPTS=-o allow_other -o default_permissions"
+EnvironmentFile=/etc/default/epd-fuse
+ExecStartPre=/usr/bin/mkdir ${EPD_MOUNTPOINT}
+ExecStart=/usr/sbin/epd_fuse --panel=${EPD_SIZE} $EPD_OPTS ${EPD_MOUNTPOINT}
 ExecStop=/usr/bin/umount /dev/epd
 KillSignal=SIGQUIT
 KillMode=mixed

@@ -58,6 +58,13 @@ pacman -S python-imaging ttf-dejavu
 pacman -S ttf-freefont
 ~~~~~
 
+All above/below on a single install: (for convenience)
+
+~~~~~
+pacman -S mg zsh curl rsync ntp git base-devel fuse python-imaging ttf-dejavu ttf-freefont tmux
+~~~~~
+
+
 # Create a user to use for EPD development
 
 Create a user for development, I like to set its shell to zsh.
@@ -129,7 +136,7 @@ scp -p ~/.zshrc ~/.mg repaper@beaglebone:
 scp -p ~/.zshrc ~/.mg repaper@192.168.1.123:
 ~~~~~
 
-See the ExampleScripts/README.md for a sampe tmux configuration
+See the ExampleScripts/README.md for a sample tmux configuration
 
 ~~~~~
 # to install tmux
@@ -174,8 +181,13 @@ Install the necessary libraries and compile
 ~~~~~
 cd gratis/PlatformWithOS
 make help   # follow the various make options
-# e.g. for Beaglebone Black  (or rpi instead of bb)
+#
+# e.g. for Beaglebone Black
 make COG_VERSION=V2 bb-clean bb
+#
+# Alternative for Raspberry Pi
+make COG_VERSION=V2 rpi-clean rpi
+#
 # run the test program (in this case a 2.7" panel was connected)
 sudo ./driver-common/epd_test 2.7
 # the panel should cycle through several images
@@ -183,14 +195,25 @@ sudo ./driver-common/epd_test 2.7
 
 ## Setup systemd configuration
 
+**Note:**
+* **the make install taget currently only works on debian**
+* **use the notes below to install manually**
+
 Arch is using systemd and the this part is sysv init typs of startup script
 
+setup the panel confguration in /etc/default
+
 ~~~~~
-sudo cp ./driver-common/epd_fuse /usr/sbin/
-sudo cp ./driver-common/epd-*.service /usr/lib/systemd/system/
+sudo cp ./driver-common/epd-fuse.default /etc/default/epd-fuse
 #
 # Ensure correct panel size in config: (use your editor: vi vim mg nano
-sudo $EDITOR /usr/lib/systemd/system/epd-fuse.service
+sudo $EDITOR /etc/default/epd-fuse
+~~~~~
+
+Set up the systemd service file
+
+~~~~~
+sudo cp ./driver-common/epd-fuse.service /usr/lib/systemd/system/
 #
 # ensure systemd picks up changes in: /usr/lib/systemd/system/
 sudo systemctl daemon-reload
@@ -265,6 +288,7 @@ progressing:
 sudo ntpq -nc peers 127.0.0.1
 ~~~~~
 
+
 ## Timezone
 
 View current timezone status
@@ -285,4 +309,15 @@ Set the desired timezone and check the date to see if it is correct.
 ~~~~~
 sudo timedatectl set-timezone Asia/Taipei
 date
+sudo timedatectl status
+~~~~~
+
+
+## Running the Clock27.py demo as a service
+
+~~~~~
+sudo cp demo/Clock27.service /usr/lib/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable Clock27.service
+sudo systemctl start Clock27.service
 ~~~~~
