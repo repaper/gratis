@@ -223,7 +223,7 @@ sudo systemctl list-unit-files |grep -i epd
 #   epd-fuse.service                       disabled
 #
 # enable and start the driver
-sudo systemctl enable epd-fuse.service
+sudo systemctl enable epd-fuse
 sudo systemctl start epd-fuse
 #
 cat /dev/epd/panel

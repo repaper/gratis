@@ -33,6 +33,8 @@ LDFLAGS += -lrt
 
 RM = rm -f
 
+UNAME_r := $(shell uname -r)
+IS_ARCH := $(if $(findstring ARCH,${UNAME_r}),YES,NO)
 
 VPATH = .:${PLATFORM}
 
@@ -42,27 +44,46 @@ all: gpio_test epd_test epd_fuse
 EPD_FUSE_CONF = ${PLATFORM}/epd-fuse.conf
 EPD_FUSE_SH = ${PLATFORM}/epd-fuse.sh
 
+# abort if binary has not been built
+.PHONY: check-compiled
+check-compiled:
+	[ -e epd_fuse ] || false
+
+# install binary driver ans associated config/startup or service files
 .PHONY: install
-install: epd_fuse
+install: check-compiled
 	install --group=root --mode=750 --owner=root epd_fuse "${PREFIX}/sbin"
-	if [ -e "${EPD_FUSE_CONF}" ]  ; \
+	[ -e /etc/default/epd-fuse ] || install --group=root --mode=644 --owner=root epd-fuse.default /etc/default/epd-fuse
+ifeq (YES,${IS_ARCH})
+	install --group=root --mode=644 --owner=root epd-fuse.service "${PREFIX}/lib/systemd/system/epd-fuse.service"
+	-systemctl daemon-reload
+	-systemctl enable epd-fuse
+else # otherwise Debian
+	if [ -e "${EPD_FUSE_CONF}" ] ; \
 	then \
 	  install --group=root --mode=644 --owner=root "${EPD_FUSE_CONF}" /etc/init ; \
 	fi
 	if [ -e "${EPD_FUSE_SH}" ] ; \
 	then \
 	  install --group=root --mode=755 --owner=root "${EPD_FUSE_SH}" /etc/init.d/epd-fuse ; \
-	  [ -e /etc/default/epd-fuse ] || install --group=root --mode=644 --owner=root epd-fuse.default /etc/default/epd-fuse ; \
 	  update-rc.d epd-fuse defaults ; \
 	fi
+endif
 
 .PHONY: remove
 remove:
 	[ -x /etc/init.d/epd-fuse ] && /etc/init.d/epd-fuse stop
 	rm -f "${PREFIX}/sbin/epd_fuse"
+ifeq (YES,${IS_ARCH})
+	-systemctl stop epd-fuse
+	-systemctl disable epd-fuse
+	-systemctl daemon-reload
+	rm -f "${PREFIX}/lib/systemd/system/epd-fuse.service"
+else # otherwise Debian
 	rm -f /etc/init/epd-fuse.conf
 	rm -f /etc/init.d/epd-fuse
 	update-rc.d epd-fuse remove
+endif
 	[ -d /dev/epd ] && rmdir /dev/epd
 	echo NOT Removing: /etc/default/epd-fuse
 
