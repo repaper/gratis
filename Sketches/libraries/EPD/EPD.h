@@ -136,7 +136,7 @@ public:
 	void frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// convert temperature to compensation factor
-	int temperature_to_factor_10x(int temperature);
+	int temperature_to_factor_10x(int temperature) const;
 
 	// single line display - very low-level
 	// also has to handle AVR progmem
