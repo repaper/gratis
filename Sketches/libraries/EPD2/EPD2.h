@@ -60,12 +60,12 @@ typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class {
 private:
-	int EPD_Pin_PANEL_ON;
-	int EPD_Pin_BORDER;
-	int EPD_Pin_DISCHARGE;
-	int EPD_Pin_RESET;
-	int EPD_Pin_BUSY;
-	int EPD_Pin_EPD_CS;
+	const uint8_t EPD_Pin_PANEL_ON;
+	const uint8_t EPD_Pin_BORDER;
+	const uint8_t EPD_Pin_DISCHARGE;
+	const uint8_t EPD_Pin_RESET;
+	const uint8_t EPD_Pin_BUSY;
+	const uint8_t EPD_Pin_EPD_CS;
 
 	EPD_size size;
 	uint16_t lines_per_display;
@@ -162,12 +162,12 @@ public:
 	// inline static void detachInterrupt();
 
 	EPD_Class(EPD_size size,
-		  int panel_on_pin,
-		  int border_pin,
-		  int discharge_pin,
-		  int reset_pin,
-		  int busy_pin,
-		  int chip_select_pin);
+		  uint8_t panel_on_pin,
+		  uint8_t border_pin,
+		  uint8_t discharge_pin,
+		  uint8_t reset_pin,
+		  uint8_t busy_pin,
+		  uint8_t chip_select_pin);
 
 };
 

@@ -41,12 +41,12 @@ static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 
 
 EPD_Class::EPD_Class(EPD_size size,
-		     int panel_on_pin,
-		     int border_pin,
-		     int discharge_pin,
-		     int reset_pin,
-		     int busy_pin,
-		     int chip_select_pin) :
+		     uint8_t panel_on_pin,
+		     uint8_t border_pin,
+		     uint8_t discharge_pin,
+		     uint8_t reset_pin,
+		     uint8_t busy_pin,
+		     uint8_t chip_select_pin) :
 	EPD_Pin_PANEL_ON(panel_on_pin),
 	EPD_Pin_BORDER(border_pin),
 	EPD_Pin_DISCHARGE(discharge_pin),

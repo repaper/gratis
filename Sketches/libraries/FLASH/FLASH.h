@@ -33,7 +33,7 @@
 
 class FLASH_Class {
 private:
-	int CS;
+	uint8_t CS;
 
 	void spi_setup(void);
 	void spi_teardown(void);
@@ -63,10 +63,10 @@ public:
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
-	void begin(int chip_select_pin);
+	void begin(uint8_t chip_select_pin);
 	void end(void);
 
-	FLASH_Class(int chip_select_pin);
+	FLASH_Class(uint8_t chip_select_pin);
 
 };
 

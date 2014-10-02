@@ -60,11 +60,12 @@ enum {
 FLASH_Class FLASH(9);
 
 
-FLASH_Class::FLASH_Class(int chip_select_pin) : CS(chip_select_pin) {
+FLASH_Class::FLASH_Class(uint8_t chip_select_pin) : CS(chip_select_pin) {
 }
 
 
-void FLASH_Class::begin(int chip_select_pin) {
+// TODO: Why allow begin to change the chip_select_pin (except for this could make chip_select_pin constant)
+void FLASH_Class::begin(uint8_t chip_select_pin) {
 	digitalWrite(chip_select_pin, HIGH);
 	pinMode(chip_select_pin, OUTPUT);
 	this->CS = chip_select_pin;

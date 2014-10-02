@@ -73,12 +73,12 @@
 S5813A_Class S5813A(PIN_TEMPERATURE);
 
 
-S5813A_Class::S5813A_Class(int input_pin) : temperature_pin(input_pin) {
+S5813A_Class::S5813A_Class(uint8_t input_pin) : temperature_pin(input_pin) {
 }
 
 
-// initialise the anolog system
-void S5813A_Class::begin(int input_pin) {
+// initialise the analog system
+void S5813A_Class::begin(uint8_t input_pin) {
 	pinMode(input_pin, INPUT);
 	analogReference(ANALOG_REFERENCE);
 	this->temperature_pin = input_pin;
