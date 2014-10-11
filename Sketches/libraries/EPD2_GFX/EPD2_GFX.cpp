@@ -43,6 +43,10 @@ void EPD_GFX::display(void) {
 	// erase old, display new
 	this->EPD.begin();
 	this->EPD.setFactor(temperature);
+#if defined(EPD_ENABLE_EXTRA_SRAM)
 	this->EPD.image_sram(this->image);
+#else
+#error EPD_GFX - Needs more RAM: EPD_ENABLE_EXTRA_SRAM
+#endif
 	this->EPD.end();
 }
