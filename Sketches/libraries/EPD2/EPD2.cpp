@@ -628,8 +628,8 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
        // scan line
        int scan_pos = (this->lines_per_display - line - 1) >> 2;
        int scan_shift = (line & 0x03) << 1;
-       for (int b = 0; b < this->bytes_per_scan; ++b) {
-	       if (scan_pos == b) {
+       for (unsigned int b = 0; b < this->bytes_per_scan; ++b) {
+	       if (scan_pos == (int) b) {
 		       SPI_put(0x03 << scan_shift);
 	       } else {
 		       SPI_put(0x00);
@@ -723,6 +723,7 @@ static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 	digitalWrite(cs_pin, HIGH);
 }
 
+// FIXME: What is the purpose of rbuffer?  It is set, but never used.
 static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 	// CS low
 	digitalWrite(cs_pin, LOW);

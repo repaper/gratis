@@ -154,7 +154,7 @@ static void flash_read(void *buffer, uint32_t address, uint16_t length);
 static void epd_power_flash_access(bool state);
 
 #if !defined(DISPLAY_LIST)
-static void flash_program(const void *buffer, uint16_t sector, uint16_t length);
+static void flash_program(uint16_t sector, const void *buffer, uint16_t length);
 #endif
 
 // define the E-Ink display
@@ -228,7 +228,7 @@ static const display_list_type display_list = {
 
 // state counter
 static int state = 0;
-static int display_index = 0;
+static unsigned int display_index = 0;
 
 // main loop
 void loop() {
@@ -345,7 +345,7 @@ static void flash_program(uint16_t sector, PROGMEM const void *buffer, uint16_t 
 
 	epd_power_flash_access(true);
 	// erase required sectors
-	for (int i = 0; i < length; i += FLASH_SECTOR_SIZE, address += FLASH_SECTOR_SIZE) {
+	for (unsigned int i = 0; i < length; i += FLASH_SECTOR_SIZE, address += FLASH_SECTOR_SIZE) {
 		Serial.print("FLASH: erase = 0x");
 		Serial.println(address, HEX);
 		FLASH.write_enable();
