@@ -96,16 +96,17 @@ void SPI_off(SPI_type *spi) {
 // send a data block to SPI
 // will only change CS if the SPI_CS bits are set
 void SPI_send(SPI_type *spi, const void *buffer, size_t length) {
-
-	struct spi_ioc_transfer transfer_buffer[1];
-
-	transfer_buffer[0].tx_buf = (unsigned long)(buffer);
-	transfer_buffer[0].rx_buf = 0;  // nothing to receive
-	transfer_buffer[0].len = length;
-	transfer_buffer[0].delay_usecs = 2;
-	transfer_buffer[0].speed_hz = spi->bps;
-	transfer_buffer[0].bits_per_word = 8;
-	transfer_buffer[0].cs_change = 1;
+	struct spi_ioc_transfer transfer_buffer[1] = {
+		{
+			.tx_buf = (unsigned long)(buffer),
+			.rx_buf = 0,  // nothing to receive
+			.len = length,
+			.delay_usecs = 2,
+			.speed_hz = spi->bps,
+			.bits_per_word = 8,
+			.cs_change = 1
+		}
+	};
 
 	if (-1 == ioctl(spi->fd, SPI_IOC_MESSAGE(1), transfer_buffer)) {
 		warn("SPI: send failure");
@@ -115,15 +116,17 @@ void SPI_send(SPI_type *spi, const void *buffer, size_t length) {
 // send a data block to SPI and return last bytes returned by slave
 // will only change CS if the SPI_CS bits are set
 void SPI_read(SPI_type *spi, const void *buffer, void *received, size_t length) {
-	struct spi_ioc_transfer transfer_buffer[1];
-
-	transfer_buffer[0].tx_buf = (unsigned long)(buffer);
-	transfer_buffer[0].rx_buf = (unsigned long)(received);
-	transfer_buffer[0].len = length;
-	transfer_buffer[0].delay_usecs = 2;
-	transfer_buffer[0].speed_hz = spi->bps;
-	transfer_buffer[0].bits_per_word = 8;
-	transfer_buffer[0].cs_change = 1;
+	struct spi_ioc_transfer transfer_buffer[1] = {
+		{
+			.tx_buf = (unsigned long)(buffer),
+			.rx_buf = (unsigned long)(received),
+			.len = length,
+			.delay_usecs = 2,
+			.speed_hz = spi->bps,
+			.bits_per_word = 8,
+			.cs_change = 1
+		}
+	};
 
 	if (-1 == ioctl(spi->fd, SPI_IOC_MESSAGE(1), transfer_buffer)) {
 		warn("SPI: read failure");
