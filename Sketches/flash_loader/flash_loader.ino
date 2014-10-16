@@ -153,7 +153,7 @@ static void flash_info(void);
 static void flash_read(void *buffer, uint32_t address, uint16_t length);
 
 #if !defined(DISPLAY_LIST)
-static void flash_program(const void *buffer, uint16_t sector, uint16_t length);
+static void flash_program(uint16_t sector, const void *buffer, uint16_t length);
 #endif
 
 // define the E-Ink display
@@ -184,7 +184,7 @@ void setup() {
 	digitalWrite(Pin_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
-#if !defined(__MSP430_CPU__)
+#if defined(__AVR__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
@@ -227,7 +227,7 @@ static const display_list_type display_list = {
 
 // state counter
 static int state = 0;
-static int display_index = 0;
+static unsigned int display_index = 0;
 static uint32_t old_address = 0xffffffff;
 
 // main loop
@@ -305,7 +305,6 @@ static void flash_read(void *buffer, uint32_t address, uint16_t length) {
 	FLASH.read(buffer, address, length);
 }
 
-
 #if !defined(DISPLAY_LIST)
 // program image into FLASH
 static void flash_program(uint16_t sector, PROGMEM const void *buffer, uint16_t length) {
@@ -319,7 +318,7 @@ static void flash_program(uint16_t sector, PROGMEM const void *buffer, uint16_t 
 	uint32_t address = (uint32_t)(sector) << FLASH_SECTOR_SHIFT;
 
 	// erase required sectors
-	for (int i = 0; i < length; i += FLASH_SECTOR_SIZE, address += FLASH_SECTOR_SIZE) {
+	for (unsigned int i = 0; i < length; i += FLASH_SECTOR_SIZE, address += FLASH_SECTOR_SIZE) {
 		Serial.print("FLASH: erase = 0x");
 		Serial.println(address, HEX);
 		FLASH.write_enable();

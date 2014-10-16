@@ -23,7 +23,7 @@
 #include "EPD2_GFX.h"
 
 
-void EPD_GFX::begin() {
+void EPD_GFX::begin(void) {
 	int temperature = this->S5813A.read();
 
 	// erase display
@@ -37,12 +37,16 @@ void EPD_GFX::begin() {
 }
 
 
-void EPD_GFX::display() {
+void EPD_GFX::display(void) {
 	int temperature = this->S5813A.read();
 
 	// erase old, display new
 	this->EPD.begin();
 	this->EPD.setFactor(temperature);
+#if defined(EPD_ENABLE_EXTRA_SRAM)
 	this->EPD.image_sram(this->image);
+#else
+#error EPD_GFX - Needs more RAM: EPD_ENABLE_EXTRA_SRAM
+#endif
 	this->EPD.end();
 }

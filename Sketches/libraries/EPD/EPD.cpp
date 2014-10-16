@@ -32,46 +32,47 @@
 static void PWM_start(int pin);
 static void PWM_stop(int pin);
 
-static void SPI_on();
-static void SPI_off();
+static void SPI_on(void);
+static void SPI_off(void);
 static void SPI_put(uint8_t c);
 static void SPI_put_wait(uint8_t c, int busy_pin);
 static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 
-
-EPD_Class::EPD_Class(EPD_size size,
-		     int panel_on_pin,
-		     int border_pin,
-		     int discharge_pin,
-		     int pwm_pin,
-		     int reset_pin,
-		     int busy_pin,
-		     int chip_select_pin) :
+// TODO: A lot of these variables could be made constants 
+// (they are set in constructor and remain constant thereafter)
+EPD_Class::EPD_Class(EPD_size _size,
+		     uint8_t panel_on_pin,
+		     uint8_t border_pin,
+		     uint8_t discharge_pin,
+		     uint8_t pwm_pin,
+		     uint8_t reset_pin,
+		     uint8_t busy_pin,
+		     uint8_t chip_select_pin) :
 	EPD_Pin_PANEL_ON(panel_on_pin),
 	EPD_Pin_BORDER(border_pin),
 	EPD_Pin_DISCHARGE(discharge_pin),
 	EPD_Pin_PWM(pwm_pin),
 	EPD_Pin_RESET(reset_pin),
 	EPD_Pin_BUSY(busy_pin),
-	EPD_Pin_EPD_CS(chip_select_pin) {
+	EPD_Pin_EPD_CS(chip_select_pin),
+	size(_size) {
 
-	this->size = size;
-	this->stage_time = 480; // milliseconds
-	this->lines_per_display = 96;
-	this->dots_per_line = 128;
-	this->bytes_per_line = 128 / 8;
-	this->bytes_per_scan = 96 / 4;
-	this->filler = false;
+	this->stage_time = 480; // milliseconds	// const, does not seem to be used outside of constructor(?)
+	this->lines_per_display = 96;	// const
+//	this->dots_per_line = 128;		// FIXME: Unused
+	this->bytes_per_line = 128 / 8;	// const
+	this->bytes_per_scan = lines_per_display / 4;	// const
+	this->filler = false;			// const
 
 
 	// display size dependant items
 	{
-		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xff, 0x00};
-		static uint8_t gs[] = {0x72, 0x03};
-		this->channel_select = cs;
-		this->channel_select_length = sizeof(cs);
-		this->gate_source = gs;
-		this->gate_source_length = sizeof(gs);
+		static const uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xff, 0x00};
+		static const uint8_t gs[] = {0x72, 0x03};
+		this->channel_select = cs;	// const
+		this->channel_select_length = sizeof(cs);	// const
+		this->gate_source = gs;	// const
+		this->gate_source_length = sizeof(gs);	// const
 	}
 
 	// set up size structure
@@ -82,12 +83,12 @@ EPD_Class::EPD_Class(EPD_size size,
 
 	case EPD_2_0: {
 		this->lines_per_display = 96;
-		this->dots_per_line = 200;
+//		this->dots_per_line = 200;
 		this->bytes_per_line = 200 / 8;
-		this->bytes_per_scan = 96 / 4;
+		this->bytes_per_scan = lines_per_display / 4;
 		this->filler = true;
-		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0xe0, 0x00};
-		static uint8_t gs[] = {0x72, 0x03};
+		static const uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0xe0, 0x00};
+		static const uint8_t gs[] = {0x72, 0x03};
 		this->channel_select = cs;
 		this->channel_select_length = sizeof(cs);
 		this->gate_source = gs;
@@ -98,12 +99,12 @@ EPD_Class::EPD_Class(EPD_size size,
 	case EPD_2_7: {
 		this->stage_time = 630; // milliseconds
 		this->lines_per_display = 176;
-		this->dots_per_line = 264;
+//		this->dots_per_line = 264;
 		this->bytes_per_line = 264 / 8;
-		this->bytes_per_scan = 176 / 4;
+		this->bytes_per_scan = lines_per_display / 4;
 		this->filler = true;
-		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xfe, 0x00, 0x00};
-		static uint8_t gs[] = {0x72, 0x00};
+		static const uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xfe, 0x00, 0x00};
+		static const uint8_t gs[] = {0x72, 0x00};
 		this->channel_select = cs;
 		this->channel_select_length = sizeof(cs);
 		this->gate_source = gs;
@@ -116,7 +117,7 @@ EPD_Class::EPD_Class(EPD_size size,
 }
 
 
-void EPD_Class::begin() {
+void EPD_Class::begin(void) {
 
 	// power up sequence
 	digitalWrite(this->EPD_Pin_RESET, LOW);
@@ -128,7 +129,7 @@ void EPD_Class::begin() {
 	SPI_on();
 
 	PWM_start(this->EPD_Pin_PWM);
-	Delay_ms(25);                       // Allow time for PWN to start up
+	Delay_ms(25);                       // Allow time for PWM to start
 	digitalWrite(this->EPD_Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
 
@@ -236,7 +237,7 @@ void EPD_Class::begin() {
 }
 
 
-void EPD_Class::end() {
+void EPD_Class::end(void) {
 
 	// dummy frame
 	this->frame_fixed(0x55, EPD_normal);
@@ -346,7 +347,7 @@ void EPD_Class::end() {
 
 // convert a temperature in Celcius to
 // the scale factor for frame_*_repeat methods
-int EPD_Class::temperature_to_factor_10x(int temperature) {
+int EPD_Class::temperature_to_factor_10x(int temperature) const {
 	if (temperature <= -10) {
 		return 170;
 	} else if (temperature <= -5) {
@@ -399,7 +400,7 @@ void EPD_Class::frame_sram(const uint8_t *image, EPD_stage stage){
 
 void EPD_Class::frame_cb(uint32_t address, EPD_reader *reader, EPD_stage stage) {
 	static uint8_t buffer[264 / 8];
-	for (uint8_t line = 0; line < this->lines_per_display; ++line) {
+	for (uint8_t line = 0; line < this->lines_per_display ; ++line) {
 		reader(buffer, address + line * this->bytes_per_line, this->bytes_per_line);
 		this->line(line, buffer, 0, false, stage);
 	}
@@ -496,7 +497,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 	// even pixels
 	for (uint16_t b = this->bytes_per_line; b > 0; --b) {
 		if (0 != data) {
-#if defined(__MSP430_CPU__)
+#if !defined(__AVR__)
 			uint8_t pixels = data[b - 1] & 0xaa;
 #else
 			// AVR has multiple memory spaces
@@ -538,7 +539,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 	// odd pixels
 	for (uint16_t b = 0; b < this->bytes_per_line; ++b) {
 		if (0 != data) {
-#if defined(__MSP430_CPU__)
+#if !defined(__AVR__)
 			uint8_t pixels = data[b] & 0x55;
 #else
 			// AVR has multiple memory spaces
@@ -591,7 +592,7 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 }
 
 
-static void SPI_on() {
+static void SPI_on(void) {
 	SPI.end();
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
@@ -603,7 +604,7 @@ static void SPI_on() {
 }
 
 
-static void SPI_off() {
+static void SPI_off(void) {
 	// SPI.begin();
 	// SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);

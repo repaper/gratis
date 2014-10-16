@@ -60,22 +60,23 @@ enum {
 FLASH_Class FLASH(9);
 
 
-FLASH_Class::FLASH_Class(int chip_select_pin) : CS(chip_select_pin) {
+FLASH_Class::FLASH_Class(uint8_t chip_select_pin) : CS(chip_select_pin) {
 }
 
 
-void FLASH_Class::begin(int chip_select_pin) {
+// TODO: Why allow begin to change the chip_select_pin (except for this could make chip_select_pin constant)
+void FLASH_Class::begin(uint8_t chip_select_pin) {
 	digitalWrite(chip_select_pin, HIGH);
 	pinMode(chip_select_pin, OUTPUT);
 	this->CS = chip_select_pin;
 }
 
 
-void FLASH_Class::end() {
+void FLASH_Class::end(void) {
 }
 
 // configure the SPI for FLASH access
-void FLASH_Class::spi_setup() {
+void FLASH_Class::spi_setup(void) {
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE3);
@@ -90,7 +91,7 @@ void FLASH_Class::spi_setup() {
 }
 
 // shutdown SPI after FLASH access
-void FLASH_Class::spi_teardown() {
+void FLASH_Class::spi_teardown(void) {
 	Delay_us(50);
 	digitalWrite(this->CS, HIGH);
 	SPI.end();
@@ -190,7 +191,7 @@ void FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
 }
 
 
-#if !defined(__MSP430_CPU__)
+#if defined(__AVR__)
 void FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *buffer, uint16_t length) {
 	while (this->is_busy()) {
 	}

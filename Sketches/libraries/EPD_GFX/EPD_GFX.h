@@ -27,6 +27,8 @@ private:
 	EPD_Class &EPD;
 	S5813A_Class &S5813A;
 
+	// FIXME: Make width/height parameters
+	// FIXME: Have to change these constants to suit panel (128 x 96, 200 x 96, 264 x 176)
 	static const int pixel_width = 200;  // must be a multiple of 8
 	static const int pixel_height = 96;
 
@@ -48,8 +50,8 @@ public:
 		EPD(epd), S5813A(s5813a) {
 	}
 
-	void begin();
-	void end();
+	void begin(void);
+	void end(void);
 
 	// set a single pixel in new_image
 	void drawPixel(int16_t x, int16_t y, uint16_t colour) {
@@ -64,7 +66,7 @@ public:
 	}
 
 	// change from old image to new image
-	void display();
+	void display(void);
 
 };
 

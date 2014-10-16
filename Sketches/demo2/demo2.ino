@@ -132,7 +132,7 @@ const int Pin_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
-#else
+#elif defined(__AVR__)
 
 // Arduino IO layout
 const int Pin_TEMPERATURE = A0;
@@ -184,7 +184,7 @@ void setup() {
 	digitalWrite(Pin_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
-#if !defined(__MSP430_CPU__)
+#if defined(__AVR__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
@@ -217,6 +217,7 @@ void setup() {
 
 static int state = 0;
 
+static const char * errmsg[] = { "OK", "UNSUPPORTED_COG", "PANEL_BROKEN", "DC_FAILED" };
 
 // main loop
 void loop() {
@@ -228,7 +229,7 @@ void loop() {
 	EPD.begin(); // power up the EPD panel
 	if (!EPD) {
 		Serial.print("EPD error = ");
-		Serial.print(EPD.error());
+		Serial.print(errmsg[EPD.error()]);
 		Serial.println("");
 		return;
 	}

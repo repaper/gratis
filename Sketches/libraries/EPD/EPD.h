@@ -18,10 +18,12 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#if defined(__MSP430_CPU__)
-#define PROGMEM
-#else
+#if defined(__AVR__)
 #include <avr/pgmspace.h>
+#else
+#ifndef PROGMEM
+#define PROGMEM
+#endif
 #endif
 
 // if more SRAM available (8 kBytes)
@@ -46,19 +48,19 @@ typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class {
 private:
-	int EPD_Pin_EPD_CS;
-	int EPD_Pin_PANEL_ON;
-	int EPD_Pin_BORDER;
-	int EPD_Pin_DISCHARGE;
-	int EPD_Pin_PWM;
-	int EPD_Pin_RESET;
-	int EPD_Pin_BUSY;
+	const uint8_t EPD_Pin_PANEL_ON;
+	const uint8_t EPD_Pin_BORDER;
+	const uint8_t EPD_Pin_DISCHARGE;
+	const uint8_t EPD_Pin_PWM;
+	const uint8_t EPD_Pin_RESET;
+	const uint8_t EPD_Pin_BUSY;
+	const uint8_t EPD_Pin_EPD_CS;
 
-	EPD_size size;
+	const EPD_size size;
 	uint16_t stage_time;
 	uint16_t factored_stage_time;
 	uint16_t lines_per_display;
-	uint16_t dots_per_line;
+//	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
 	uint16_t bytes_per_scan;
 	PROGMEM const uint8_t *gate_source;
@@ -72,15 +74,15 @@ private:
 
 public:
 	// power up and power down the EPD panel
-	void begin();
-	void end();
+	void begin(void);
+	void end(void);
 
 	void setFactor(int temperature = 25) {
 		this->factored_stage_time = this->stage_time * this->temperature_to_factor_10x(temperature) / 10;
 	}
 
 	// clear display (anything -> white)
-	void clear() {
+	void clear(void) {
 		this->frame_fixed_repeat(0xff, EPD_compensate);
 		this->frame_fixed_repeat(0xff, EPD_white);
 		this->frame_fixed_repeat(0xaa, EPD_inverse);
@@ -134,7 +136,7 @@ public:
 	void frame_cb_repeat(uint32_t address, EPD_reader *reader, EPD_stage stage);
 
 	// convert temperature to compensation factor
-	int temperature_to_factor_10x(int temperature);
+	int temperature_to_factor_10x(int temperature) const;
 
 	// single line display - very low-level
 	// also has to handle AVR progmem
@@ -143,14 +145,14 @@ public:
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
-	EPD_Class(EPD_size size,
-		  int panel_on_pin,
-		  int border_pin,
-		  int discharge_pin,
-		  int pwm_pin,
-		  int reset_pin,
-		  int busy_pin,
-		  int chip_select_pin);
+	EPD_Class(EPD_size _size,
+		  uint8_t panel_on_pin,
+		  uint8_t border_pin,
+		  uint8_t discharge_pin,
+		  uint8_t pwm_pin,
+		  uint8_t reset_pin,
+		  uint8_t busy_pin,
+		  uint8_t chip_select_pin);
 
 };
 
