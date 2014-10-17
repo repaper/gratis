@@ -104,7 +104,7 @@ void SPI_send(SPI_type *spi, const void *buffer, size_t length) {
 			.delay_usecs = 2,
 			.speed_hz = spi->bps,
 			.bits_per_word = 8,
-			.cs_change = 1
+			.cs_change = 0
 		}
 	};
 
@@ -124,7 +124,7 @@ void SPI_read(SPI_type *spi, const void *buffer, void *received, size_t length) 
 			.delay_usecs = 2,
 			.speed_hz = spi->bps,
 			.bits_per_word = 8,
-			.cs_change = 1
+			.cs_change = 0
 		}
 	};
 
