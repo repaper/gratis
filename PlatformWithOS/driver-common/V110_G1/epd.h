@@ -17,8 +17,14 @@
 
 #include "spi.h"
 
-// specify COG  version for compile-time #if
-#define EPD_COG_VERSION 1
+// compile-time #if configuration
+#define EPD_CHIP_VERSION      1
+#define EPD_FILM_VERSION      110
+#define EPD_PWM_REQUIRED      1
+#define EPD_IMAGE_ONE_ARG     0
+#define EPD_IMAGE_TWO_ARG     1
+#define EPD_PARTIAL_AVAILABLE 1
+
 
 // possible panel sizes
 typedef enum {

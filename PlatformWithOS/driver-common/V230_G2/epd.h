@@ -12,13 +12,18 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-#if !defined(EPD_V2_H)
-#define EPD_V2_H 1
+#if !defined(EPD_H)
+#define EPD_H 1
 
 #include "spi.h"
 
-// specify COG  version for compile-time #if
-#define EPD_COG_VERSION 2
+// compile-time #if configuration
+#define EPD_CHIP_VERSION      2
+#define EPD_FILM_VERSION      230
+#define EPD_PWM_REQUIRED      0
+#define EPD_IMAGE_ONE_ARG     1
+#define EPD_IMAGE_TWO_ARG     0
+#define EPD_PARTIAL_AVAILABLE 0
 
 // possible panel sizes
 typedef enum {

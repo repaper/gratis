@@ -76,7 +76,7 @@ struct EPD_struct {
 	int dots_per_line;
 	int bytes_per_line;
 	int bytes_per_scan;
-	int filler;
+	bool filler;
 
 	EPD_error status;
 

@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 	GPIO_mode(panel_on_pin, GPIO_OUTPUT);
 	GPIO_mode(border_pin, GPIO_OUTPUT);
 	GPIO_mode(discharge_pin, GPIO_OUTPUT);
-#if  EPD_COG_VERSION == 1
+#if EPD_PWM_REQUIRED
 	GPIO_mode(pwm_pin, GPIO_PWM);
 #endif
 	GPIO_mode(reset_pin, GPIO_OUTPUT);
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
 				   panel_on_pin,
 				   border_pin,
 				   discharge_pin,
-#if  EPD_COG_VERSION == 1
+#if EPD_PWM_REQUIRED
 				   pwm_pin,
 #endif
 				   reset_pin,
@@ -181,14 +181,16 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < image_count; ++i) {
 		printf("image = %d\n", i);
 		EPD_begin(epd);
-#if EPD_COG_VERSION == 1
+#if EPD_IMAGE_TWO_ARG
 		if (0 == i) {
 			EPD_image_0(epd, images[i]);
 		} else {
 			EPD_image(epd, images[i - 1], images[i]);
 		}
-#else
+#elif EPD_IMAGE_ONE_ARG
 		EPD_image(epd, images[i]);
+#else
+#error "unsupported EPD_image() function"
 #endif
 		EPD_end(epd);
 		if (i < image_count - 1) {
