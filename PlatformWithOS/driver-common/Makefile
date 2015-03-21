@@ -3,30 +3,26 @@
 PREFIX ?= /usr
 
 PLATFORM ?= ../RasberryPi
-COG_VERSION ?= V1
+PANEL_VERSION ?= v231_g2
 EPD_IO ?= epd_io.h
 
 FUSE_CFLAGS := $(shell pkg-config fuse --cflags)
 FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
 
+# determine the epd.[ch] files path for the specific panel
+EPD_DIR = $(notdir $(realpath $(strip ${PANEL_VERSION})))
+
+ifeq (,$(strip ${EPD_DIR}))
+$(error unsupported PANEL_VERSION=${PANEL_VERSION})
+endif
+
+# set up toolchaion options
 CFLAGS += ${FUSE_CFLAGS}
 CFLAGS += -Wall -Werror -std=gnu99
 CFLAGS += -I${PLATFORM}
+CFLAGS += -I${EPD_DIR}
+CFLAGS += -I.
 CFLAGS += -DEPD_IO='"${EPD_IO}"'
-
-ifeq ($(strip ${COG_VERSION}),V1)
-CFLAGS += -DEPD_COG_VERSION=1
-EPD_H = epd_v1.h
-EPD_O = epd_v1.o
-else
-ifeq ($(strip ${COG_VERSION}),V2)
-CFLAGS += -DEPD_COG_VERSION=2
-EPD_H = epd_v2.h
-EPD_O = epd_v2.o
-else
-$(error unsupported COG_VERSION=${COG_VERSION})
-endif
-endif
 
 LDFLAGS += ${FUSE_LDFLAGS}
 LDFLAGS += -lrt
@@ -36,7 +32,7 @@ RM = rm -f
 UNAME_r := $(shell uname -r)
 IS_ARCH := $(if $(findstring ARCH,${UNAME_r}),YES,NO)
 
-VPATH = .:${PLATFORM}
+VPATH = .:${PLATFORM}:${EPD_DIR}
 
 .PHONY: all
 all: gpio_test epd_test epd_fuse
@@ -103,31 +99,37 @@ test-fuse:
 	-sudo /etc/init.d/epd-fuse stop
 
 
+# low-level driver
+DRIVER_OBJECTS = gpio.o spi.o epd.o
+GPIO_OBJECTS = gpio_test.o gpio.o
+FUSE_OBJECTS = epd_fuse.o ${DRIVER_OBJECTS}
+TEST_OBJECTS = epd_test.o ${DRIVER_OBJECTS}
+
 # build the fuse driver
 CLEAN_FILES += epd-fuse
-epd_fuse: epd_fuse.o gpio.o spi.o ${EPD_O}
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" epd_fuse.o gpio.o spi.o ${EPD_O}
+epd_fuse: ${FUSE_OBJECTS}
+	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${FUSE_OBJECTS}
 
 
 # build simple GPIO test program
 CLEAN_FILES += gpio_test
-gpio_test: gpio_test.o gpio.o
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" gpio_test.o gpio.o
+gpio_test: ${GPIO_OBJECTS}
+	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${GPIO_OBJECTS}
 
 # build EPD test program
 CLEAN_FILES += epd_test
-epd_test: epd_test.o gpio.o spi.o ${EPD_O}
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" epd_test.o gpio.o spi.o ${EPD_O}
+epd_test: ${TEST_OBJECTS}
+	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${TEST_OBJECTS}
 
 
 # dependencies
 gpio_test.o: gpio_test.h gpio.h
-epd_test.o: gpio.h ${EPD_IO} spi.h ${EPD_H}
-epd_fuse.o: gpio.h ${EPD_IO} spi.h ${EPD_H}
+epd_test.o: gpio.h ${EPD_IO} spi.h epd.h
+epd_fuse.o: gpio.h ${EPD_IO} spi.h epd.h
 
 gpio.o: gpio.h
 spi.o: spi.h
-${EPD_O}: spi.h gpio.h ${EPD_H}
+epd.o: spi.h gpio.h epd.h
 
 
 # clean up

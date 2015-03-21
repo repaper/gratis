@@ -12,11 +12,15 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-#if !defined(EPD_V1_H)
-#define EPD_V1_H 1
+#if !defined(EPD_H)
+#define EPD_H 1
 
 #include "spi.h"
 
+// specify COG  version for compile-time #if
+#define EPD_COG_VERSION 1
+
+// possible panel sizes
 typedef enum {
 	EPD_1_44,        // 128 x 96
 	EPD_2_0,         // 200 x 96
@@ -28,7 +32,6 @@ typedef enum {           // error codes
 } EPD_error;
 
 typedef struct EPD_struct EPD_type;
-
 
 
 // functions

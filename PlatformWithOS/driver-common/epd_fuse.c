@@ -32,14 +32,7 @@
 
 #include "gpio.h"
 #include "spi.h"
-#if EPD_COG_VERSION == 1
-#include "epd_v1.h"
-#elif EPD_COG_VERSION == 2
-#include "epd_v2.h"
-#else
-#error "unsupported COG version"
-#endif
-
+#include "epd.h"
 #include EPD_IO
 
 

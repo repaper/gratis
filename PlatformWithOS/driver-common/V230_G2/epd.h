@@ -17,6 +17,10 @@
 
 #include "spi.h"
 
+// specify COG  version for compile-time #if
+#define EPD_COG_VERSION 2
+
+// possible panel sizes
 typedef enum {
 	EPD_1_44,        // 128 x 96
 	EPD_2_0,         // 200 x 96

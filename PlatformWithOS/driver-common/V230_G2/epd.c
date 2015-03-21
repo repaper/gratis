@@ -25,7 +25,7 @@
 
 #include "gpio.h"
 #include "spi.h"
-#include "epd_v2.h"
+#include "epd.h"
 
 // delays - more consistent naming
 #define Delay_ms(ms) usleep(1000 * (ms))
