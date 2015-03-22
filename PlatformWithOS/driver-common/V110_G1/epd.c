@@ -567,7 +567,7 @@ static void frame_fixed_repeat(EPD_type *epd, uint8_t fixed_value, EPD_stage sta
 		if (-1 == timer_gettime(epd->timer, &its)) {
 			err(1, "timer_gettime failed");
 		}
-	} while (its.it_value.tv_sec > 0 && its.it_value.tv_nsec > 0);
+	} while (its.it_value.tv_sec > 0 || its.it_value.tv_nsec > 0);
 }
 
 
@@ -586,7 +586,7 @@ static void frame_data_repeat(EPD_type *epd, const uint8_t *image, const uint8_t
 		if (-1 == timer_gettime(epd->timer, &its)) {
 			err(1, "timer_gettime failed");
 		}
-	} while (its.it_value.tv_sec > 0 && its.it_value.tv_nsec > 0);
+	} while (its.it_value.tv_sec > 0 || its.it_value.tv_nsec > 0);
 }
 
 
