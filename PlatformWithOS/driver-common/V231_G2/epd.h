@@ -24,11 +24,14 @@
 #define EPD_IMAGE_ONE_ARG     0
 #define EPD_IMAGE_TWO_ARG     1
 #define EPD_PARTIAL_AVAILABLE 1
+
+// display panels supported
 #define EPD_1_44_SUPPORT      1
 #define EPD_1_9_SUPPORT       1
 #define EPD_2_0_SUPPORT       1
 #define EPD_2_6_SUPPORT       1
 #define EPD_2_7_SUPPORT       1
+
 
 // possible panel sizes
 typedef enum {
