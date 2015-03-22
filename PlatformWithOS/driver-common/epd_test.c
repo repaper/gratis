@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
 		goto done_spi;
 	}
 
-#if 0
+#if 1
 	// EPD display
 	printf("clear display\n");
 	EPD_begin(epd);
