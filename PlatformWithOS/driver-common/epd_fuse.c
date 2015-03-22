@@ -13,7 +13,7 @@
 // governing permissions and limitations under the License.
 
 
-#define VERSION 3
+#define VERSION 4
 
 #define STR1(x) #x
 #define STR(x) STR1(x)
