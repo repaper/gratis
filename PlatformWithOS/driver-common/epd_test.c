@@ -35,6 +35,16 @@
 #include "text_image_1_44.xbm"
 #include "venus_1_44.xbm"
 
+#if EPD_1_9_SUPPORT
+// 1.9" test images
+#include "aphrodite_1_9.xbm"
+#include "cat_1_9.xbm"
+#include "saturn_1_9.xbm"
+#include "text_hello_1_9.xbm"
+#include "text_image_1_9.xbm"
+#include "venus_1_9.xbm"
+#endif
+
 // 2.0" test images
 #include "aphrodite_2_0.xbm"
 #include "cat_2_0.xbm"
@@ -42,6 +52,16 @@
 #include "text_hello_2_0.xbm"
 #include "text_image_2_0.xbm"
 #include "venus_2_0.xbm"
+
+#if EPD_2_6_SUPPORT
+// 2.6" test images
+#include "aphrodite_2_6.xbm"
+#include "cat_2_6.xbm"
+#include "saturn_2_6.xbm"
+#include "text_hello_2_6.xbm"
+#include "text_image_2_6.xbm"
+#include "venus_2_6.xbm"
+#endif
 
 // 2.7" test images
 #include "aphrodite_2_7.xbm"
@@ -61,6 +81,17 @@ static const uint8_t *images_1_44[] = {
 	venus_1_44_bits
 };
 
+#if EPD_1_9_SUPPORT
+static const uint8_t *images_1_9[] = {
+	aphrodite_1_9_bits,
+	cat_1_9_bits,
+	saturn_1_9_bits,
+	text_hello_1_9_bits,
+	text_image_1_9_bits,
+	venus_1_9_bits
+};
+#endif
+
 static const uint8_t *images_2_0[] = {
 	aphrodite_2_0_bits,
 	cat_2_0_bits,
@@ -70,6 +101,17 @@ static const uint8_t *images_2_0[] = {
 	venus_2_0_bits
 };
 
+#if EPD_2_6_SUPPORT
+static const uint8_t *images_2_6[] = {
+	aphrodite_2_6_bits,
+	cat_2_6_bits,
+	saturn_2_6_bits,
+	text_hello_2_6_bits,
+	text_image_2_6_bits,
+	venus_2_6_bits
+};
+#endif
+
 static const uint8_t *images_2_7[] = {
 	aphrodite_2_7_bits,
 	cat_2_7_bits,
@@ -78,6 +120,7 @@ static const uint8_t *images_2_7[] = {
 	text_image_2_7_bits,
 	venus_2_7_bits
 };
+
 
 #define SIZE_OF_ARRAY(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -96,7 +139,16 @@ static void usage(const char *program_name, const char *message, ...) {
 		program_name = "epd_test";
 	}
 
-	printf("usage: %s [ 1.44 | 2.0 | 2.7 ]\n", program_name);
+	printf("usage: %s [ 1.44 "
+#if EPD_1_9_SUPPORT
+	       "| 1.9 "
+#endif
+	       "| 2.0 "
+#if EPD_2_6_SUPPORT
+	       "| 2.6 "
+#endif
+	       "| 2.7 "
+	       "]\n", program_name);
 	exit(1);
 }
 
@@ -118,10 +170,22 @@ int main(int argc, char *argv[]) {
 		display_size = EPD_1_44;
 		images = images_1_44;
 		image_count = SIZE_OF_ARRAY(images_1_44);
+#if EPD_1_9_SUPPORT
+	} else if (0 == strcmp("1.9", argv[1]) || 0 == strcmp("1_9", argv[1])) {
+		display_size = EPD_1_9;
+		images = images_1_9;
+		image_count = SIZE_OF_ARRAY(images_1_9);
+#endif
 	} else if (0 == strcmp("2.0", argv[1]) || 0 == strcmp("2_0", argv[1])) {
 		display_size = EPD_2_0;
 		images = images_2_0;
 		image_count = SIZE_OF_ARRAY(images_2_0);
+#if EPD_2_6_SUPPORT
+	} else if (0 == strcmp("2.6", argv[1]) || 0 == strcmp("2_6", argv[1])) {
+		display_size = EPD_2_6;
+		images = images_2_6;
+		image_count = SIZE_OF_ARRAY(images_2_6);
+#endif
 	} else if (0 == strcmp("2.7", argv[1]) || 0 == strcmp("2_7", argv[1])) {
 		display_size = EPD_2_7;
 		images = images_2_7;
@@ -169,13 +233,11 @@ int main(int argc, char *argv[]) {
 		goto done_spi;
 	}
 
-#if 1
 	// EPD display
 	printf("clear display\n");
 	EPD_begin(epd);
 	EPD_clear(epd);
 	EPD_end(epd);
-#endif
 
 	printf("images start\n");
 	for (int i = 0; i < image_count; ++i) {

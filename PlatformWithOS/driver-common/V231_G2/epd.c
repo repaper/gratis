@@ -89,6 +89,7 @@ struct EPD_struct {
 	int dots_per_line;
 	int bytes_per_line;
 	int bytes_per_scan;
+	bool middle_scan;
 
 	bool pre_border_byte;
 	EPD_border_byte border_byte;
@@ -146,7 +147,7 @@ EPD_type *EPD_create(EPD_size size,
 	epd->dots_per_line = 128;
 	epd->bytes_per_line = 128 / 8;
 	epd->bytes_per_scan = 96 / 4;
-
+	epd->middle_scan = true; // => data-scan-data ELSE: scan-data-scan
 	epd->pre_border_byte = false;
 	epd->border_byte = EPD_BORDER_BYTE_ZERO;
 
@@ -163,6 +164,20 @@ EPD_type *EPD_create(EPD_size size,
 	case EPD_1_44:  // default so no change
 		break;
 
+	case EPD_1_9: {
+		epd->lines_per_display = 128;
+		epd->dots_per_line = 144;
+		epd->bytes_per_line = 144 / 8;
+		epd->middle_scan = false;
+		epd->bytes_per_scan = 128 / 4 / 2; // scan/2 - data - scan/2
+		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x03, 0xfc, 0x00, 0x00, 0xff};
+		epd->channel_select = cs;
+		epd->channel_select_length = sizeof(cs);
+		epd->pre_border_byte = false;
+		epd->border_byte = EPD_BORDER_BYTE_SET;
+		break;
+	}
+
 	case EPD_2_0: {
 		epd->lines_per_display = 96;
 		epd->dots_per_line = 200;
@@ -173,6 +188,21 @@ EPD_type *EPD_create(EPD_size size,
 		epd->channel_select_length = sizeof(cs);
 		epd->pre_border_byte = true;
 		epd->border_byte = EPD_BORDER_BYTE_NONE;
+		break;
+	}
+
+	case EPD_2_6: {
+		epd->base_stage_time = 630; // milliseconds
+		epd->lines_per_display = 128;
+		epd->dots_per_line = 232;
+		epd->bytes_per_line = 232 / 8;
+		epd->middle_scan = false;
+		epd->bytes_per_scan = 128 / 4 / 2; // scan/2 - data - scan/2
+		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0xff};
+		epd->channel_select = cs;
+		epd->channel_select_length = sizeof(cs);
+		epd->pre_border_byte = false;
+		epd->border_byte = EPD_BORDER_BYTE_SET;
 		break;
 	}
 
@@ -196,9 +226,15 @@ EPD_type *EPD_create(EPD_size size,
 	EPD_set_temperature(epd, 25);
 
 	// buffer for frame line
-	epd->line_buffer_size = 2 * epd->bytes_per_line
-		+ epd->bytes_per_scan
-		+ 3; // command byte, pre_border_byte, border byte
+	if (epd->middle_scan) {
+		epd->line_buffer_size = 2 * epd->bytes_per_line
+			+ epd->bytes_per_scan
+			+ 3; // command byte, pre_border_byte, border byte
+	} else {
+		epd->line_buffer_size = epd->bytes_per_line
+			+ 2 * epd->bytes_per_scan
+			+ 3; // command byte, pre_border_byte, border byte
+	}
 
 	epd->line_buffer = malloc(epd->line_buffer_size + 4096);
 	if (NULL == epd->line_buffer) {
@@ -590,6 +626,7 @@ static void border_dummy_line(EPD_type *epd) {
 }
 
 
+// pixels on display are numbered from 1 so even is actually bits 1,3,5,...
 static void even_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
 
 	for (uint16_t b = 0; b < epd->bytes_per_line; ++b) {
@@ -627,6 +664,7 @@ static void even_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_
 	}
 }
 
+// pixels on display are numbered from 1 so odd is actually bits 0,2,4,...
 static void odd_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
 	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
 		if (NULL != data) {
@@ -658,6 +696,51 @@ static void odd_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t
 	}
 }
 
+// interleave bits: (byte)76543210 -> (16 bit).7.6.5.4.3.2.1
+static inline uint16_t interleave_bits(uint16_t value) {
+	value = (value | (value << 4)) & 0x0f0f;
+	value = (value | (value << 2)) & 0x3333;
+	value = (value | (value << 1)) & 0x5555;
+	return value;
+}
+
+// pixels on display are numbered from 1
+static void all_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
+	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
+		if (NULL != data) {
+			uint16_t pixels = interleave_bits(data[b - 1]);
+
+			uint16_t pixel_mask = 0xffff;
+			if (NULL != mask) {
+				uint16_t pixel_mask = interleave_bits(mask[b - 1]);
+				pixel_mask = (pixel_mask ^ pixels) & 0x5555;
+				pixel_mask |= pixel_mask << 1;
+			}
+			switch(stage) {
+			case EPD_compensate:  // B -> W, W -> B (Current Image)
+				pixels = 0xaaaa | (pixels ^ 0x5555);
+				break;
+			case EPD_white:       // B -> N, W -> W (Current Image)
+				pixels = 0x5555 + (pixels ^ 0x5555);
+				break;
+			case EPD_inverse:     // B -> N, W -> B (New Image)
+				pixels = 0x5555 | ((pixels ^ 0x5555) << 1);
+				break;
+			case EPD_normal:       // B -> B, W -> W (New Image)
+				pixels = 0xaaaa | pixels;
+				break;
+			}
+			pixels = (pixels & pixel_mask) | (~pixel_mask & 0x5555);
+			*(*pp)++ = pixels >> 8;
+			*(*pp)++ = pixels;
+		} else {
+			*(*pp)++ = fixed_value;
+			*(*pp)++ = fixed_value;
+		}
+	}
+}
+
+// output one line of scan and data bytes to the display
 static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
 
 	SPI_on(epd->spi);
@@ -674,10 +757,10 @@ static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t 
 		*p++ = 0x00;
 	}
 
-	bool odd_first = true;
-
-	if (odd_first) {
+	if (epd->middle_scan) {
+		// data bytes
 		odd_pixels(epd, &p, data, fixed_value, mask, stage);
+
 		// scan line
 		for (uint16_t b = epd->bytes_per_scan; b > 0; --b) {
 			if (line / 4 == b - 1) {
@@ -686,18 +769,31 @@ static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t 
 				*p++ = 0x00;
 			}
 		}
+
+		// data bytes
 		even_pixels(epd, &p, data, fixed_value, mask, stage);
 
 	} else {
-		odd_pixels(epd, &p, data, fixed_value, mask, stage);
+		// even scan line, but as lines on display are numbered from 1, line: 1,3,5,...
 		for (uint16_t b = 0; b < epd->bytes_per_scan; ++b) {
-			if (line / 4 == b) {
-				*p++ = 0xc0 >> (2 * (line & 0x03));
+			if (0 != (line & 0x01) && line / 8 == b) {
+				*p++ = 0xc0 >> (line & 0x06);
 			} else {
 				*p++ = 0x00;
 			}
 		}
-		even_pixels(epd, &p, data, fixed_value, mask, stage);
+
+		// data bytes
+		all_pixels(epd, &p, data, fixed_value, mask, stage);
+
+		// odd scan line, but as lines on display are numbered from 1, line: 0,2,4,6,...
+		for (uint16_t b = epd->bytes_per_scan; b > 0; --b) {
+			if (0 == (line & 0x01) && line / 8 == b - 1) {
+				*p++ = 0x03 << (line & 0x06);
+			} else {
+				*p++ = 0x00;
+			}
+		}
 	}
 
 	// post data border byte
