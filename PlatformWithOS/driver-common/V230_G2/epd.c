@@ -355,13 +355,14 @@ void EPD_begin(EPD_type *epd) {
 		}
 	}
 	if (!dc_ok) {
-		// output enable to disable
-		SPI_send(epd->spi, CU8(0x70, 0x02), 2);
-		SPI_send(epd->spi, CU8(0x72, 0x40), 2);
 		epd->status = EPD_DC_FAILED;
 		power_off(epd);
 		return;
 	}
+
+	// output enable to disable
+	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x40), 2);
 }
 
 
