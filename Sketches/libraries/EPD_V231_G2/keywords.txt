@@ -1,0 +1,40 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+EPD	KEYWORD1
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+end	KEYWORD2
+setFactor	KEYWORD2
+error	KEYWORD2
+clear	KEYWORD2
+image_0	KEYWORD2
+image	KEYWORD2
+image_sram	KEYWORD2
+frame_fixed	KEYWORD2
+frame_data	KEYWORD2
+frame_cb	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+EPD_1_44	LITERAL1
+EPD_2_0	LITERAL1
+EPD_2_7	LITERAL1
+
+EPD_compensate	LITERAL1
+EPD_white	LITERAL1
+EPD_inverse	LITERAL1
+EPD_normal	LITERAL1
