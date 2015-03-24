@@ -18,7 +18,7 @@
 
 #include <SPI.h>
 
-#include "EPD.h"
+#include "EPD_V110_G1.h"
 
 // delays - more consistent naming
 #define Delay_ms(ms) delay(ms)
@@ -38,7 +38,7 @@ static void SPI_put(uint8_t c);
 static void SPI_put_wait(uint8_t c, int busy_pin);
 static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 
-// TODO: A lot of these variables could be made constants 
+// TODO: A lot of these variables could be made constants
 // (they are set in constructor and remain constant thereafter)
 EPD_Class::EPD_Class(EPD_size _size,
 		     uint8_t panel_on_pin,
@@ -57,9 +57,8 @@ EPD_Class::EPD_Class(EPD_size _size,
 	EPD_Pin_EPD_CS(chip_select_pin),
 	size(_size) {
 
-	this->stage_time = 480; // milliseconds	// const, does not seem to be used outside of constructor(?)
+	this->stage_time = 480; // milliseconds
 	this->lines_per_display = 96;	// const
-//	this->dots_per_line = 128;		// FIXME: Unused
 	this->bytes_per_line = 128 / 8;	// const
 	this->bytes_per_scan = lines_per_display / 4;	// const
 	this->filler = false;			// const
@@ -83,7 +82,6 @@ EPD_Class::EPD_Class(EPD_size _size,
 
 	case EPD_2_0: {
 		this->lines_per_display = 96;
-//		this->dots_per_line = 200;
 		this->bytes_per_line = 200 / 8;
 		this->bytes_per_scan = lines_per_display / 4;
 		this->filler = true;
@@ -99,7 +97,6 @@ EPD_Class::EPD_Class(EPD_size _size,
 	case EPD_2_7: {
 		this->stage_time = 630; // milliseconds
 		this->lines_per_display = 176;
-//		this->dots_per_line = 264;
 		this->bytes_per_line = 264 / 8;
 		this->bytes_per_scan = lines_per_display / 4;
 		this->filler = true;

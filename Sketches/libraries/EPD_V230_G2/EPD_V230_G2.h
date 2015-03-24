@@ -12,8 +12,8 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-#if !defined(EPD2_H)
-#define EPD2_H 1
+#if !defined(EPD_V230_G2_H)
+#define EPD_V230_G2_H 1
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -21,12 +21,26 @@
 #if defined(__AVR__)
 #include <avr/pgmspace.h>
 #else
-
 #ifndef PROGMEM
 #define PROGMEM
 #endif
-
 #endif
+
+// compile-time #if configuration
+#define EPD_CHIP_VERSION      2
+#define EPD_FILM_VERSION      230
+#define EPD_PWM_REQUIRED      1
+#define EPD_IMAGE_ONE_ARG     0
+#define EPD_IMAGE_TWO_ARG     1
+#define EPD_PARTIAL_AVAILABLE 0
+
+// display panels supported
+#define EPD_1_44_SUPPORT      1
+#define EPD_1_9_SUPPORT       0
+#define EPD_2_0_SUPPORT       1
+#define EPD_2_6_SUPPORT       0
+#define EPD_2_7_SUPPORT       1
+
 
 // if more SRAM available (8 kBytes)
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)

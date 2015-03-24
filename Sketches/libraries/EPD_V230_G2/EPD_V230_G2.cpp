@@ -18,7 +18,7 @@
 
 #include <SPI.h>
 
-#include "EPD2.h"
+#include "EPD_V230_G2.h"
 
 // delays - more consistent naming
 #define Delay_ms(ms) delay(ms)
@@ -274,14 +274,14 @@ void EPD_Class::begin(void) {
 		}
 	}
 	if (!dc_ok) {
-		// output enable to disable
-		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
-		SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x40), 2);
-
 		this->status = EPD_DC_FAILED;
 		this->power_off();
 		return;
 	}
+
+	// output enable to disable
+	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
+	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x40), 2);
 
 	SPI_off();
 }

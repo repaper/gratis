@@ -12,8 +12,8 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-#if !defined(EPD_H)
-#define EPD_H 1
+#if !defined(EPD_V110_G1_H)
+#define EPD_V110_G1_H 1
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -25,6 +25,22 @@
 #define PROGMEM
 #endif
 #endif
+
+// compile-time #if configuration
+#define EPD_CHIP_VERSION      1
+#define EPD_FILM_VERSION      110
+#define EPD_PWM_REQUIRED      1
+#define EPD_IMAGE_ONE_ARG     0
+#define EPD_IMAGE_TWO_ARG     1
+#define EPD_PARTIAL_AVAILABLE 1
+
+// display panels supported
+#define EPD_1_44_SUPPORT      1
+#define EPD_1_9_SUPPORT       0
+#define EPD_2_0_SUPPORT       1
+#define EPD_2_6_SUPPORT       0
+#define EPD_2_7_SUPPORT       1
+
 
 // if more SRAM available (8 kBytes)
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -60,7 +76,6 @@ private:
 	uint16_t stage_time;
 	uint16_t factored_stage_time;
 	uint16_t lines_per_display;
-//	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
 	uint16_t bytes_per_scan;
 	PROGMEM const uint8_t *gate_source;
@@ -90,7 +105,7 @@ public:
 	}
 
 	// assuming a clear (white) screen output an image (PROGMEM data)
-	void image(PROGMEM const uint8_t *image) {
+	void image_0(PROGMEM const uint8_t *image) {
 		this->frame_fixed_repeat(0xaa, EPD_compensate);
 		this->frame_fixed_repeat(0xaa, EPD_white);
 		this->frame_data_repeat(image, EPD_inverse);
@@ -157,5 +172,3 @@ public:
 };
 
 #endif
-
-
