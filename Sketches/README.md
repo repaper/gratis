@@ -31,15 +31,36 @@ supported and this needs [Java](http://java.com) to be installed.
 
 # Example Programs
 
-**IMPORTANT NOTES for COG V2**
+**IMPORTANT NOTES for COG G1/G2 and different Panel Versions**
 
-1. The programs below only support the COG V1 using the `EPD` library.
-2. There is preliminary support for COG V2 by the `EPD2` and `EPD2_GFX` libraries
-   since the driving sequence is very different.
-3. There are initial translations of `demo` into `demo2`,
-   also `command2`, `flash_loader2` and `thermo2` from corresponding originals.
-4. The COG V2 can be used with current extension board
-5. The COG V2 does not use PWM - this can be disconnected from
+**CURRENTLY In Progress: New way to access demos - Read CAREFULLY!**
+
+1. There are now three panel versions and three corresponding drivers:
+  a) Panel: **V110 G1**  Driver: `EPD_V110_G1`.
+  b) Panel: **V230 G2**  Driver: `EPD_V230_G2`. (does not allow partial update)
+  c) Panel: **V231 G2**  Driver: `EPD_V231_G2`. (supports new 1.9" and 2.6" size panels)
+
+2. Each on the demos is being canged to make example loading easier.
+   This uses a Ruby script (`make-examples`) that converts the
+   following demos into examples thata are placed into the `examples`
+   folder for each driver.  A Separate example is created for each
+   panel size so not editing is needed to try any panel.  (Note: The
+   base demo files contain items like `{% SECTION:item %}`that are
+   changes by the script)
+
+3. Load example by **File** → **Examples** → **EPD_V**vvv**_G**g → **demo_**sss
+   (where vvv=Film[110,230,231], g=COG[1,2] and sss=Size[144,190,200,260,270])
+
+4. Demos updated: `demo`
+
+5. Demos **NOT Updated Yet**: `command`, `flash_loader` and `thermo`
+
+6. Graphics `EPD_GFX` **NOT Updated Yet** - There will be 3 separate
+   versions and the thermo demo will become the example for these.
+
+7. Panels using COG G2 can be used with current extension board
+
+8. Panels using COG G2 does not use PWM - this can be disconnected from
    the LaunchPad/Arduino.
 
 ---
@@ -186,8 +207,7 @@ Pin 10 as in AlaMode case.
   these directly.  The Command program can use these files for its
   upload command.
 * **FLASH** - Driver for the SPI FLASH chip on the EPD eval board.
-* **EPD** - E-Ink Panel driver (COG V1).
-* **EPD2** - E-Ink Panel driver (COG V2) *experimental*.
+* **EPD_V**vvv**_G**g - E-Ink Panel driver (Panel Vvvv COG Gg).
 * **EPD_GFX** - This sub-classes the
   [Adafruit_GFX library](https://github.com/adafruit/Adafruit-GFX-Library)
   which needs to be downloaded an installed in to the libraries folder

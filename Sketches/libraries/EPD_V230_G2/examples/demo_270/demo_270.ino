@@ -14,7 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// {% SYSTEM:notice %}
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-25 08:00:47 UTC *****
 
 
 // Simple demo to toggle EPD between two images.
@@ -39,13 +39,13 @@
 // required libraries
 #include <SPI.h>
 #include <FLASH.h>
-#include <{% DRIVER:header %}>
+#include <EPD_V230_G2.h>
 #include <S5813A.h>
 
 
 // Change this for different display size
 // supported sizes: 144 200 270
-#define SCREEN_SIZE {% DRIVER:panelsize %}
+#define SCREEN_SIZE 270
 
 // select two images from:  text_image text-hello cat aphrodite venus saturn
 #define IMAGE_1  text_image

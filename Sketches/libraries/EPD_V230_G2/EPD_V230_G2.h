@@ -29,9 +29,9 @@
 // compile-time #if configuration
 #define EPD_CHIP_VERSION      2
 #define EPD_FILM_VERSION      230
-#define EPD_PWM_REQUIRED      1
-#define EPD_IMAGE_ONE_ARG     0
-#define EPD_IMAGE_TWO_ARG     1
+#define EPD_PWM_REQUIRED      0
+#define EPD_IMAGE_ONE_ARG     1
+#define EPD_IMAGE_TWO_ARG     0
 #define EPD_PARTIAL_AVAILABLE 0
 
 // display panels supported
@@ -81,7 +81,7 @@ private:
 	const uint8_t EPD_Pin_BUSY;
 	const uint8_t EPD_Pin_EPD_CS;
 
-	EPD_size size;
+	const EPD_size size;
 	uint16_t lines_per_display;
 	uint16_t dots_per_line;
 	uint16_t bytes_per_line;
@@ -175,7 +175,7 @@ public:
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
-	EPD_Class(EPD_size size,
+	EPD_Class(EPD_size _size,
 		  uint8_t panel_on_pin,
 		  uint8_t border_pin,
 		  uint8_t discharge_pin,

@@ -40,7 +40,7 @@ static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length);
 
 
-EPD_Class::EPD_Class(EPD_size size,
+EPD_Class::EPD_Class(EPD_size _size,
 		     uint8_t panel_on_pin,
 		     uint8_t border_pin,
 		     uint8_t discharge_pin,
@@ -52,9 +52,9 @@ EPD_Class::EPD_Class(EPD_size size,
 	EPD_Pin_DISCHARGE(discharge_pin),
 	EPD_Pin_RESET(reset_pin),
 	EPD_Pin_BUSY(busy_pin),
-	EPD_Pin_EPD_CS(chip_select_pin) {
+	EPD_Pin_EPD_CS(chip_select_pin),
+	size(_size) {
 
-	this->size = size;
 	this->lines_per_display = 96;
 	this->dots_per_line = 128;
 	this->bytes_per_line = 128 / 8;

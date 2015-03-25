@@ -57,7 +57,7 @@ EPD_Class::EPD_Class(EPD_size _size,
 	EPD_Pin_EPD_CS(chip_select_pin),
 	size(_size) {
 
-	this->stage_time = 480; // milliseconds
+	this->base_stage_time = 480; // milliseconds
 	this->lines_per_display = 96;	// const
 	this->bytes_per_line = 128 / 8;	// const
 	this->bytes_per_scan = lines_per_display / 4;	// const
@@ -95,7 +95,7 @@ EPD_Class::EPD_Class(EPD_size _size,
 	}
 
 	case EPD_2_7: {
-		this->stage_time = 630; // milliseconds
+		this->base_stage_time = 630; // milliseconds
 		this->lines_per_display = 176;
 		this->bytes_per_line = 264 / 8;
 		this->bytes_per_scan = lines_per_display / 4;
@@ -110,7 +110,7 @@ EPD_Class::EPD_Class(EPD_size _size,
 	}
 	}
 
-	this->factored_stage_time = this->stage_time;
+	this->factored_stage_time = this->base_stage_time;
 }
 
 

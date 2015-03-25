@@ -29,10 +29,10 @@
 // compile-time #if configuration
 #define EPD_CHIP_VERSION      2
 #define EPD_FILM_VERSION      231
-#define EPD_PWM_REQUIRED      1
+#define EPD_PWM_REQUIRED      0
 #define EPD_IMAGE_ONE_ARG     0
 #define EPD_IMAGE_TWO_ARG     1
-#define EPD_PARTIAL_AVAILABLE 1
+#define EPD_PARTIAL_AVAILABLE 0
 
 // display panels supported
 #define EPD_1_44_SUPPORT      1
@@ -49,7 +49,9 @@
 
 typedef enum {
 	EPD_1_44,        // 128 x 96
+	EPD_1_9,         // 144 x 128
 	EPD_2_0,         // 200 x 96
+	EPD_2_6,         // 232 x 128
 	EPD_2_7          // 264 x 176
 } EPD_size;
 
@@ -67,6 +69,12 @@ typedef enum {           // error codes
 	EPD_DC_FAILED
 } EPD_error;
 
+typedef enum {
+	EPD_BORDER_BYTE_NONE,  // no border byte requred
+	EPD_BORDER_BYTE_ZERO,  // border byte == 0x00 requred
+	EPD_BORDER_BYTE_SET,   // border byte needs to be set
+} EPD_border_byte;
+
 typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class {
@@ -74,7 +82,6 @@ private:
 	const uint8_t EPD_Pin_PANEL_ON;
 	const uint8_t EPD_Pin_BORDER;
 	const uint8_t EPD_Pin_DISCHARGE;
-	const uint8_t EPD_Pin_PWM;
 	const uint8_t EPD_Pin_RESET;
 	const uint8_t EPD_Pin_BUSY;
 	const uint8_t EPD_Pin_EPD_CS;
@@ -98,13 +105,18 @@ private:
 
 	EPD_Class(const EPD_Class &f);  // prevent copy
 
+	void power_off(void);
+	void nothing_frame(void);
+	void dummy_line(void);
+	void border_dummy_line(void);
+
 public:
 	// power up and power down the EPD panel
 	void begin(void);
 	void end(void);
 
 	void setFactor(int temperature = 25) {
-		this->factored_stage_time = this->stage_time * this->temperature_to_factor_10x(temperature) / 10;
+		this->factored_stage_time = this->base_stage_time * this->temperature_to_factor_10x(temperature) / 10;
 	}
 
 	const bool operator!(void) const {
@@ -173,9 +185,9 @@ public:
 	int temperature_to_factor_10x(int temperature) const;
 
 	// called by line()
-	void EPD_Class::even_pixels(const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage) {
-	void EPD_Class::odd_pixels(const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage) {
-	void EPD_Class::all_pixels(const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage) {
+	void even_pixels(const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage);
+	void odd_pixels(const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage);
+	void all_pixels(const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage);
 
 	// single line display - very low-level
 	// also has to handle AVR progmem
@@ -188,7 +200,6 @@ public:
 		  uint8_t panel_on_pin,
 		  uint8_t border_pin,
 		  uint8_t discharge_pin,
-		  uint8_t pwm_pin,
 		  uint8_t reset_pin,
 		  uint8_t busy_pin,
 		  uint8_t chip_select_pin);

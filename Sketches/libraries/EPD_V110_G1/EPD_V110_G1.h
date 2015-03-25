@@ -32,7 +32,7 @@
 #define EPD_PWM_REQUIRED      1
 #define EPD_IMAGE_ONE_ARG     0
 #define EPD_IMAGE_TWO_ARG     1
-#define EPD_PARTIAL_AVAILABLE 1
+#define EPD_PARTIAL_AVAILABLE 0
 
 // display panels supported
 #define EPD_1_44_SUPPORT      1
@@ -73,7 +73,7 @@ private:
 	const uint8_t EPD_Pin_EPD_CS;
 
 	const EPD_size size;
-	uint16_t stage_time;
+	uint16_t base_stage_time;
 	uint16_t factored_stage_time;
 	uint16_t lines_per_display;
 	uint16_t bytes_per_line;
@@ -93,7 +93,7 @@ public:
 	void end(void);
 
 	void setFactor(int temperature = 25) {
-		this->factored_stage_time = this->stage_time * this->temperature_to_factor_10x(temperature) / 10;
+		this->factored_stage_time = this->base_stage_time * this->temperature_to_factor_10x(temperature) / 10;
 	}
 
 	// clear display (anything -> white)
