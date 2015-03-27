@@ -51,9 +51,9 @@ supported and this needs [Java](http://java.com) to be installed.
 3. Load example by **File** → **Examples** → **EPD_V**vvv**_G**g → **demo_**sss
    (where vvv=Film[110,230,231], g=COG[1,2] and sss=Size[144,190,200,260,270])
 
-4. Demos updated: `demo`
+4. Demos updated: `demo`, `command`, `flash_loader`
 
-5. Demos **NOT Updated Yet**: `command`, `flash_loader` and `thermo`
+5. Demos **NOT Updated Yet**: `thermo`
 
 6. Graphics `EPD_GFX` **NOT Updated Yet** - There will be 3 separate
    versions and the thermo demo will become the example for these.
