@@ -1,5 +1,5 @@
 // -*- mode: c++ -*-
-// Copyright 2013 Pervasive Displays, Inc.
+// Copyright 2013-2015 Pervasive Displays, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include <FLASH.h>
-#include <EPD.h>
+#include <EPD_V110_G1.h>
 #include <S5813A.h>
 #include <FLASH.h>
 
