@@ -27,13 +27,13 @@
 // required libraries
 #include <SPI.h>
 #include <FLASH.h>
-#include <{% DRIVER:header %}>
+#include <EPD_V110_G1.h>
 #include <S5813A.h>
 
 
 // Change this for different display size
 // supported sizes: 144 200 270 (190 260 - V231_G2 only)
-#define SCREEN_SIZE {% DRIVER:panelsize %}
+#define SCREEN_SIZE 144
 
 // select image from:  text_image text-hello cat aphrodite venus saturn
 // select a suitable sector, (size 260/270 will take two adjacent sectors)

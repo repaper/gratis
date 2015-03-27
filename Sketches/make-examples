@@ -40,9 +40,9 @@ EPD_DRIVERS = [
 # list of base sketches to edit to suit the driver version and add
 # to the individual driver's "examples" folder
 EPD_SKETCHES = [
-  {sketch: 'demo'}
+  {sketch: 'demo'},
+  {sketch: 'flash_loader'},
 # ***** FIX THIS: add these once converted *****
-#  {sketch: 'flash_loader'},
 #  {sketch: 'command'},
 #  {sketch: 'thermo'}
 ]

@@ -60,6 +60,14 @@ typedef enum {           // Image pixel -> Display pixel
 	EPD_normal       // B -> B, W -> W (New Image)
 } EPD_stage;
 
+// just for compatibility with othe newe panels
+typedef enum {           // error codes
+	EPD_OK,
+	EPD_UNSUPPORTED_COG,
+	EPD_PANEL_BROKEN,
+	EPD_DC_FAILED
+} EPD_error;
+
 typedef void EPD_reader(void *buffer, uint32_t address, uint16_t length);
 
 class EPD_Class {
@@ -94,6 +102,16 @@ public:
 
 	void setFactor(int temperature = 25) {
 		this->factored_stage_time = this->base_stage_time * this->temperature_to_factor_10x(temperature) / 10;
+	}
+
+	// there is no status available from the hardware
+	const bool operator!(void) const {
+		return false;  // EPD_OK != this->status;
+	}
+
+	// there is no status available from the hardware
+	EPD_error error(void) const {
+		return EPD_OK; // this->status;
 	}
 
 	// clear display (anything -> white)
