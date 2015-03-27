@@ -42,13 +42,12 @@ EPD_DRIVERS = [
 EPD_SKETCHES = [
   {sketch: 'demo'},
   {sketch: 'flash_loader'},
-  {sketch: 'command'}
-# ***** FIX THIS: add these once converted *****
-#  {sketch: 'thermo'}
+  {sketch: 'command'},
+  {sketch: 'thermo'}
 ]
 
 # regular expression to match customisations
-# e.g. {% DRIVER:name %}  →  EPV_V110_G1
+# e.g. {% DRIVER:name %}  →  EPD_V110_G1
 CUSTOM_REGEXP = /\{%[[:space:]]*([[:upper:]]+)[[:space:]]*:[[:space:]]*([[:alnum:]]+)[[:space:]]*%\}/
 
 
@@ -233,14 +232,20 @@ if __FILE__ == $0 then
               when 'SYSTEM'
                 system_message item, match
 
+              when 'PANEL'
+                case item
+                when 'size'
+                  panel_size.to_s
+                else
+                  match
+                end
+
               when 'DRIVER'
                 case item
                 when 'name'
                   driver_name
                 when 'header'
                   driver_name + '.h'
-                when 'panelsize'
-                  panel_size.to_s
                 else
                   match
                 end

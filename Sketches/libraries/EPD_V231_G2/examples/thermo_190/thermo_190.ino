@@ -14,10 +14,10 @@
 // governing permissions and limitations under the License.
 
 
-// {% SYSTEM:notice %}
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 05:59:59 UTC *****
 
 
-// Simple demo to toggle EPD between two images.
+// graphic temperature display
 
 // Operation from reset:
 // * display version
@@ -25,76 +25,34 @@
 // * display FLASH detected or not
 // * display temperature (displayed before every image is changed)
 // * clear screen
-// * delay 5 seconds (flash LED)
-// * display text image
-// * delay 5 seconds (flash LED)
-// * display picture
-// * delay 5 seconds (flash LED)
-// * back to text display
+// * update display (temperature)
+// * delay 60 seconds (flash LED)
+// * back to update display
 
 
 #include <Arduino.h>
 #include <inttypes.h>
 #include <ctype.h>
 
-// required libraries
+// required libraried
 #include <SPI.h>
 #include <FLASH.h>
-#include <{% DRIVER:header %}>
-#define SCREEN_SIZE {% PANEL:size %}
+#include <EPD_V231_G2.h>
+#define SCREEN_SIZE 190
 #include <EPD_PANELS.h>
 #include <S5813A.h>
+#include <Adafruit_GFX.h>
+#include <EPD_GFX.h>
 
-// select two images from:  text_image text-hello cat aphrodite venus saturn
-#define IMAGE_1  text_image
-#define IMAGE_2  cat
 
-// Error message for MSP430
-#if (SCREEN_SIZE == 270) && defined(__MSP430_CPU__)
-#error MSP430: not enough memory
-#endif
+// update delay in seconds
+#define LOOP_DELAY_SECONDS 60
 
-// no futher changed below this point
+
+// no futher changes below this point
 
 // current version number
-#define DEMO_VERSION "4"
-
-
-// pre-processor convert to string
-#define MAKE_STRING1(X) #X
-#define MAKE_STRING(X) MAKE_STRING1(X)
-
-// other pre-processor magic
-// token joining and computing the string for #include
-#define ID(X) X
-#define MAKE_NAME1(X,Y) ID(X##Y)
-#define MAKE_NAME(X,Y) MAKE_NAME1(X,Y)
-#define MAKE_JOIN(X,Y) MAKE_STRING(MAKE_NAME(X,Y))
-
-// calculate the include name and variable names
-#define IMAGE_1_FILE MAKE_JOIN(IMAGE_1,EPD_IMAGE_FILE_SUFFIX)
-#define IMAGE_1_BITS MAKE_NAME(IMAGE_1,EPD_IMAGE_NAME_SUFFIX)
-#define IMAGE_2_FILE MAKE_JOIN(IMAGE_2,EPD_IMAGE_FILE_SUFFIX)
-#define IMAGE_2_BITS MAKE_NAME(IMAGE_2,EPD_IMAGE_NAME_SUFFIX)
-
-
-// Add Images library to compiler path
-#include <Images.h>  // this is just an empty file
-
-// images
-PROGMEM const
-#define unsigned
-#define char uint8_t
-#include IMAGE_1_FILE
-#undef char
-#undef unsigned
-
-PROGMEM const
-#define unsigned
-#define char uint8_t
-#include IMAGE_2_FILE
-#undef char
-#undef unsigned
+#define THERMO_VERSION "4"
 
 
 #if defined(__MSP430_CPU__)
@@ -140,6 +98,11 @@ const int Pin_RED_LED = 13;
 #define LED_OFF LOW
 
 
+// pre-processor convert to string
+#define MAKE_STRING1(X) #X
+#define MAKE_STRING(X) MAKE_STRING1(X)
+
+
 // define the E-Ink display
 EPD_Class EPD(EPD_SIZE,
 	      Pin_PANEL_ON,
@@ -152,6 +115,8 @@ EPD_Class EPD(EPD_SIZE,
 	      Pin_BUSY,
 	      Pin_EPD_CS);
 
+// graphic handler
+EPD_GFX G_EPD(EPD, S5813A);
 
 // I/O setup
 void setup() {
@@ -185,37 +150,35 @@ void setup() {
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
-	delay(20);  // allows terminal time to sync
 #endif
 	Serial.println();
 	Serial.println();
-	Serial.println("Demo version: " DEMO_VERSION);
+	Serial.println("Thermo version: " THERMO_VERSION);
 	Serial.println("Display size: " MAKE_STRING(EPD_SIZE));
 	Serial.println("Film: V" MAKE_STRING(EPD_FILM_VERSION));
 	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
-
 	Serial.println();
 
 	FLASH.begin(Pin_FLASH_CS);
 	if (FLASH.available()) {
 		Serial.println("FLASH chip detected OK");
 	} else {
-		uint8_t maufacturer;
-		uint16_t device;
-		FLASH.info(&maufacturer, &device);
-		Serial.print("unsupported FLASH chip: MFG: 0x");
-		Serial.print(maufacturer, HEX);
-		Serial.print("  device: 0x");
-		Serial.print(device, HEX);
-		Serial.println();
+		Serial.println("unsupported FLASH chip");
 	}
 
 	// configure temperature sensor
 	S5813A.begin(Pin_TEMPERATURE);
+
+	// get the current temperature
+	int temperature = S5813A.read();
+	Serial.print("Temperature = ");
+	Serial.print(temperature);
+	Serial.println(" Celcius");
+
+	// set up graphics EPD library
+	// and clear the screen
+	G_EPD.begin();
 }
-
-
-static int state = 0;
 
 
 // main loop
@@ -225,58 +188,71 @@ void loop() {
 	Serial.print(temperature);
 	Serial.println(" Celcius");
 
-	EPD.begin(); // power up the EPD panel
-	EPD.setFactor(temperature); // adjust for current temperature
+	int h = G_EPD.height();
+	int w = G_EPD.width();
 
-	int delay_counts = 50;
-	switch(state) {
-	default:
-	case 0:         // clear the screen
-		EPD.clear();
-		state = 1;
-		delay_counts = 5;  // reduce delay so first image come up quickly
-		break;
+	G_EPD.drawRect(1, 1, w - 2, h - 2, EPD_GFX::BLACK);
+	G_EPD.drawRect(3, 3, w - 6, h - 6, EPD_GFX::BLACK);
 
-	case 1:         // clear -> text
-#if EPD_IMAGE_ONE_ARG
-		EPD.image(IMAGE_1_BITS);
-#elif EPD_IMAGE_TWO_ARG
-		EPD.image_0(IMAGE_1_BITS);
-#else
-#error "unsupported image function"
-#endif
-		++state;
-		break;
+	G_EPD.fillTriangle(135,20, 186,40, 152,84, EPD_GFX::BLACK);
+	G_EPD.fillTriangle(139,26, 180,44, 155,68, EPD_GFX::WHITE);
 
-	case 2:         // text -> picture
-#if EPD_IMAGE_ONE_ARG
-		EPD.image(IMAGE_2_BITS);
-#elif EPD_IMAGE_TWO_ARG
-		EPD.image(IMAGE_1_BITS, IMAGE_2_BITS);
-#else
-#error "unsupported image function"
-#endif
-		++state;
-		break;
+	char temp[sizeof("-999 C")];
+	snprintf(temp, sizeof(temp), "%4d C", temperature);
 
-	case 3:        // picture -> text
-#if EPD_IMAGE_ONE_ARG
-		EPD.image(IMAGE_1_BITS);
-#elif EPD_IMAGE_TWO_ARG
-		EPD.image(IMAGE_2_BITS, IMAGE_1_BITS);
-#else
-#error "unsupported image function"
-#endif
-		state = 2;  // back to picture next time
-		break;
+	int x = 20;
+	int y = 30;
+	for (int i = 0; i < sizeof(temp) - 1; ++i, x += 14) {
+		G_EPD.drawChar(x, y, temp[i], EPD_GFX::BLACK, EPD_GFX::WHITE, 2);
 	}
-	EPD.end();   // power down the EPD panel
 
-	// flash LED for 5 seconds
-	for (int x = 0; x < delay_counts; ++x) {
-		digitalWrite(Pin_RED_LED, LED_ON);
-		delay(50);
-		digitalWrite(Pin_RED_LED, LED_OFF);
-		delay(50);
+	// small circle for degrees symbol
+	G_EPD.drawCircle(20 + 4 * 14 + 6, 30, 4, EPD_GFX::BLACK);
+
+// 100 difference just to simplify things
+// so 1 pixel = 1 degree
+#define T_MIN (-10)
+#define T_MAX 80
+
+	// clip
+	if (temperature < T_MIN) {
+		temperature= T_MIN;
+	} else if (temperature > T_MAX) {
+		temperature = T_MAX;
+	}
+
+	// temperature bar
+	int bar_w = temperature - T_MIN;  // zero based
+	int bar_h = 4;
+	int bar_x0 = 24;
+	int bar_y0 = 60;
+
+	G_EPD.fillRect(bar_x0, bar_y0, T_MAX - T_MIN, bar_h, EPD_GFX::WHITE);
+	G_EPD.fillRect(bar_x0, bar_y0, bar_w, bar_h, EPD_GFX::BLACK);
+
+	// scale
+	for (int t0 = T_MIN; t0 < T_MAX; t0 += 5) {
+		int t = t0 - T_MIN;
+		int tick = 8;
+		if (0 == t0) {
+			tick = 12;
+			G_EPD.drawCircle(bar_x0 + t, bar_y0 + 16, 3, EPD_GFX::BLACK);
+		} else if (0 == t0 % 10) {
+			tick = 10;
+		}
+		G_EPD.drawLine(bar_x0 + t, bar_y0 + tick, bar_x0 + t, bar_y0 + 6, EPD_GFX::BLACK);
+		G_EPD.drawLine(bar_x0 + t, bar_y0 + 6, bar_x0 + t + 5, bar_y0 + 6, EPD_GFX::BLACK);
+		G_EPD.drawLine(bar_x0 + t + 5, bar_y0 + 6, bar_x0 + t + 5, bar_y0 + 8, EPD_GFX::BLACK);
+	}
+
+	// update the display
+	G_EPD.display();
+
+	// flash LED for a number of seconds
+	for (int x = 0; x < LOOP_DELAY_SECONDS * 10; ++x) {
+		  digitalWrite(Pin_RED_LED, LED_ON);
+		  delay(50);
+		  digitalWrite(Pin_RED_LED, LED_OFF);
+		  delay(50);
 	}
 }

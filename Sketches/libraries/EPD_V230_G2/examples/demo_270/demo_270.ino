@@ -14,7 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 03:54:05 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 05:59:59 UTC *****
 
 
 // Simple demo to toggle EPD between two images.
@@ -33,6 +33,7 @@
 // * back to text display
 
 
+#include <Arduino.h>
 #include <inttypes.h>
 #include <ctype.h>
 
@@ -40,46 +41,13 @@
 #include <SPI.h>
 #include <FLASH.h>
 #include <EPD_V230_G2.h>
-#include <S5813A.h>
-
-
-// Change this for different display size
-// supported sizes: 144 200 270 (190 260 - V231_G2 only)
 #define SCREEN_SIZE 270
+#include <EPD_PANELS.h>
+#include <S5813A.h>
 
 // select two images from:  text_image text-hello cat aphrodite venus saturn
 #define IMAGE_1  text_image
 #define IMAGE_2  cat
-
-// set up images from screen sizes
-#if (SCREEN_SIZE == 144) && EPD_1_44_SUPPORT
-#define EPD_SIZE EPD_1_44
-#define FILE_SUFFIX _1_44.xbm
-#define NAME_SUFFIX _1_44_bits
-
-#elif (SCREEN_SIZE == 190) && EPD_1_9_SUPPORT
-#define EPD_SIZE EPD_1_9
-#define FILE_SUFFIX _1_9.xbm
-#define NAME_SUFFIX _1_9_bits
-
-#elif (SCREEN_SIZE == 200) && EPD_2_0_SUPPORT
-#define EPD_SIZE EPD_2_0
-#define FILE_SUFFIX _2_0.xbm
-#define NAME_SUFFIX _2_0_bits
-
-#elif (SCREEN_SIZE == 260) && EPD_2_6_SUPPORT
-#define EPD_SIZE EPD_2_6
-#define FILE_SUFFIX _2_6.xbm
-#define NAME_SUFFIX _2_6_bits
-
-#elif (SCREEN_SIZE == 270) && EPD_2_7_SUPPORT
-#define EPD_SIZE EPD_2_7
-#define FILE_SUFFIX _2_7.xbm
-#define NAME_SUFFIX _2_7_bits
-
-#else
-#error "Unknown EPD size: Change the #define SCREEN_SIZE to a supported value"
-#endif
 
 // Error message for MSP430
 #if (SCREEN_SIZE == 270) && defined(__MSP430_CPU__)
@@ -89,7 +57,7 @@
 // no futher changed below this point
 
 // current version number
-#define DEMO_VERSION "3"
+#define DEMO_VERSION "4"
 
 
 // pre-processor convert to string
@@ -97,17 +65,17 @@
 #define MAKE_STRING(X) MAKE_STRING1(X)
 
 // other pre-processor magic
-// tiken joining and computing the string for #include
+// token joining and computing the string for #include
 #define ID(X) X
 #define MAKE_NAME1(X,Y) ID(X##Y)
 #define MAKE_NAME(X,Y) MAKE_NAME1(X,Y)
 #define MAKE_JOIN(X,Y) MAKE_STRING(MAKE_NAME(X,Y))
 
 // calculate the include name and variable names
-#define IMAGE_1_FILE MAKE_JOIN(IMAGE_1,FILE_SUFFIX)
-#define IMAGE_1_BITS MAKE_NAME(IMAGE_1,NAME_SUFFIX)
-#define IMAGE_2_FILE MAKE_JOIN(IMAGE_2,FILE_SUFFIX)
-#define IMAGE_2_BITS MAKE_NAME(IMAGE_2,NAME_SUFFIX)
+#define IMAGE_1_FILE MAKE_JOIN(IMAGE_1,EPD_IMAGE_FILE_SUFFIX)
+#define IMAGE_1_BITS MAKE_NAME(IMAGE_1,EPD_IMAGE_NAME_SUFFIX)
+#define IMAGE_2_FILE MAKE_JOIN(IMAGE_2,EPD_IMAGE_FILE_SUFFIX)
+#define IMAGE_2_BITS MAKE_NAME(IMAGE_2,EPD_IMAGE_NAME_SUFFIX)
 
 
 // Add Images library to compiler path

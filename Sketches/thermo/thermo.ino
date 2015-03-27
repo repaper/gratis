@@ -14,6 +14,9 @@
 // governing permissions and limitations under the License.
 
 
+// {% SYSTEM:notice %}
+
+
 // graphic temperature display
 
 // Operation from reset:
@@ -27,23 +30,19 @@
 // * back to update display
 
 
+#include <Arduino.h>
 #include <inttypes.h>
 #include <ctype.h>
 
 // required libraried
 #include <SPI.h>
 #include <FLASH.h>
-#include <EPD.h>
+#include <{% DRIVER:header %}>
+#define SCREEN_SIZE {% PANEL:size %}
+#include <EPD_PANELS.h>
 #include <S5813A.h>
 #include <Adafruit_GFX.h>
 #include <EPD_GFX.h>
-
-
-// Change this for different display size
-// supported sizes: 1_44 2_0
-// NOTE: change the pixel_width in EPD_GFX.h to match
-//       selected display (1.44 -> 128, 2.00 -> 200)
-#define EPD_SIZE EPD_2_0
 
 
 // update delay in seconds
@@ -53,7 +52,7 @@
 // no futher changes below this point
 
 // current version number
-#define THERMO_VERSION "3"
+#define THERMO_VERSION "4"
 
 
 #if defined(__MSP430_CPU__)
@@ -63,7 +62,9 @@ const int Pin_TEMPERATURE = A4;
 const int Pin_PANEL_ON = P2_3;
 const int Pin_BORDER = P2_5;
 const int Pin_DISCHARGE = P2_4;
+#if EPD_PWM_REQUIRED
 const int Pin_PWM = P2_1;
+#endif
 const int Pin_RESET = P2_2;
 const int Pin_BUSY = P2_0;
 const int Pin_EPD_CS = P2_6;
@@ -78,7 +79,9 @@ const int Pin_TEMPERATURE = A0;
 const int Pin_PANEL_ON = 2;
 const int Pin_BORDER = 3;
 const int Pin_DISCHARGE = 4;
+#if EPD_PWM_REQUIRED
 const int Pin_PWM = 5;
+#endif
 const int Pin_RESET = 6;
 const int Pin_BUSY = 7;
 const int Pin_EPD_CS = 8;
@@ -101,7 +104,16 @@ const int Pin_RED_LED = 13;
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_PWM, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
+EPD_Class EPD(EPD_SIZE,
+	      Pin_PANEL_ON,
+	      Pin_BORDER,
+	      Pin_DISCHARGE,
+#if EPD_PWM_REQUIRED
+	      Pin_PWM,
+#endif
+	      Pin_RESET,
+	      Pin_BUSY,
+	      Pin_EPD_CS);
 
 // graphic handler
 EPD_GFX G_EPD(EPD, S5813A);
@@ -111,7 +123,9 @@ void setup() {
 	pinMode(Pin_RED_LED, OUTPUT);
 	pinMode(Pin_SW2, INPUT);
 	pinMode(Pin_TEMPERATURE, INPUT);
+#if EPD_PWM_REQUIRED
 	pinMode(Pin_PWM, OUTPUT);
+#endif
 	pinMode(Pin_BUSY, INPUT);
 	pinMode(Pin_RESET, OUTPUT);
 	pinMode(Pin_PANEL_ON, OUTPUT);
@@ -121,7 +135,9 @@ void setup() {
 	pinMode(Pin_FLASH_CS, OUTPUT);
 
 	digitalWrite(Pin_RED_LED, LOW);
+#if EPD_PWM_REQUIRED
 	digitalWrite(Pin_PWM, LOW);
+#endif
 	digitalWrite(Pin_RESET, LOW);
 	digitalWrite(Pin_PANEL_ON, LOW);
 	digitalWrite(Pin_DISCHARGE, LOW);
@@ -138,7 +154,9 @@ void setup() {
 	Serial.println();
 	Serial.println();
 	Serial.println("Thermo version: " THERMO_VERSION);
-	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
+	Serial.println("Display size: " MAKE_STRING(EPD_SIZE));
+	Serial.println("Film: V" MAKE_STRING(EPD_FILM_VERSION));
+	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
 	Serial.println();
 
 	FLASH.begin(Pin_FLASH_CS);

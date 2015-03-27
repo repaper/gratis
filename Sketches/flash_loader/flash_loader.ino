@@ -13,6 +13,10 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
+
+// {% SYSTEM:notice %}
+
+
 // Simple demo with two functions:
 //
 // 1. Copy an included iname to a specified FLSH sector and display it
@@ -28,6 +32,8 @@
 #include <SPI.h>
 #include <FLASH.h>
 #include <{% DRIVER:header %}>
+#define SCREEN_SIZE {% PANEL:size %}
+#include <EPD_PANELS.h>
 #include <S5813A.h>
 
 
@@ -47,45 +53,8 @@
 
 // no futher changed below this point
 
-// set up images from screen size2
-// set up images from screen sizes
-#if (SCREEN_SIZE == 144) && EPD_1_44_SUPPORT
-#define EPD_SIZE EPD_1_44
-#define FILE_SUFFIX _1_44.xbm
-#define NAME_SUFFIX _1_44_bits
-#define SECTORS_USED 1
-
-#elif (SCREEN_SIZE == 190) && EPD_1_9_SUPPORT
-#define EPD_SIZE EPD_1_9
-#define FILE_SUFFIX _1_9.xbm
-#define NAME_SUFFIX _1_9_bits
-#define SECTORS_USED 1
-
-#elif (SCREEN_SIZE == 200) && EPD_2_0_SUPPORT
-#define EPD_SIZE EPD_2_0
-#define FILE_SUFFIX _2_0.xbm
-#define NAME_SUFFIX _2_0_bits
-#define SECTORS_USED 1
-
-#elif (SCREEN_SIZE == 260) && EPD_2_6_SUPPORT
-#define EPD_SIZE EPD_2_6
-#define FILE_SUFFIX _2_6.xbm
-#define NAME_SUFFIX _2_6_bits
-#define SECTORS_USED 2
-
-#elif (SCREEN_SIZE == 270) && EPD_2_7_SUPPORT
-#define EPD_SIZE EPD_2_7
-#define FILE_SUFFIX _2_7.xbm
-#define NAME_SUFFIX _2_7_bits
-#define SECTORS_USED 2
-
-#else
-#error "Unknown EPD size: Change the #define SCREEN_SIZE to a supported value"
-#endif
-
-
 // program version
-#define FLASH_LOADER_VERSION "3"
+#define FLASH_LOADER_VERSION "4"
 
 // pre-processor convert to string
 #define MAKE_STRING1(X) #X
@@ -99,8 +68,8 @@
 #define MAKE_JOIN(X,Y) MAKE_STRING(MAKE_NAME(X,Y))
 
 // calculate the include name and variable names
-#define IMAGE_FILE MAKE_JOIN(IMAGE,FILE_SUFFIX)
-#define IMAGE_BITS MAKE_NAME(IMAGE,NAME_SUFFIX)
+#define IMAGE_FILE MAKE_JOIN(IMAGE,EPD_IMAGE_FILE_SUFFIX)
+#define IMAGE_BITS MAKE_NAME(IMAGE,EPD_IMAGE_NAME_SUFFIX)
 
 
 // Add Images library to compiler path

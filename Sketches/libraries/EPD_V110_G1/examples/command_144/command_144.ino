@@ -14,6 +14,12 @@
 // governing permissions and limitations under the License.
 
 
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 05:59:59 UTC *****
+
+
+// simple serial port driven command system to upload data to flash
+// and display images.
+
 #include <Arduino.h>
 #include <inttypes.h>
 #include <ctype.h>
@@ -22,35 +28,13 @@
 #include <SPI.h>
 #include <FLASH.h>
 #include <EPD_V110_G1.h>
+#define SCREEN_SIZE 144
+#include <EPD_PANELS.h>
 #include <S5813A.h>
 
 
-// Change this for different display size
-// supported sizes: 144 200 270 (190 260 - V231_G2 only)
-#define SCREEN_SIZE 144
-
-// set up images from screen sizes
-#if (SCREEN_SIZE == 144) && EPD_1_44_SUPPORT
-#define EPD_SIZE EPD_1_44
-
-#elif (SCREEN_SIZE == 190) && EPD_1_9_SUPPORT
-#define EPD_SIZE EPD_1_9
-
-#elif (SCREEN_SIZE == 200) && EPD_2_0_SUPPORT
-#define EPD_SIZE EPD_2_0
-
-#elif (SCREEN_SIZE == 260) && EPD_2_6_SUPPORT
-#define EPD_SIZE EPD_2_6
-
-#elif (SCREEN_SIZE == 270) && EPD_2_7_SUPPORT
-#define EPD_SIZE EPD_2_7
-
-#else
-#error "Unknown EPD size: Change the #define SCREEN_SIZE to a supported value"
-#endif
-
 // version number
-#define COMMAND_VERSION "3"
+#define COMMAND_VERSION "4"
 
 
 // definition of I/O pins LaunchPad and Arduino are different
