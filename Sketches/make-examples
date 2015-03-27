@@ -42,8 +42,8 @@ EPD_DRIVERS = [
 EPD_SKETCHES = [
   {sketch: 'demo'},
   {sketch: 'flash_loader'},
+  {sketch: 'command'}
 # ***** FIX THIS: add these once converted *****
-#  {sketch: 'command'},
 #  {sketch: 'thermo'}
 ]
 

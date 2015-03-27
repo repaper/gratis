@@ -21,13 +21,13 @@
 // required libraries
 #include <SPI.h>
 #include <FLASH.h>
-#include <{% DRIVER:header %}>
+#include <EPD_V231_G2.h>
 #include <S5813A.h>
 
 
 // Change this for different display size
 // supported sizes: 144 200 270 (190 260 - V231_G2 only)
-#define SCREEN_SIZE {% DRIVER:panelsize %}
+#define SCREEN_SIZE 144
 
 // set up images from screen sizes
 #if (SCREEN_SIZE == 144) && EPD_1_44_SUPPORT

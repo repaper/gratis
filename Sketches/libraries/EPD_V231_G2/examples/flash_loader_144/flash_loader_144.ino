@@ -85,7 +85,7 @@
 
 
 // program version
-#define FLASH_LOADER_VERSION "2"
+#define FLASH_LOADER_VERSION "3"
 
 // pre-processor convert to string
 #define MAKE_STRING1(X) #X
@@ -222,7 +222,9 @@ void setup() {
 	Serial.println();
 	Serial.println();
 	Serial.println("Flash loader version: " FLASH_LOADER_VERSION);
-	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
+	Serial.println("Display size: " MAKE_STRING(EPD_SIZE));
+	Serial.println("Film: V" MAKE_STRING(EPD_FILM_VERSION));
+	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
 	Serial.println();
 
 	FLASH.begin(Pin_FLASH_CS);

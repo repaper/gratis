@@ -14,7 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 02:16:01 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 02:43:37 UTC *****
 
 
 // Simple demo to toggle EPD between two images.

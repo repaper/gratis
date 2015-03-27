@@ -21,34 +21,36 @@
 // required libraries
 #include <SPI.h>
 #include <FLASH.h>
-#include <EPD2.h>
+#include <EPD_V110_G1.h>
 #include <S5813A.h>
 
+
 // Change this for different display size
-// supported sizes: 144 200 270
-#define SCREEN_SIZE 0
+// supported sizes: 144 200 270 (190 260 - V231_G2 only)
+#define SCREEN_SIZE 270
 
-
-// no futher changed below this point
-
-// set up images from screen size2
-#if (SCREEN_SIZE == 144)
+// set up images from screen sizes
+#if (SCREEN_SIZE == 144) && EPD_1_44_SUPPORT
 #define EPD_SIZE EPD_1_44
-#define SECTORS_USED 1
 
-#elif (SCREEN_SIZE == 200)
+#elif (SCREEN_SIZE == 190) && EPD_1_9_SUPPORT
+#define EPD_SIZE EPD_1_9
+
+#elif (SCREEN_SIZE == 200) && EPD_2_0_SUPPORT
 #define EPD_SIZE EPD_2_0
-#define SECTORS_USED 1
 
-#elif (SCREEN_SIZE == 270)
+#elif (SCREEN_SIZE == 260) && EPD_2_6_SUPPORT
+#define EPD_SIZE EPD_2_6
+
+#elif (SCREEN_SIZE == 270) && EPD_2_7_SUPPORT
 #define EPD_SIZE EPD_2_7
-#define SECTORS_USED 2
 
 #else
-#error "Unknown EPB size: Change the #define SCREEN_SIZE to a supported value"
+#error "Unknown EPD size: Change the #define SCREEN_SIZE to a supported value"
 #endif
 
-#define COMMAND_VERSION "1"
+// version number
+#define COMMAND_VERSION "3"
 
 
 // definition of I/O pins LaunchPad and Arduino are different
@@ -60,7 +62,9 @@ const int Pin_TEMPERATURE = A4;
 const int Pin_PANEL_ON = P2_3;
 const int Pin_BORDER = P2_5;
 const int Pin_DISCHARGE = P2_4;
+#if EPD_PWM_REQUIRED
 const int Pin_PWM = P2_1;
+#endif
 const int Pin_RESET = P2_2;
 const int Pin_BUSY = P2_0;
 const int Pin_EPD_CS = P2_6;
@@ -75,7 +79,9 @@ const int Pin_TEMPERATURE = A0;
 const int Pin_PANEL_ON = 2;
 const int Pin_BORDER = 3;
 const int Pin_DISCHARGE = 4;
+#if EPD_PWM_REQUIRED
 const int Pin_PWM = 5;
+#endif
 const int Pin_RESET = 6;
 const int Pin_BUSY = 7;
 const int Pin_EPD_CS = 8;
@@ -97,7 +103,6 @@ const int Pin_RED_LED = 13;
 
 
 // function prototypes
-static void epd_power_flash_access(bool state);
 static void flash_info(void);
 static void flash_read(void *buffer, uint32_t address, uint16_t length);
 
@@ -115,7 +120,16 @@ static void Serial_hex_dump(uint32_t address, const void *buffer, uint16_t lengt
 
 
 // define the E-Ink display
-EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
+EPD_Class EPD(EPD_SIZE,
+	      Pin_PANEL_ON,
+	      Pin_BORDER,
+	      Pin_DISCHARGE,
+#if EPD_PWM_REQUIRED
+	      Pin_PWM,
+#endif
+	      Pin_RESET,
+	      Pin_BUSY,
+	      Pin_EPD_CS);
 
 
 // I/O setup
@@ -123,7 +137,9 @@ void setup() {
 	pinMode(Pin_RED_LED, OUTPUT);
 	pinMode(Pin_SW2, INPUT);
 	pinMode(Pin_TEMPERATURE, INPUT);
+#if EPD_PWM_REQUIRED
 	pinMode(Pin_PWM, OUTPUT);
+#endif
 	pinMode(Pin_BUSY, INPUT);
 	pinMode(Pin_RESET, OUTPUT);
 	pinMode(Pin_PANEL_ON, OUTPUT);
@@ -133,7 +149,9 @@ void setup() {
 	pinMode(Pin_FLASH_CS, OUTPUT);
 
 	digitalWrite(Pin_RED_LED, LOW);
-	digitalWrite(Pin_PWM, LOW);  // not actually used - set low so can use current eval board unmodified
+#if EPD_PWM_REQUIRED
+	digitalWrite(Pin_PWM, LOW);
+#endif
 	digitalWrite(Pin_RESET, LOW);
 	digitalWrite(Pin_PANEL_ON, LOW);
 	digitalWrite(Pin_DISCHARGE, LOW);
@@ -149,8 +167,10 @@ void setup() {
 #endif
 	Serial.println();
 	Serial.println();
-	Serial.println("Command G2 version: " COMMAND_VERSION);
-	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
+	Serial.println("Command version: " COMMAND_VERSION);
+	Serial.println("Display size: " MAKE_STRING(EPD_SIZE));
+	Serial.println("Film: V" MAKE_STRING(EPD_FILM_VERSION));
+	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
 	Serial.println();
 
 	FLASH.begin(Pin_FLASH_CS);
@@ -179,6 +199,9 @@ void loop() {
 		Serial.println("e<ss>      - erase sector to 0xff");
 		Serial.println("u<ss>      - upload XBM to sector");
 		Serial.println("i<ss>      - display an image on white screen");
+#if EPD_IMAGE_TWO_ARG
+		Serial.println("r<ss>      - revert an image back to white");
+#endif
 		Serial.println("l          - search for non-empty sectors");
 		Serial.println("w          - clear screen to white");
 		Serial.println("f          - dump FLASH identification");
@@ -198,25 +221,21 @@ void loop() {
 		Serial.println();
 		uint32_t address = sector;
 		address <<= 12;
-		epd_power_flash_access(true);
 		for (uint16_t i = 0; i < count; ++i) {
 			uint8_t buffer[16];
 			FLASH.read(buffer, address, sizeof(buffer));
 			Serial_hex_dump(address, buffer, sizeof(buffer));
 			address += sizeof(buffer);
 		}
-		epd_power_flash_access(false);
 		break;
 	}
 
 	case 'e':
 	{
 		uint32_t sector = Serial_gethex(true);
-		epd_power_flash_access(true);
 		FLASH.write_enable();
 		FLASH.sector_erase(sector << 12);
 		FLASH.write_disable();
-		epd_power_flash_access(false);
 		break;
 	}
 
@@ -228,7 +247,6 @@ void loop() {
 		Serial.println();
 		Serial.println("start upload...");
 
-		epd_power_flash_access(true);
 		for (;;) {
 			uint8_t buffer[16];
 			uint16_t count = 0;
@@ -246,7 +264,6 @@ void loop() {
 		}
 
 		FLASH.write_disable();
-		epd_power_flash_access(false);
 
 		Serial.println();
 		Serial.print(" read = ");
@@ -264,6 +281,7 @@ void loop() {
 		break;
 	}
 
+#if EPD_IMAGE_ONE_ARG
 	case 'i':
 	{
 		uint32_t address = Serial_gethex(true);
@@ -283,6 +301,36 @@ void loop() {
 		EPD.end();
 		break;
 	}
+
+#elif EPD_IMAGE_TWO_ARG
+	case 'i':
+	{
+		uint32_t address = Serial_gethex(true);
+		address <<= 12;
+		EPD.begin();
+		int t = S5813A.read();
+		EPD.setFactor(t);
+		EPD.frame_cb_repeat(address, flash_read, EPD_inverse);
+		EPD.frame_cb_repeat(address, flash_read, EPD_normal);
+		EPD.end();
+		break;
+	}
+
+	case 'r':
+	{
+		uint32_t address = Serial_gethex(true);
+		address <<= 12;
+		EPD.begin();
+		int t = S5813A.read();
+		EPD.setFactor(t);
+		EPD.frame_cb_repeat(address, flash_read, EPD_compensate);
+		EPD.frame_cb_repeat(address, flash_read, EPD_white);
+		EPD.end();
+		break;
+	}
+#else
+#error "unsupported image function"
+#endif
 
 	case 'l':
 	{
@@ -331,13 +379,6 @@ void loop() {
 	case 'w':
 	{
 		EPD.begin();
-		if (!EPD) {
-			Serial.print("EPD error = ");
-			Serial.print(EPD.error());
-			Serial.println("");
-			break;
-		}
-
 		int t = S5813A.read();
 		EPD.setFactor(t);
 		EPD.clear();
@@ -371,25 +412,9 @@ void loop() {
 }
 
 
-static void epd_power_flash_access(bool state) {
-	if (state) {
-		// turn on panel, but hold reset to prevent SPI loading
-		digitalWrite(Pin_RESET, HIGH);
-		digitalWrite(Pin_EPD_CS, HIGH);
-		digitalWrite(Pin_PANEL_ON, HIGH);
-	} else {
-		// turn off panel, after FLASH access
-		digitalWrite(Pin_RESET, LOW);
-		digitalWrite(Pin_EPD_CS, LOW);
-		digitalWrite(Pin_PANEL_ON, LOW);
-	}
-}
-
 static void flash_info(void) {
 	uint8_t maufacturer;
 	uint16_t device;
-
-	epd_power_flash_access(true);
 
 	if (FLASH.available()) {
 		Serial.println("FLASH chip detected OK");
@@ -403,8 +428,6 @@ static void flash_info(void) {
 	Serial.print(" device = ");
 	Serial_puthex_word(device);
 	Serial.println();
-
-	epd_power_flash_access(false);
 }
 
 
