@@ -78,22 +78,25 @@ void FLASH_Class::end(void) {
 // configure the SPI for FLASH access
 void FLASH_Class::spi_setup(void) {
 	SPI.begin();
+	digitalWrite(this->CS, HIGH);
+
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE3);
 	SPI.setClockDivider(SPI_CLOCK_DIV4);
+
 	Delay_us(10);
 
-	digitalWrite(this->CS, HIGH);
 	SPI.transfer(FLASH_NOP); // flush the SPI buffer
-	// SPI.transfer(FLASH_NOP); // ..
-	// SPI.transfer(FLASH_NOP); // ..
-	Delay_us(50);
+	SPI.transfer(FLASH_NOP); // ..
+	SPI.transfer(FLASH_NOP); // ..
+	Delay_us(10);
 }
 
 // shutdown SPI after FLASH access
 void FLASH_Class::spi_teardown(void) {
-	Delay_us(50);
+	Delay_us(10);
 	digitalWrite(this->CS, HIGH);
+	SPI.transfer(FLASH_NOP); // flush the SPI buffer
 	SPI.end();
 }
 
@@ -109,9 +112,14 @@ bool FLASH_Class::available(void) {
 
 
 void FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
-	this->spi_setup();
+	this->wait_for_ready();
+
 	digitalWrite(this->CS, LOW);
-	Delay_us(1000);                     // FLASH wake up delay
+	Delay_us(1500);                     // FLASH wake up delay
+	digitalWrite(this->CS, HIGH);
+	Delay_us(50);
+	digitalWrite(this->CS, LOW);
+	Delay_us(10);
 	SPI.transfer(FLASH_RDID);
 	*maufacturer = SPI.transfer(FLASH_NOP);
 	uint8_t id_high = SPI.transfer(FLASH_NOP);
@@ -122,8 +130,7 @@ void FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
 
 
 void FLASH_Class::read(void *buffer, uint32_t address, uint16_t length) {
-	while (this->is_busy()) {           // wait for last action to finish
-	}
+	this->wait_for_ready();
 
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
@@ -139,22 +146,27 @@ void FLASH_Class::read(void *buffer, uint32_t address, uint16_t length) {
 }
 
 
-bool FLASH_Class::is_busy(void) {
+void FLASH_Class::wait_for_ready(void) {
 	this->spi_setup();
+	while (this->is_busy()) {
+	}
+}
+
+bool FLASH_Class::is_busy(void) {
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
 	SPI.transfer(FLASH_RDSR);
-	bool busy = 0 != (FLASH_WIP & SPI.transfer(0xff));
+	bool busy = 0 != (FLASH_WIP & SPI.transfer(FLASH_NOP));
 	digitalWrite(this->CS, HIGH);
 	SPI.transfer(FLASH_NOP);
-	Delay_us(50);
+	Delay_us(10);
 	return busy;
 }
 
 
 void FLASH_Class::write_enable(void) {
-	while (this->is_busy()) {
-	}
+	this->wait_for_ready();
+
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
 	SPI.transfer(FLASH_WREN);
@@ -164,8 +176,7 @@ void FLASH_Class::write_enable(void) {
 
 
 void FLASH_Class::write_disable(void) {
-	while (this->is_busy()) {
-	}
+	this->wait_for_ready();
 
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
@@ -175,8 +186,7 @@ void FLASH_Class::write_disable(void) {
 
 
 void FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
-	while (this->is_busy()) {
-	}
+	this->wait_for_ready();
 
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
@@ -193,8 +203,7 @@ void FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
 
 #if defined(__AVR__)
 void FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *buffer, uint16_t length) {
-	while (this->is_busy()) {
-	}
+	this->wait_for_ready();
 
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);
@@ -212,8 +221,7 @@ void FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *buffe
 
 
 void FLASH_Class::sector_erase(uint32_t address) {
-	while (this->is_busy()) {
-	}
+	this->wait_for_ready();
 
 	digitalWrite(this->CS, LOW);
 	Delay_us(10);

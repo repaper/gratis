@@ -38,6 +38,7 @@ private:
 	void spi_setup(void);
 	void spi_teardown(void);
 	bool is_busy(void);
+	void wait_for_ready(void);
 	FLASH_Class(const FLASH_Class &f);  // prevent copy
 
 public:
