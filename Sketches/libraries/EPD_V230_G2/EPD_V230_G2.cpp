@@ -582,7 +582,8 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value,
        if (set_voltage_limit) {
 	       // charge pump voltage level reduce voltage shift
 	       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x04), 2);
-	       SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, this->voltage_level), 2);
+	       const uint8_t b[2] = {0x72, this->voltage_level};
+	       SPI_send(this->EPD_Pin_EPD_CS, b, sizeof(b));
        }
 
        // send data
