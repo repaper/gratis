@@ -1,0 +1,22 @@
+---
+# installs all required packages
+
+# to skip an update set environment e.g.: env UPDATE_PACKAGES=NO vagrant provision
+
+- name: Updates apt cache
+  sudo: true
+  when: lookup('env', 'UPDATE_PACKAGES') != "NO"
+  apt: update_cache=true
+
+- name: Installs necessary packages
+  sudo: true
+  apt: pkg="{{ item }}" state=latest
+  with_items:
+    - mg
+    - rsync
+    - lynx
+    - zsh
+    - git
+    - xauth
+    - openjdk-7-jre
+    - picocom
