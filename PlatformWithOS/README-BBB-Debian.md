@@ -50,7 +50,7 @@ sudo cp beaglebone/gpio-header/generated/gpio-P[89].* /lib/firmware
 ~~~~~
 
 Change to sources, compile and install:
-
+**Be sure to choose the correct PANEL_VERSION**
 ~~~~~
 cd gratis/PlatformWithOS
 make PANEL_VERSION=V110_G1 bb
@@ -72,6 +72,7 @@ cat /dev/epd/panel
 ~~~~~
 
 Display an image:
+**Use the correct image size to match panel**
 ~~~~~
 echo C > /dev/epd/command
 ./driver-common/xbm2bin < ./driver-common/cat_2_7.xbm > /dev/epd/display
