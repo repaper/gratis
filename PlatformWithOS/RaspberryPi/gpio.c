@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -34,7 +36,9 @@
 
 // register addresses in Rasberry PI
 enum {
-	BCM_PERIPERALS_ADDRESS = 0x20000000,
+	V1_BCM_PERIPHERALS_ADDRESS = 0x20000000,
+	V2_BCM_PERIPHERALS_ADDRESS = 0x3F000000,
+
 	GPIO_REGISTERS         = 0x00200000,
 	PWM_REGISTERS          = 0x0020C000,
 	CLOCK_REGISTERS        = 0x00101000,
@@ -205,6 +209,21 @@ enum {
 	PWM_DIVISOR_VALUE = 0x5A000000 | (((32 * 6) & 0xfff) << 12)   // 100kHz
 };
 
+// Chip versions
+typedef struct {
+	const char *name;
+	const uint32_t base;
+} chip_version;
+
+const char *cpu_info_file = "/proc/cpuinfo";
+const char *cpu_info_key = "\nHardware";  // note '\n' for start of line match
+const chip_version chips[] = {
+	{"BCM2708", V1_BCM_PERIPHERALS_ADDRESS},
+	{"BCM2709", V2_BCM_PERIPHERALS_ADDRESS}
+};
+
+#define SIZE_OF_ARRAY(a) (sizeof(a)/ sizeof((a)[0]))
+
 
 // access to peripherals
 volatile uint32_t *gpio_map;
@@ -214,12 +233,21 @@ volatile uint32_t *clock_map;
 
 
 // local function prototypes;
-static bool create_rw_map(volatile uint32_t **map, int fd, uint32_t offset);
+static bool get_cpu_io_base_address(uint32_t *base);
+static bool create_rw_map(volatile uint32_t **map, int fd, uint32_t base_address, uint32_t offset);
 static bool delete_map(volatile uint32_t *address);
 
 
 // set up access to the GPIO and PWM
 bool GPIO_setup() {
+
+	uint32_t base_address = 0;
+
+	if (!get_cpu_io_base_address(&base_address)) {
+		warn("cannot get the GPIO base address");
+		return false;
+	}
+
 	const char *memory_device = "/dev/mem";
 
 	int mem_fd = open(memory_device, O_RDWR | O_SYNC | O_CLOEXEC);
@@ -229,21 +257,21 @@ bool GPIO_setup() {
 		return false;
 	}
 
-	// memory map entry to access the variou peripheral registers
+	// memory map entry to access the various peripheral registers
 
-	if (!create_rw_map(&gpio_map, mem_fd, GPIO_REGISTERS)) {
+	if (!create_rw_map(&gpio_map, mem_fd, base_address, GPIO_REGISTERS)) {
 		warn("failed to mmap gpio");
 		goto close_mem;
 	}
-	if (!create_rw_map(&pwm_map, mem_fd, PWM_REGISTERS)) {
+	if (!create_rw_map(&pwm_map, mem_fd, base_address, PWM_REGISTERS)) {
 		warn("failed to mmap pwm");
 		goto unmap_gpio;
 	}
-	if (!create_rw_map(&clock_map, mem_fd, CLOCK_REGISTERS)) {
+	if (!create_rw_map(&clock_map, mem_fd, base_address, CLOCK_REGISTERS)) {
 		warn("failed to mmap clock");
 		goto unmap_pwm;
 	}
-	/* if (!create_rw_map(&timer_map, mem_fd, TIMER_REGISTERS)) { */
+	/* if (!create_rw_map(&timer_map, mem_fd, base_address, TIMER_REGISTERS)) { */
 	/* 	warn("failed to mmap timer"); */
 	/* 	goto unmap_clock; */
 	/* } */
@@ -368,12 +396,58 @@ void GPIO_pwm_write(int pin, uint32_t value) {
 // map page size
 #define MAP_SIZE 4096
 
+bool get_cpu_io_base_address(uint32_t *base) {
+
+	int info_fd = open(cpu_info_file, O_RDONLY);
+
+	if (info_fd < 0) {
+		warn("cannot open: %s", cpu_info_file);
+		return false;
+	}
+
+	char buffer[8192];  // cpuinfo is not very big (on Rpi B2: "cat /proc/cpuinfo | wc -c" -> 1112 bytes)
+	memset(buffer, 0, sizeof(buffer)); // ensure nul('\0') terminated
+
+	ssize_t n = read(info_fd, buffer, sizeof(buffer) - 1);
+	close(info_fd);
+
+	if (n < 0) {
+		return false;
+	}
+
+	// locate the key
+	char *p = strstr(buffer, cpu_info_key);
+	if (NULL == p) {
+		return false;
+	}
+
+	p += strlen(cpu_info_key);
+
+	while (isspace(*p) || ':' == *p) {
+		++p;
+	}
+	char *p1 = p;
+	while (isalnum(*p1)) {
+		++p1;
+	}
+
+	for (int i = 0; i < SIZE_OF_ARRAY(chips); ++i) {
+		size_t l = p1 - p;
+		if (strlen(chips[i].name) == l && 0 == strncmp(chips[i].name, p, l)) {
+			*base = chips[i].base;
+			return true;
+		}
+	}
+
+	// failed
+	return false;
+}
 
 // setup a map to a peripheral offset
 // false => error
-static bool create_rw_map(volatile uint32_t **map, int fd, uint32_t offset) {
+static bool create_rw_map(volatile uint32_t **map, int fd, uint32_t base_address, uint32_t offset) {
 
-	void *m = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, BCM_PERIPERALS_ADDRESS + offset);
+	void *m = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, base_address + offset);
 
 	*map = (volatile uint32_t *)(m);
 
