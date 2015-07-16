@@ -181,6 +181,7 @@ static struct {
 // PWM files
 #define MUX_default "default"
 #define MUX_pwm     "pwm"
+#define MUX_spi     "spi"
 
 const char *const pwm_state_file[] = {
 	"/sys/devices/platform/ocp/ocp:P9_14_pinmux/state",
@@ -198,6 +199,16 @@ const char *const pwm_state_file[] = {
 
 #define PWM_POLARITY_normal "normal"
 #define PWM_DEFAULT_PERIOD 500000
+
+
+// SPI initialisation
+const char *const spi_state_file[] = {
+	"/sys/devices/platform/ocp/ocp:P9_17_pinmux/state",
+	"/sys/devices/platform/ocp/ocp:P9_21_pinmux/state",
+	"/sys/devices/platform/ocp/ocp:P9_22_pinmux/state",
+	"/sys/devices/platform/ocp/ocp:P9_18_pinmux/state"
+};
+
 
 // firmware files (/lib/firmware/NAME-00A0.dtbo) to load
 //#define CAPE_IIO "cape-bone-iio"
@@ -246,6 +257,12 @@ bool GPIO_setup() {
 
 /// revoke access to GPIO and PWM
 bool GPIO_teardown() {
+
+	// finalise SPI multiplexor
+	for (int i = 0; i < SIZEOF_ARRAY(spi_state_file); ++i) {
+		write_file(spi_state_file[i], MUX_default "\n", CONST_STRLEN(MUX_default "\n"));
+	}
+
 	for (size_t pin = 0; pin < SIZE_OF_ARRAY(gpio_info); ++pin) {
 		if (Mode_NONE == gpio_info[pin].active) {
 			continue;
@@ -424,6 +441,12 @@ static bool load_firmware(const char *pin_name) {
 
 	// finished with the cape manager
 	close(fd);
+
+	// initialise SPI multiplexor
+	for (int i = 0; i < SIZEOF_ARRAY(spi_state_file); ++i) {
+		write_file(spi_state_file[i], MUX_spi "\n", CONST_STRLEN(MUX_spi "\n"));
+	}
+
 	return true;
 }
 
