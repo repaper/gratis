@@ -259,7 +259,7 @@ bool GPIO_setup() {
 bool GPIO_teardown() {
 
 	// finalise SPI multiplexor
-	for (int i = 0; i < SIZEOF_ARRAY(spi_state_file); ++i) {
+	for (int i = 0; i < SIZE_OF_ARRAY(spi_state_file); ++i) {
 		write_file(spi_state_file[i], MUX_default "\n", CONST_STRLEN(MUX_default "\n"));
 	}
 
@@ -443,7 +443,7 @@ static bool load_firmware(const char *pin_name) {
 	close(fd);
 
 	// initialise SPI multiplexor
-	for (int i = 0; i < SIZEOF_ARRAY(spi_state_file); ++i) {
+	for (int i = 0; i < SIZE_OF_ARRAY(spi_state_file); ++i) {
 		write_file(spi_state_file[i], MUX_spi "\n", CONST_STRLEN(MUX_spi "\n"));
 	}
 
