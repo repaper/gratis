@@ -14,7 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 05:59:59 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-07-23 02:50:18 UTC *****
 
 
 // graphic temperature display
@@ -22,7 +22,7 @@
 // Operation from reset:
 // * display version
 // * display compiled-in display setting
-// * display FLASH detected or not
+// * display EPD FLASH detected or not
 // * display temperature (displayed before every image is changed)
 // * clear screen
 // * update display (temperature)
@@ -36,7 +36,7 @@
 
 // required libraried
 #include <SPI.h>
-#include <FLASH.h>
+#include <EPD_FLASH.h>
 #include <EPD_V230_G2.h>
 #define SCREEN_SIZE 200
 #include <EPD_PANELS.h>
@@ -68,7 +68,7 @@ const int Pin_PWM = P2_1;
 const int Pin_RESET = P2_2;
 const int Pin_BUSY = P2_0;
 const int Pin_EPD_CS = P2_6;
-const int Pin_FLASH_CS = P2_7;
+const int Pin_EPD_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
@@ -85,7 +85,7 @@ const int Pin_PWM = 5;
 const int Pin_RESET = 6;
 const int Pin_BUSY = 7;
 const int Pin_EPD_CS = 8;
-const int Pin_FLASH_CS = 9;
+const int Pin_EPD_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
 
@@ -132,7 +132,7 @@ void setup() {
 	pinMode(Pin_DISCHARGE, OUTPUT);
 	pinMode(Pin_BORDER, OUTPUT);
 	pinMode(Pin_EPD_CS, OUTPUT);
-	pinMode(Pin_FLASH_CS, OUTPUT);
+	pinMode(Pin_EPD_FLASH_CS, OUTPUT);
 
 	digitalWrite(Pin_RED_LED, LOW);
 #if EPD_PWM_REQUIRED
@@ -143,7 +143,7 @@ void setup() {
 	digitalWrite(Pin_DISCHARGE, LOW);
 	digitalWrite(Pin_BORDER, LOW);
 	digitalWrite(Pin_EPD_CS, LOW);
-	digitalWrite(Pin_FLASH_CS, HIGH);
+	digitalWrite(Pin_EPD_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
 #if defined(__AVR__)
@@ -159,11 +159,11 @@ void setup() {
 	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
 	Serial.println();
 
-	FLASH.begin(Pin_FLASH_CS);
-	if (FLASH.available()) {
-		Serial.println("FLASH chip detected OK");
+	EPD_FLASH.begin(Pin_EPD_FLASH_CS);
+	if (EPD_FLASH.available()) {
+		Serial.println("EPD FLASH chip detected OK");
 	} else {
-		Serial.println("unsupported FLASH chip");
+		Serial.println("unsupported EPD FLASH chip");
 	}
 
 	// configure temperature sensor

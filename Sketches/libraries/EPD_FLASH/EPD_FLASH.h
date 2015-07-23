@@ -19,19 +19,19 @@
 
 
 // maximum bytes that can be written by one write command
-#define FLASH_PAGE_SIZE 128
+#define EPD_FLASH_PAGE_SIZE 128
 
-// to shift sector number (0..FLASH_SECTOR_COUNT) to an address for erase
-#define FLASH_SECTOR_SHIFT 12
+// to shift sector number (0..EPD_FLASH_SECTOR_COUNT) to an address for erase
+#define EPD_FLASH_SECTOR_SHIFT 12
 
 // erase size is one sector
-#define FLASH_SECTOR_SIZE 4096
+#define EPD_FLASH_SECTOR_SIZE 4096
 
 // total available sectors
-#define FLASH_SECTOR_COUNT 256
+#define EPD_FLASH_SECTOR_COUNT 256
 
 
-class FLASH_Class {
+class EPD_FLASH_Class {
 private:
 	uint8_t CS;
 
@@ -39,7 +39,7 @@ private:
 	void spi_teardown(void);
 	bool is_busy(void);
 	void wait_for_ready(void);
-	FLASH_Class(const FLASH_Class &f);  // prevent copy
+	EPD_FLASH_Class(const EPD_FLASH_Class &f);  // prevent copy
 
 public:
 	bool available(void);
@@ -67,10 +67,10 @@ public:
 	void begin(uint8_t chip_select_pin);
 	void end(void);
 
-	FLASH_Class(uint8_t chip_select_pin);
+	EPD_FLASH_Class(uint8_t chip_select_pin);
 
 };
 
-extern FLASH_Class FLASH;
+extern EPD_FLASH_Class EPD_FLASH;
 
 #endif

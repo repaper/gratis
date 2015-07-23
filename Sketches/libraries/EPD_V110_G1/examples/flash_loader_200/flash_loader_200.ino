@@ -14,7 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-03-27 05:59:59 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-07-23 02:50:18 UTC *****
 
 
 // Simple demo with two functions:
@@ -30,7 +30,7 @@
 
 // required libraries
 #include <SPI.h>
-#include <FLASH.h>
+#include <EPD_FLASH.h>
 #include <EPD_V110_G1.h>
 #define SCREEN_SIZE 200
 #include <EPD_PANELS.h>
@@ -47,7 +47,7 @@
 #define FLASH_SECTOR 0
 
 // if the display list is defined it will take priority over the flashing
-// (and FLASH code is disbled)
+// (and FLASH code is disabled)
 // define a list of {sector, milliseconds}
 // #define DISPLAY_LIST {0, 5000}, {1, 5000}
 
@@ -100,7 +100,7 @@ const int Pin_PWM = P2_1;
 const int Pin_RESET = P2_2;
 const int Pin_BUSY = P2_0;
 const int Pin_EPD_CS = P2_6;
-const int Pin_FLASH_CS = P2_7;
+const int Pin_EPD_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
@@ -117,7 +117,7 @@ const int Pin_PWM = 5;
 const int Pin_RESET = 6;
 const int Pin_BUSY = 7;
 const int Pin_EPD_CS = 8;
-const int Pin_FLASH_CS = 9;
+const int Pin_EPD_FLASH_CS = 9;
 const int Pin_SW2 = 12;
 const int Pin_RED_LED = 13;
 
@@ -169,7 +169,7 @@ void setup() {
 	pinMode(Pin_DISCHARGE, OUTPUT);
 	pinMode(Pin_BORDER, OUTPUT);
 	pinMode(Pin_EPD_CS, OUTPUT);
-	pinMode(Pin_FLASH_CS, OUTPUT);
+	pinMode(Pin_EPD_FLASH_CS, OUTPUT);
 
 	digitalWrite(Pin_RED_LED, LOW);
 #if EPD_PWM_REQUIRED
@@ -180,7 +180,7 @@ void setup() {
 	digitalWrite(Pin_DISCHARGE, LOW);
 	digitalWrite(Pin_BORDER, LOW);
 	digitalWrite(Pin_EPD_CS, LOW);
-	digitalWrite(Pin_FLASH_CS, HIGH);
+	digitalWrite(Pin_EPD_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
 #if defined(__AVR__)
@@ -196,7 +196,7 @@ void setup() {
 	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
 	Serial.println();
 
-	FLASH.begin(Pin_FLASH_CS);
+	EPD_FLASH.begin(Pin_EPD_FLASH_CS);
 	flash_info();
 
 	// configure temperature sensor
@@ -314,14 +314,14 @@ static void flash_info(void) {
 	uint8_t maufacturer;
 	uint16_t device;
 
-	if (FLASH.available()) {
-		Serial.println("FLASH chip detected OK");
+	if (EPD_FLASH.available()) {
+		Serial.println("EPD FLASH chip detected OK");
 	} else {
-		Serial.println("unsupported FLASH chip");
+		Serial.println("unsupported EPD FLASH chip");
 	}
 
-	FLASH.info(&maufacturer, &device);
-	Serial.print("FLASH: manufacturer = 0x");
+	EPD_FLASH.info(&maufacturer, &device);
+	Serial.print("EPD_FLASH: manufacturer = 0x");
 	Serial.print(maufacturer, HEX);
 	Serial.print("  device = 0x");
 	Serial.print(device, HEX);
@@ -331,7 +331,7 @@ static void flash_info(void) {
 
 // EPD display callback for reading the FLASH
 static void flash_read(void *buffer, uint32_t address, uint16_t length) {
-	FLASH.read(buffer, address, length);
+	EPD_FLASH.read(buffer, address, length);
 }
 
 #if !defined(DISPLAY_LIST)
@@ -344,28 +344,28 @@ static void flash_program(uint16_t sector, PROGMEM const void *buffer, uint16_t 
 	Serial.print("  total bytes: ");
 	Serial.println(length, DEC);
 
-	uint32_t address = (uint32_t)(sector) << FLASH_SECTOR_SHIFT;
+	uint32_t address = (uint32_t)(sector) << EPD_FLASH_SECTOR_SHIFT;
 
 	// erase required sectors
-	for (unsigned int i = 0; i < length; i += FLASH_SECTOR_SIZE, address += FLASH_SECTOR_SIZE) {
+	for (unsigned int i = 0; i < length; i += EPD_FLASH_SECTOR_SIZE, address += EPD_FLASH_SECTOR_SIZE) {
 		Serial.print("FLASH: erase = 0x");
 		Serial.println(address, HEX);
-		FLASH.write_enable();
-		FLASH.sector_erase(address);
+		EPD_FLASH.write_enable();
+		EPD_FLASH.sector_erase(address);
 	}
 
-	// writable pages are FLASH_PAGE_SIZE bytes
+	// writable pages are EPD_FLASH_PAGE_SIZE bytes
 	PROGMEM const uint8_t *p = (PROGMEM const uint8_t *)buffer;
-	for (address = (uint32_t)(sector) << FLASH_SECTOR_SHIFT; length >= FLASH_PAGE_SIZE;
-	     length -= FLASH_PAGE_SIZE, address += FLASH_PAGE_SIZE, p += FLASH_PAGE_SIZE) {
+	for (address = (uint32_t)(sector) << EPD_FLASH_SECTOR_SHIFT; length >= EPD_FLASH_PAGE_SIZE;
+	     length -= EPD_FLASH_PAGE_SIZE, address += EPD_FLASH_PAGE_SIZE, p += EPD_FLASH_PAGE_SIZE) {
 		Serial.print("FLASH: write @ 0x");
 		Serial.print(address, HEX);
 		Serial.print("  from: 0x");
 		Serial.print((uint32_t)p, HEX);
 		Serial.print("  bytes: 0x");
-		Serial.println(FLASH_PAGE_SIZE, HEX);
-		FLASH.write_enable();
-		FLASH.write_from_progmem(address, p, FLASH_PAGE_SIZE);
+		Serial.println(EPD_FLASH_PAGE_SIZE, HEX);
+		EPD_FLASH.write_enable();
+		EPD_FLASH.write_from_progmem(address, p, EPD_FLASH_PAGE_SIZE);
 	}
 	// write any remaining partial page
 	if (length > 0) {
@@ -375,11 +375,11 @@ static void flash_program(uint16_t sector, PROGMEM const void *buffer, uint16_t 
 		Serial.print((uint32_t)p, HEX);
 		Serial.print("  bytes: 0x");
 		Serial.println(length, HEX);
-		FLASH.write_enable();
-		FLASH.write_from_progmem(address, p, length);
+		EPD_FLASH.write_enable();
+		EPD_FLASH.write_from_progmem(address, p, length);
 	}
 
 	// turn off write - just to be safe
-	FLASH.write_disable();
+	EPD_FLASH.write_disable();
 }
 #endif

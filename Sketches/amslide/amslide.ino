@@ -26,7 +26,7 @@
 // Operation from reset:
 // * display version
 // * display compiled-in display setting
-// * display FLASH detected or not
+// * display EPD FLASH detected or not
 // * display temperature (displayed before every image is changed)
 // * clear screen
 // * delay 5 seconds
@@ -40,10 +40,9 @@
 
 #include <SPI.h>
 #include <SD.h>
-#include <FLASH.h>
+#include <EPD_FLASH.h>
 #include <EPD_V110_G1.h>
 #include <S5813A.h>
-#include <FLASH.h>
 
 
 // Change this for different display size
@@ -67,7 +66,7 @@ const int Pin_PWM = P2_1;
 const int Pin_RESET = P2_2;
 const int Pin_BUSY = P2_0;
 const int Pin_EPD_CS = P2_6;
-const int Pin_FLASH_CS = P2_7;
+const int Pin_EPD_FLASH_CS = P2_7;
 const int Pin_SW2 = P1_3;
 const int Pin_RED_LED = P1_0;
 
@@ -82,7 +81,7 @@ const int Pin_PWM = 5;
 const int Pin_RESET = 6;
 const int Pin_BUSY = 7;
 const int Pin_EPD_CS = 8;
-const int Pin_FLASH_CS = 9;
+const int Pin_EPD_FLASH_CS = 9;
 const int Pin_SD_CS = 10;
 
 #endif
@@ -215,7 +214,7 @@ void setup() {
 	pinMode(Pin_DISCHARGE, OUTPUT);
 	pinMode(Pin_BORDER, OUTPUT);
 	pinMode(Pin_EPD_CS, OUTPUT);
-	pinMode(Pin_FLASH_CS, OUTPUT);
+	pinMode(Pin_EPD_FLASH_CS, OUTPUT);
 
 	digitalWrite(Pin_PWM, LOW);
 	digitalWrite(Pin_RESET, LOW);
@@ -223,7 +222,7 @@ void setup() {
 	digitalWrite(Pin_DISCHARGE, LOW);
 	digitalWrite(Pin_BORDER, LOW);
 	digitalWrite(Pin_EPD_CS, LOW);
-	digitalWrite(Pin_FLASH_CS, HIGH);
+	digitalWrite(Pin_EPD_FLASH_CS, HIGH);
 
 #if !defined(__MSP430_CPU__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
@@ -236,11 +235,11 @@ void setup() {
 	Serial.println("Display: " MAKE_STRING(EPD_SIZE));
 	Serial.println();
 
-	FLASH.begin(Pin_FLASH_CS);
-	if (FLASH.available()) {
-		Serial.println("FLASH chip detected OK");
+	EPD_FLASH.begin(Pin_EPD_FLASH_CS);
+	if (EPD_FLASH.available()) {
+		Serial.println("EPD FLASH chip detected OK");
 	} else {
-		Serial.println("unsupported FLASH chip");
+		Serial.println("unsupported EPD FLASH chip");
 	}
 
 	// configure temperature sensor
