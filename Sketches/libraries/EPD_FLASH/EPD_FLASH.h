@@ -13,7 +13,8 @@
 // governing permissions and limitations under the License.
 
 // Updated 2015-08-01 by Rei Vilo
-// Changed CS for EPD_FLASH_CS to avoid conflicts with Energia
+// . Added #include Energia
+// . Changed CS for EPD_FLASH_CS to avoid conflicts with Energia
 
 #if !defined(EPD_FLASH_H)
 #define EPD_FLASH_H 1
