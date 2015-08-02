@@ -60,7 +60,7 @@ enum {
 EPD_FLASH_Class EPD_FLASH(9);
 
 
-EPD_FLASH_Class::EPD_FLASH_Class(uint8_t chip_select_pin) : CS(chip_select_pin) {
+EPD_FLASH_Class::EPD_FLASH_Class(uint8_t chip_select_pin) : EPD_FLASH_CS(chip_select_pin) {
 }
 
 
@@ -68,7 +68,7 @@ EPD_FLASH_Class::EPD_FLASH_Class(uint8_t chip_select_pin) : CS(chip_select_pin) 
 void EPD_FLASH_Class::begin(uint8_t chip_select_pin) {
 	digitalWrite(chip_select_pin, HIGH);
 	pinMode(chip_select_pin, OUTPUT);
-	this->CS = chip_select_pin;
+	this->EPD_FLASH_CS = chip_select_pin;
 }
 
 
@@ -78,7 +78,7 @@ void EPD_FLASH_Class::end(void) {
 // configure the SPI for EPD_FLASH access
 void EPD_FLASH_Class::spi_setup(void) {
 	SPI.begin();
-	digitalWrite(this->CS, HIGH);
+	digitalWrite(this->EPD_FLASH_CS, HIGH);
 
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE3);
@@ -95,7 +95,7 @@ void EPD_FLASH_Class::spi_setup(void) {
 // shutdown SPI after EPD_FLASH access
 void EPD_FLASH_Class::spi_teardown(void) {
 	Delay_us(10);
-	digitalWrite(this->CS, HIGH);
+	digitalWrite(this->EPD_FLASH_CS, HIGH);
 	SPI.transfer(EPD_FLASH_NOP); // flush the SPI buffer
 	SPI.end();
 }
@@ -114,11 +114,11 @@ bool EPD_FLASH_Class::available(void) {
 void EPD_FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(1500);                     // FLASH wake up delay
-	digitalWrite(this->CS, HIGH);
+	digitalWrite(this->EPD_FLASH_CS, HIGH);
 	Delay_us(50);
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_RDID);
 	*maufacturer = SPI.transfer(EPD_FLASH_NOP);
@@ -132,7 +132,7 @@ void EPD_FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
 void EPD_FLASH_Class::read(void *buffer, uint32_t address, uint16_t length) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_FAST_READ);
 	SPI.transfer(address >> 16);
@@ -153,11 +153,11 @@ void EPD_FLASH_Class::wait_for_ready(void) {
 }
 
 bool EPD_FLASH_Class::is_busy(void) {
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_RDSR);
 	bool busy = 0 != (EPD_FLASH_WIP & SPI.transfer(EPD_FLASH_NOP));
-	digitalWrite(this->CS, HIGH);
+	digitalWrite(this->EPD_FLASH_CS, HIGH);
 	SPI.transfer(EPD_FLASH_NOP);
 	Delay_us(10);
 	return busy;
@@ -167,7 +167,7 @@ bool EPD_FLASH_Class::is_busy(void) {
 void EPD_FLASH_Class::write_enable(void) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_WREN);
 	this->spi_teardown();
@@ -178,7 +178,7 @@ void EPD_FLASH_Class::write_enable(void) {
 void EPD_FLASH_Class::write_disable(void) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_WRDI);
 	this->spi_teardown();
@@ -188,7 +188,7 @@ void EPD_FLASH_Class::write_disable(void) {
 void EPD_FLASH_Class::write(uint32_t address, const void *buffer, uint16_t length) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_PP);
 	SPI.transfer(address >> 16);
@@ -205,7 +205,7 @@ void EPD_FLASH_Class::write(uint32_t address, const void *buffer, uint16_t lengt
 void EPD_FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *buffer, uint16_t length) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_PP);
 	SPI.transfer(address >> 16);
@@ -223,7 +223,7 @@ void EPD_FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *b
 void EPD_FLASH_Class::sector_erase(uint32_t address) {
 	this->wait_for_ready();
 
-	digitalWrite(this->CS, LOW);
+	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
 	SPI.transfer(EPD_FLASH_SE);
 	SPI.transfer(address >> 16);
