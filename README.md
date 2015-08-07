@@ -1,5 +1,15 @@
 # gratis
 
+Updated 2015-08-01 by Rei Vilo
+
+* Added `#include Energia.h`
+* For Energia, changed pin names to pin numbers (pin names are deprecated)
+* Works on MSP430F5529, LM4F120, TM4C123
+* Fails on MSP432 and CC3200
+* [Recognize the FPL material type by the rear labels](http://www.pervasivedisplays.com/products/label_info)
+* Use branch [rei-vilo / gratis / CC3200 and MSP432](https://github.com/rei-vilo/gratis/tree/CC3200-and-MSP432)
+
+
 ## Sketches
 
 These are example programs that will compile and run on the following platforms
