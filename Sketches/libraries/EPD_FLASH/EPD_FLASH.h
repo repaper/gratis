@@ -12,10 +12,17 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Updated 2015-08-01 by Rei Vilo
+// Changed CS for EPD_FLASH_CS to avoid conflicts with Energia
+
 #if !defined(EPD_FLASH_H)
 #define EPD_FLASH_H 1
 
-#include <Arduino.h>
+#if defined(ENERGIA)
+#   include "Energia.h"
+#else
+#   include <Arduino.h>
+#endif
 
 
 // maximum bytes that can be written by one write command
@@ -33,7 +40,7 @@
 
 class EPD_FLASH_Class {
 private:
-	uint8_t CS;
+	uint8_t EPD_FLASH_CS;
 
 	void spi_setup(void);
 	void spi_teardown(void);
