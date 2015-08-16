@@ -3,8 +3,8 @@
 PREFIX ?= /usr
 
 PLATFORM ?= ../RasberryPi
-PANEL_VERSION ?= v231_g2
-EPD_IO ?= epd_io.h
+PANEL_VERSION ?= V231_G2
+EPD_IO ?= epd_io_free_uart.h
 
 FUSE_CFLAGS := $(shell pkg-config fuse --cflags)
 FUSE_LDFLAGS := $(shell pkg-config fuse --libs)
@@ -16,7 +16,7 @@ ifeq (,$(strip ${EPD_DIR}))
 $(error unsupported PANEL_VERSION=${PANEL_VERSION})
 endif
 
-# set up toolchaion options
+# set up toolchain options
 CFLAGS += ${FUSE_CFLAGS}
 CFLAGS += -Wall -Werror -std=gnu99
 CFLAGS += -I${PLATFORM}
@@ -35,7 +35,7 @@ IS_ARCH := $(if $(findstring ARCH,${UNAME_r}),YES,NO)
 VPATH = .:${PLATFORM}:${EPD_DIR}
 
 .PHONY: all
-all: gpio_test epd_test epd_fuse
+all: gpio_test epd_test epd_fuse epd_test_screen
 
 EPD_FUSE_CONF = ${PLATFORM}/epd-fuse.conf
 EPD_FUSE_SH = ${PLATFORM}/epd-fuse.sh
@@ -104,6 +104,7 @@ DRIVER_OBJECTS = gpio.o spi.o epd.o
 GPIO_OBJECTS = gpio_test.o gpio.o
 FUSE_OBJECTS = epd_fuse.o ${DRIVER_OBJECTS}
 TEST_OBJECTS = epd_test.o ${DRIVER_OBJECTS}
+SCREEN_OBJECTS = epd_test_screen.o ${DRIVER_OBJECTS}
 
 # build the fuse driver
 CLEAN_FILES += epd-fuse
@@ -122,9 +123,16 @@ epd_test: ${TEST_OBJECTS}
 	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${TEST_OBJECTS}
 
 
+# build EPD test screen program
+CLEAN_FILES += epd_test_screen
+epd_test_screen: ${SCREEN_OBJECTS}
+	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${SCREEN_OBJECTS}
+
+
 # dependencies
 gpio_test.o: gpio_test.h gpio.h
 epd_test.o: gpio.h ${EPD_IO} spi.h epd.h
+epd_test_screen.o: gpio.h ${EPD_IO} spi.h epd.h
 epd_fuse.o: gpio.h ${EPD_IO} spi.h epd.h
 
 gpio.o: gpio.h
