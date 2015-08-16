@@ -1,4 +1,15 @@
 # gratis
+Added by Neil Matthews for Percheron Electronics Ltd 2015-08-16
+
+For the E-paper Hat with the Raspberry Pi, everything you need is in
+PlatformWithOS and its subdirectories. The Makefile in the PlatformWithOS 
+folder has already been edited to use the correct panel type and epd_io configuration.
+The epd-fuse.default file in driver common has also been suitably edited.
+In driver-common there are test programs in C which you can compile from the 
+PlatformWithOS directory by typing make rpi. You can then run sudo driver-common/epd_test 2.7 
+which should scroll through a sequence of seven images at ~2 second intervals.
+Then type sudo make rpi-install to install and configure the fuse driver.
+
 
 Updated 2015-08-01 by Rei Vilo
 
