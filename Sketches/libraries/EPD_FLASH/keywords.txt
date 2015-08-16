@@ -1,12 +1,12 @@
 #######################################
-# Syntax Coloring Map FLASH
+# Syntax Coloring Map EPD_FLASH
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-FLASH	KEYWORD1
+EPD_FLASH	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -26,4 +26,4 @@ sector_erase	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
-#FLASH_	LITERAL1
+#EPD_FLASH_	LITERAL1
