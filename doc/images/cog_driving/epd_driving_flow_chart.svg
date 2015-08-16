@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- 由 Microsoft Visio 11.0, SVG Export, v1.0 產生 EPD Driving Flow Chart.svg 頁-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="2.03308in" height="7.48305in"
+		viewBox="0 0 146.382 538.779" xml:space="preserve" color-interpolation-filters="sRGB" class="st10">
+	<v:documentProperties v:langID="1028" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.24}
+		.st2 {fill:#000000;font-family:Verdana;font-size:0.833336em}
+		.st3 {fill:#000000;font-family:Verdana;font-size:0.833336em;font-weight:bold}
+		.st4 {font-size:1em;font-weight:normal}
+		.st5 {font-size:1em}
+		.st6 {marker-end:url(#mrkr4-50);stroke:#4677bf;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.2}
+		.st7 {fill:#4677bf;fill-opacity:1;stroke:#4677bf;stroke-opacity:1;stroke-width:0.32258064516129}
+		.st8 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st9 {fill:#000000;font-family:Verdana;font-size:0.666664em}
+		.st10 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-50" class="st7" v:arrowType="4" v:arrowSize="2" v:setback="6.2" refX="-6.2" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.1,-3.1) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>頁-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="流程圖" v:index="0"/>
+		<v:layer v:name="連接器" v:index="1"/>
+		<g id="shape1-1" v:mID="1" v:groupContext="shape" v:layerMember="0" transform="translate(48.9539,-510.193)">
+			<title>終端子</title>
+			<desc>Start</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="40.4949" cy="524.606" width="80.99" height="28.3465"/>
+			<path d="M14.17 538.78 L66.82 538.78 A14.1732 14.1732 -180 0 0 66.82 510.43 L14.17 510.43 A14.1732 14.1732 -180 1 0 14.17
+						 538.78 Z" class="st1"/>
+			<text x="28" y="527.61" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Start</text>		</g>
+		<g id="shape2-4" v:mID="2" v:groupContext="shape" v:layerMember="0" transform="translate(32.7559,-436.492)">
+			<title>程序</title>
+			<desc>Section 2 Write Image to the memory</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="517.52" width="113.39" height="42.5197"/>
+			<rect x="0" y="496.26" width="113.386" height="42.5197" class="st1"/>
+			<text x="30.63" y="508.52" class="st3" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 2<v:newlineChar/><tspan
+						x="8.84" dy="1.2em" class="st4">Write </tspan><tspan class="st4" v:langID="1028">Image </tspan><tspan
+						class="st4">to the </tspan><tspan x="35.86" dy="1.2em" class="st4" v:langID="1028">memory</tspan></text>		</g>
+		<g id="shape5-11" v:mID="5" v:groupContext="shape" v:layerMember="0" transform="translate(32.7559,-280.87)">
+			<title>程序.7</title>
+			<desc>Section 4 Initialize COG Driver</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="514.827" width="113.39" height="47.9058"/>
+			<rect x="0" y="490.874" width="113.386" height="47.9058" class="st1"/>
+			<text x="30.63" y="505.83" class="st3" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 4<v:newlineChar/><tspan
+						x="35.36" dy="1.2em" class="st4" v:langID="1028">Initialize <v:newlineChar/></tspan><tspan x="28.2"
+						dy="1.2em" class="st4" v:langID="1028">COG Driver</tspan></text>		</g>
+		<g id="shape6-16" v:mID="6" v:groupContext="shape" v:layerMember="0" transform="translate(32.7559,-198.807)">
+			<title>程序.8</title>
+			<desc>Section 5 Write Data from the memory to the EPD</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="513.409" width="113.39" height="50.7404"/>
+			<rect x="0" y="488.039" width="113.386" height="50.7404" class="st1"/>
+			<text x="30.63" y="504.41" class="st3" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 5<v:newlineChar/><tspan
+						x="6.29" dy="1.2em" class="st4">Write Data from the </tspan><tspan x="7.44" dy="1.2em" class="st4"
+						v:langID="1028">memory</tspan><tspan class="st4"> </tspan><tspan class="st4">to the EPD</tspan></text>		</g>
+		<g id="shape7-23" v:mID="7" v:groupContext="shape" v:layerMember="0" transform="translate(48.9539,-122.271)">
+			<title>決策</title>
+			<desc>Update Complete?</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="40.4949" cy="510.575" width="67.5" height="42.3073"/>
+			<path d="M0 510.57 L40.49 482.37 L80.99 510.57 L40.49 538.78 L0 510.57 Z" class="st1"/>
+			<text x="22.65" y="507.57" class="st2" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Update <tspan
+						x="13.96" dy="1.2em" class="st5">Complete</tspan><tspan class="st5" v:langID="1028">?</tspan></text>		</g>
+		<g id="shape15-28" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(32.7559,-357.405)">
+			<title>程序.4</title>
+			<desc>Section 3 Power On COG Driver</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="516.244" width="113.39" height="45.0711"/>
+			<rect x="0" y="493.708" width="113.386" height="45.0711" class="st1"/>
+			<text x="30.63" y="507.24" class="st3" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 3<v:newlineChar/><tspan
+						x="32.58" dy="1.2em" class="st4" v:langID="1028">Power </tspan><tspan class="st4">O</tspan><tspan
+						class="st4" v:langID="1028">n<v:newlineChar/></tspan><tspan x="28.2" dy="1.2em" class="st4" v:langID="1028">COG Driver</tspan></text>		</g>
+		<g id="shape17-35" v:mID="17" v:groupContext="shape" v:layerMember="0" transform="translate(32.7559,-52.6809)">
+			<title>程序.14</title>
+			<desc>Section 6 Power Off COG Driver</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="56.6929" cy="517.52" width="113.39" height="42.5197"/>
+			<rect x="0" y="496.26" width="113.386" height="42.5197" class="st1"/>
+			<text x="30.63" y="508.52" class="st3" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>Section 6<v:newlineChar/><tspan
+						x="32.23" dy="1.2em" class="st4" v:langID="1028">Power </tspan><tspan class="st4">O</tspan><tspan
+						class="st4" v:langID="1028">ff<v:newlineChar/></tspan><tspan x="28.2" dy="1.2em" class="st4"
+						v:langID="1028">COG Driver</tspan></text>		</g>
+		<g id="shape21-42" v:mID="21" v:groupContext="shape" v:layerMember="0" transform="translate(48.9539,-0.24)">
+			<title>終端子.20</title>
+			<desc>End</desc>
+			<v:custProps>
+				<v:cp v:nameU="Cost" v:lbl="成本" v:type="7" v:format="@" v:langID="1028"/>
+				<v:cp v:nameU="Duration" v:lbl="期間" v:type="2" v:langID="1028"/>
+				<v:cp v:nameU="Resources" v:lbl="資源" v:langID="1028"/>
+			</v:custProps>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(2,2,2,2)" v:tabSpace="42.5197"/>
+			<v:textRect cx="40.4949" cy="524.606" width="80.99" height="28.3465"/>
+			<path d="M14.17 538.78 L66.82 538.78 A14.1732 14.1732 -180 0 0 66.82 510.43 L14.17 510.43 A14.1732 14.1732 -180 1 0 14.17
+						 538.78 Z" class="st1"/>
+			<text x="31.05" y="527.61" class="st2" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>End</text>		</g>
+		<g id="shape19-45" v:mID="19" v:groupContext="shape" v:layerMember="1" transform="translate(96.5354,-510.193)">
+			<title>動態連接器.19</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M-7.09 538.78 L-7.09 562.52" class="st6"/>
+		</g>
+		<g id="shape3-51" v:mID="3" v:groupContext="shape" v:layerMember="1" transform="translate(82.3622,-436.492)">
+			<title>動態連接器.3</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 538.78 L7.09 565.36" class="st6"/>
+		</g>
+		<g id="shape4-56" v:mID="4" v:groupContext="shape" v:layerMember="1" transform="translate(82.3622,-357.405)">
+			<title>動態連接器.4</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 538.78 L7.09 559.97" class="st6"/>
+		</g>
+		<g id="shape9-61" v:mID="9" v:groupContext="shape" v:layerMember="1" transform="translate(82.3622,-280.87)">
+			<title>動態連接器.9</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 538.78 L7.09 562.66" class="st6"/>
+		</g>
+		<g id="shape10-66" v:mID="10" v:groupContext="shape" v:layerMember="1" transform="translate(82.3622,-198.807)">
+			<title>動態連接器.10</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 538.78 L7.09 551.47" class="st6"/>
+		</g>
+		<g id="shape11-71" v:mID="11" v:groupContext="shape" v:layerMember="1" transform="translate(96.5354,-122.271)">
+			<title>動態連接器.11</title>
+			<desc>Yes</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-7.08661" cy="552.315" width="40" height="17.6036"/>
+			<path d="M-7.09 538.78 L-7.09 558.41" class="st6"/>
+			<rect v:rectContext="textBkgnd" x="-14.0143" y="547.515" width="13.8554" height="9.59985" class="st8"/>
+			<text x="-14.01" y="554.72" class="st9" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>Yes</text>		</g>
+		<g id="shape8-78" v:mID="8" v:groupContext="shape" v:layerMember="1" transform="translate(48.9539,-150.476)">
+			<title>動態連接器.8</title>
+			<desc>No</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-28.9539" cy="510.028" width="40" height="17.6036"/>
+			<path d="M0 538.78 L-28.95 538.78 L-28.95 465.08 L-23.64 465.08" class="st6"/>
+			<rect v:rectContext="textBkgnd" x="-34.3737" y="505.228" width="10.8397" height="9.59985" class="st8"/>
+			<text x="-34.37" y="512.43" class="st9" v:langID="1028"><v:paragraph v:horizAlign="1"/><v:tabList/>No</text>		</g>
+		<g id="shape12-85" v:mID="12" v:groupContext="shape" v:layerMember="1" transform="translate(82.3622,-52.6809)">
+			<title>Dynamic connector.12</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(11):26"/>
+			</v:userDefs>
+			<path d="M7.09 538.78 L7.09 555.43" class="st6"/>
+		</g>
+	</g>
+</svg>

@@ -1,0 +1,71 @@
+---
+# setup for the vagrant user
+
+- name: Add the dialout access for USB serial
+  user: name=vagrant append=yes groups=dialout
+  sudo: true
+
+- name: Create dot files
+  copy: >-
+    src="files/dot{{ item }}"
+    dest="./{{ item }}"
+    mode=0644
+  with_items:
+    - .mg
+    - .zshrc
+
+- name: Make a local directories
+  file: >-
+    path="./{{ item }}"
+    mode="0755"
+    state=directory
+  with_items:
+    - bin
+    - Downloads
+
+- name: Install some scripts to local bin
+  copy: >-
+    src="files/{{ item.script }}"
+    dest="./bin/{{ item.name }}"
+    mode="0755"
+  with_items:
+    - {script: p9600.sh, name: p9600}
+
+# make sure the files/p9600.sh supports alternative names
+- name: Alternative symlinks for p9600
+  file: >-
+    src="p9600"
+    path="./bin/{{ item }}"
+    state=link
+    force=yes
+  with_items:
+    - p115200
+    - p1
+    - p96
+
+- name: Copy the Arduino packages to Downloads
+  copy: >-
+    src="/{{ lookup('env', 'HOME') }}/Downloads/{{ item }}"
+    dest="./Downloads/{{ item }}"
+    mode="0644"
+  with_items:
+    - arduino-{{ arduino_version }}-linux64.tar.xz
+
+- name: Extract the Arduino packages
+  command: >-
+    creates=./arduino-{{ arduino_version }}
+    tar xf "./Downloads/arduino-{{ arduino_version }}-linux64.tar.xz"
+
+- name: Link the Arduino sketches directory into repaper
+  file: >-
+    src="gratis/Sketches"
+    path="./Arduino"
+    state=link
+    force=yes
+
+- name: Link the arduino start script
+  file: >-
+    src="../arduino-{{ arduino_version }}/arduino"
+    path="./bin/arduino"
+    state=link
+    force=yes

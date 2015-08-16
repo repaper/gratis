@@ -1,0 +1,265 @@
+#!/usr/bin/env ruby
+# coding: utf-8
+
+# Copyright 2013-2015 Pervasive Displays, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at:
+#
+#   http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied.  See the License for the specific language
+# governing permissions and limitations under the License.
+
+# Ruby script to modify certain sketches to suit the various EPD
+# drivers and panel sizes and create example directories from them.
+
+# set default encoding before anything else
+UTF8 = Encoding.find 'UTF-8'
+Encoding.default_external = UTF8
+Encoding.default_internal = UTF8
+
+# import libraries
+require 'rubygems'
+require 'time'
+require 'pathname'
+require 'getoptlong'
+
+
+# list of all supported EPD drivers
+EPD_DRIVERS = [
+  {driver: 'EPD_V110_G1', panels: [144, 200, 270]},
+  {driver: 'EPD_V230_G2', panels: [144, 200, 270]},
+  {driver: 'EPD_V231_G2', panels: [144, 190, 200, 260, 270]}
+]
+
+# list of base sketches to edit to suit the driver version and add
+# to the individual driver's "examples" folder
+EPD_SKETCHES = [
+  {sketch: 'demo'},
+  {sketch: 'flash_loader'},
+  {sketch: 'command'},
+  {sketch: 'thermo'}
+]
+
+# regular expression to match customisations
+# e.g. {% DRIVER:name %}  →  EPD_V110_G1
+CUSTOM_REGEXP = /\{%[[:space:]]*([[:upper:]]+)[[:space:]]*:[[:space:]]*([[:alnum:]]+)[[:space:]]*%\}/
+
+
+# program version number
+VERSION = 1
+
+OPTIONS = GetoptLong::new(['--help',          '-h', GetoptLong::NO_ARGUMENT],
+                          ['--libraries',     '-l', GetoptLong::REQUIRED_ARGUMENT],
+                          ['--sketches',      '-s', GetoptLong::REQUIRED_ARGUMENT],
+                          ['--verbose',       '-v', GetoptLong::NO_ARGUMENT],
+                          ['--debug',         '-D', GetoptLong::NO_ARGUMENT])
+
+USAGE_MESSAGE = <<-EOF
+version: %d
+usage: make-example <options>
+       --help                 -h        This message
+       --verbose              -v        More messages
+       --libraries=DIR        -l DIR    Use a different libraries directory
+       --sketches=DIR         -s DIR    Use a different sketches directory
+EOF
+
+# class of exceptions for failure
+class MakeExamplesError < RuntimeError
+end
+
+# display usage and exit
+def usage message
+  puts "error: #{message}" unless nil == message
+  printf USAGE_MESSAGE, VERSION
+  exit 1
+end
+
+# display error and exit
+def error message
+  puts "error: #{message}" unless nil == message
+  exit 1
+end
+
+# system messages
+def system_message item, default
+  datetime = Time.now.utc.strftime '%F %T %Z'
+  case item
+  when 'notice'
+    'Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: ' + datetime + ' *****'
+  when 'datetime'
+    datetime
+  else
+    default
+  end
+end
+
+
+# if run from the command line
+if __FILE__ == $0 then
+
+  verbose = 0
+  libraries = 'libraries'
+  sketches = '.'
+  debug = false
+
+  OPTIONS.each do |opt, arg|
+
+    case opt
+    when '--help'
+      usage nil
+
+    when '--verbose'
+      verbose += 1
+
+    when '--libraries'
+      libraries = arg
+
+    when '--sketches'
+      sketches = arg
+
+    when '--debug'
+      debug = true
+
+    else
+      usage "unknown option #{opt}=#{arg}"
+    end
+  end
+
+  usage 'extraneous arguments' if ARGV.length != 0
+
+  libraries_path = Pathname.new libraries
+  usage "missing libraries directory: #{arg}" unless libraries_path.directory?
+
+  sketches_path = Pathname.new sketches
+  usage "missing sketches directory: #{arg}" unless sketches_path.directory?
+
+  # verify that all drivers exist and create their examples directory
+  EPD_DRIVERS.each do |driver|
+    driver_name = driver[:driver]
+
+    p = libraries_path.join driver_name
+    error "missing driver directory: #{p}" unless p.directory?
+
+    ex = p.join('examples')
+    if ex.exist? then
+      error "missing driver examples directory: #{ex}" unless ex.directory?
+    else
+      begin
+        ex.mkdir
+      rescue SystemCallError => e
+        error "unable to create driver examples directory: #{ex}  system error: e"
+      end
+    end
+
+    header = p.join(driver_name + '.h')
+    error "missing driver header: #{header}" unless header.file?
+
+    # save paths
+    driver[:path] = p
+    driver[:examples] = ex
+    driver[:header] = header
+  end
+
+  # verify that all sketches exist and contain the <name>.ino file
+  EPD_SKETCHES.each do |sketch|
+    sketch_name = sketch[:sketch]
+
+    p = sketches_path.join(sketch_name)
+    error "missing sketch directory: #{p}" unless p.directory?
+
+    ino = p.join(sketch_name + '.ino')
+    error "missing sketch file: #{ino}" unless ino.file?
+
+    # read all file
+    contents = ino.readlines
+    error "empty sketch file: #{ino}" unless contents.length > 0
+
+    # save paths and file contents
+    sketch[:path] = p
+    sketch[:ino] = ino
+    sketch[:contents] = contents
+  end
+
+  # create examples
+  EPD_DRIVERS.each do |driver|
+    driver_name = driver[:driver]
+
+    driver[:panels].each do |panel_size|
+
+      EPD_SKETCHES.each do |sketch|
+        sketch_name = sketch[:sketch] + '_' + panel_size.to_s
+
+        print "processing: #{driver_name}  panel: #{panel_size}  sketch: #{sketch_name}\n" if verbose >= 1
+
+        sketch_path = driver[:examples].join sketch_name
+        print "  directory: #{sketch_path}\n" if verbose >= 3
+
+        unless sketch_path.exist? then
+          begin
+            sketch_path.mkdir
+          rescue SystemCallError => e
+            error "unable to create example directory: #{sketch_path}  system error: #{e}"
+          end
+        end
+
+        sketch_file = sketch_path.join(sketch_name + '.ino')
+        print "  file: #{sketch_file}\n" if verbose >= 2
+
+        # remove old example file
+        begin
+          sketch_file.unlink if sketch_file.exist?
+        rescue SystemCallError => e
+          error "unable to erase sketch file: #{sketch_file}  system error: #{e}"
+        end
+
+        # create a new one
+        sketch_file.open 'w' do |f|
+
+          sketch[:contents].each do |line|
+
+            new_line = line.gsub CUSTOM_REGEXP do |match|
+
+              section, item = $1, $2
+
+              case section
+
+              when 'SYSTEM'
+                system_message item, match
+
+              when 'PANEL'
+                case item
+                when 'size'
+                  panel_size.to_s
+                else
+                  match
+                end
+
+              when 'DRIVER'
+                case item
+                when 'name'
+                  driver_name
+                when 'header'
+                  driver_name + '.h'
+                else
+                  match
+                end
+
+              else
+                match
+              end
+            end
+
+            f.write new_line
+
+          end
+        end
+      end
+    end
+  end
+end
