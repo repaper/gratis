@@ -66,10 +66,11 @@
 // 2.7" test images
 #include "aphrodite_2_7.xbm"
 #include "cat_2_7.xbm"
+#include "venus_2_7.xbm"
 #include "saturn_2_7.xbm"
 #include "text_hello_2_7.xbm"
 #include "text_image_2_7.xbm"
-#include "venus_2_7.xbm"
+#include "percheron_2_7.xbm"
 
 
 static const uint8_t *images_1_44[] = {
@@ -115,10 +116,11 @@ static const uint8_t *images_2_6[] = {
 static const uint8_t *images_2_7[] = {
 	aphrodite_2_7_bits,
 	cat_2_7_bits,
+	venus_2_7_bits,
 	saturn_2_7_bits,
 	text_hello_2_7_bits,
 	text_image_2_7_bits,
-	venus_2_7_bits
+	percheron_2_7_bits
 };
 
 
