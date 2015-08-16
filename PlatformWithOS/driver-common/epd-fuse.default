@@ -2,6 +2,6 @@
 # /etc/init.d/epd-fuse
 
 # Options to pass to epd_fuse
-#EPD_MOUNTPOINT=/dev/epd
-#EPD_SIZE=2.0
-#EPD_OPTS='-o allow_other -o default_permissions'
+EPD_MOUNTPOINT=/dev/epd
+EPD_SIZE=2.7
+EPD_OPTS='-o allow_other -o default_permissions'
