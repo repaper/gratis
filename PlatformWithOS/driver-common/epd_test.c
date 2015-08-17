@@ -148,7 +148,7 @@ static void usage(const char *program_name, const char *message, ...) {
 	       "| 2.6 "
 #endif
 	       "| 2.7 "
-	       "]\n", program_name);
+	       "] [image-count]\n", program_name);
 	exit(1);
 }
 
@@ -161,9 +161,9 @@ int main(int argc, char *argv[]) {
 	int image_count = SIZE_OF_ARRAY(images_1_44);
 
 	if (argc < 2) {
-		usage(argv[0], "missing argument");
-	} else if (argc > 2) {
-		usage(argv[0], "extraneous extra arguments");
+		usage(argv[0], "missing argument(s)");
+	} else if (argc > 3) {
+		usage(argv[0], "extraneous extra argument(s)");
 	}
 
 	if (0 == strcmp("1.44", argv[1]) || 0 == strcmp("1_44", argv[1])) {
@@ -192,6 +192,16 @@ int main(int argc, char *argv[]) {
 		image_count = SIZE_OF_ARRAY(images_2_7);
 	} else {
 		usage(argv[0], "unknown display size: %s", argv[1]);
+	}
+
+	if (argc > 2) {
+		int n = atoi(argv[2]);
+		if (n < 0) {
+			usage(argv[0], "image-count cannot be negative");
+		} else if (n > image_count) {
+			usage(argv[0], "image-count: %d, cannot be greater than: %d", n, image_count);
+		}
+		image_count = n;
 	}
 
 	if (!GPIO_setup()) {
@@ -239,24 +249,26 @@ int main(int argc, char *argv[]) {
 	EPD_clear(epd);
 	EPD_end(epd);
 
-	printf("images start\n");
-	for (int i = 0; i < image_count; ++i) {
-		printf("image = %d\n", i);
-		EPD_begin(epd);
+	if (image_count > 0) {
+		printf("images start\n");
+		for (int i = 0; i < image_count; ++i) {
+			printf("image = %d\n", i);
+			EPD_begin(epd);
 #if EPD_IMAGE_TWO_ARG
-		if (0 == i) {
-			EPD_image_0(epd, images[i]);
-		} else {
-			EPD_image(epd, images[i - 1], images[i]);
-		}
+			if (0 == i) {
+				EPD_image_0(epd, images[i]);
+			} else {
+				EPD_image(epd, images[i - 1], images[i]);
+			}
 #elif EPD_IMAGE_ONE_ARG
-		EPD_image(epd, images[i]);
+			EPD_image(epd, images[i]);
 #else
 #error "unsupported EPD_image() function"
 #endif
-		EPD_end(epd);
-		if (i < image_count - 1) {
-			sleep(5);
+			EPD_end(epd);
+			if (i < image_count - 1) {
+				sleep(5);
+			}
 		}
 	}
 

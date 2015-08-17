@@ -98,18 +98,17 @@ int main(int argc, char *argv[]) {
 		scan_leds();
 		for (int i = 0; i < 1024; ++i) {
 			GPIO_pwm_write(LED_PWM_PIN, i);
-			usleep(1000);
+			usleep(500);
 		}
-		scan_leds();
 		for (int i = 1023; i >= 0; --i) {
 			GPIO_pwm_write(LED_PWM_PIN, i);
-			usleep(1000);
+			usleep(500);
 		}
 	}
 
 #else
 	// simple non-pwm test
-	for (int i = 0; i < 200; ++i) {
+	for (int i = 0; i < 50; ++i) {
 		scan_leds();
 		usleep(200000);
 	}
