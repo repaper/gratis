@@ -61,6 +61,7 @@
 #include "text_hello_2_6.xbm"
 #include "text_image_2_6.xbm"
 #include "venus_2_6.xbm"
+#include "percheron_2_6.xbm"
 #endif
 
 // 2.7" test images
@@ -103,7 +104,8 @@ static const uint8_t *images_2_6[] = {
 	saturn_2_6_bits,
 	text_hello_2_6_bits,
 	text_image_2_6_bits,
-	venus_2_6_bits
+	venus_2_6_bits,
+	percheron_2_6_bits	
 };
 #endif
 
@@ -126,7 +128,7 @@ static void usage(const char *program_name, const char *message, ...) {
 		va_end(ap);
 	}
 	if (NULL != program_name) {
-		program_name = "epd_test";
+		program_name = "epd_test_screen";
 	}
 
 	printf("usage: %s [ 1.44 "

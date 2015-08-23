@@ -15,6 +15,7 @@
 
 import sys
 import os
+import subprocess
 import Image
 import ImageDraw
 import ImageFont
@@ -63,7 +64,7 @@ elif (now.month in [3, 4, 8]):
         DATE_X = 15
 else: 
 	DATE_FONT_SIZE  = 32
-	DATE_X = 20
+	DATE_X = 24
 
 DATE_Y=50
 
@@ -128,7 +129,8 @@ def get_temp():
 #	results = bus.read_i2c_block_data(addr_temp,0)
 #	Temp = results[0] << 8 | results[1]
 #	Temp = Temp >> 5
-	Temp = 200
+	output = subprocess.check_output(["cat", "/dev/epd/temperature"])
+	Temp = int(output)*10
 	Temp = float(Temp/10)
 	return Temp
 
