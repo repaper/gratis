@@ -33,9 +33,9 @@ private:
 	static const int pixel_height = EPD_PIXEL_HEIGHT;
 
 #if EPD_IMAGE_TWO_ARG
-	uint8_t old_image[pixel_width * pixel_height / 8];
+	uint8_t old_image[(uint32_t)(pixel_width) * (uint32_t)(pixel_height) / 8];
 #endif
-	uint8_t new_image[pixel_width * pixel_height / 8];
+	uint8_t new_image[(uint32_t)(pixel_width) * (uint32_t)(pixel_height) / 8];
 
 	EPD_GFX(EPD_Class&);  // disable copy constructor
 
