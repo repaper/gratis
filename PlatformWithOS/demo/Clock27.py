@@ -57,8 +57,8 @@ CLOCK_FONT_SIZE = 80
 # date
 
 if (now.month in [1, 2,  9, 10, 11, 12]):
-	DATE_FONT_SIZE  = 26
-	DATE_X = 5
+	DATE_FONT_SIZE  = 25
+	DATE_X = 6
 elif (now.month in [3, 4, 8]):
 	DATE_FONT_SIZE  = 28
         DATE_X = 15
