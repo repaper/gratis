@@ -20,59 +20,107 @@
 #include <unistd.h>
 #include <err.h>
 
+#include "epd.h"
 #include "gpio.h"
 
 // the platform specific I/O pins
-#include "gpio_test.h"
+#include EPD_IO
 
-#define ENABLE_PWM 1
+
+// use redefine the EPD pins as LEDs
+#define LED_1_PIN    reset_pin
+#define LED_2_PIN    discharge_pin
+#define LED_3_PIN    panel_on_pin
+#define LED_4_PIN    border_pin
+
+#define LED_PWM_PIN  pwm_pin
+
+
+
+void scan_leds(void) {
+	static int state = 0;
+	switch (state) {
+	default:
+		state = 0;
+	case 0:
+		GPIO_write(LED_1_PIN, 1);
+		GPIO_write(LED_2_PIN, 0);
+		GPIO_write(LED_3_PIN, 0);
+		GPIO_write(LED_4_PIN, 0);
+		break;
+	case 1:
+		GPIO_write(LED_1_PIN, 0);
+		GPIO_write(LED_2_PIN, 1);
+		GPIO_write(LED_3_PIN, 0);
+		GPIO_write(LED_4_PIN, 0);
+		break;
+	case 2:
+		GPIO_write(LED_1_PIN, 0);
+		GPIO_write(LED_2_PIN, 0);
+		GPIO_write(LED_3_PIN, 1);
+		GPIO_write(LED_4_PIN, 0);
+		break;
+	case 3:
+		GPIO_write(LED_1_PIN, 0);
+		GPIO_write(LED_2_PIN, 0);
+		GPIO_write(LED_3_PIN, 0);
+		GPIO_write(LED_4_PIN, 1);
+		break;
+	}
+	++state;
+}
 
 
 int main(int argc, char *argv[]) {
-
-	int i = 0;
-	int j = 0;
 
 	if (!GPIO_setup()) {
 		err(1, "GPIO_setup failed");
 	}
 
-	GPIO_mode(LED_BLUE, GPIO_OUTPUT);
-	GPIO_mode(LED_WHITE, GPIO_OUTPUT);
-	GPIO_mode(LED_PWM, GPIO_PWM);
+	GPIO_mode(LED_1_PIN, GPIO_OUTPUT);
+	GPIO_mode(LED_2_PIN, GPIO_OUTPUT);
+	GPIO_mode(LED_3_PIN, GPIO_OUTPUT);
+	GPIO_mode(LED_4_PIN, GPIO_OUTPUT);
+	GPIO_mode(LED_PWM_PIN, GPIO_PWM);
 
-#if ENABLE_PWM
+	GPIO_write(LED_1_PIN, 0);
+	GPIO_write(LED_2_PIN, 0);
+	GPIO_write(LED_3_PIN, 0);
+	GPIO_write(LED_4_PIN, 0);
+
+	GPIO_pwm_write(LED_PWM_PIN, 0);
+
+	usleep(200000);
+
+#if EPD_PWM_REQUIRED
 	// test with pwm
-	for (j = 0; j < 20; ++j) {
-		GPIO_write(LED_WHITE, 1);
-		for (i = 0; i < 1024; ++i) {
-			GPIO_pwm_write(LED_PWM, i);
-			usleep(1000);
+	for (int j = 0; j < 20; ++j) {
+		scan_leds();
+		for (int i = 0; i < 1024; ++i) {
+			GPIO_pwm_write(LED_PWM_PIN, i);
+			usleep(500);
 		}
-		GPIO_write(LED_WHITE, 0);
-		GPIO_write(LED_BLUE, 1);
-		for (i = 1023; i >= 0; --i) {
-			GPIO_pwm_write(LED_PWM, i);
-			usleep(1000);
+		for (int i = 1023; i >= 0; --i) {
+			GPIO_pwm_write(LED_PWM_PIN, i);
+			usleep(500);
 		}
-		GPIO_write(LED_BLUE, 0);
 	}
 
 #else
 	// simple non-pwm test
-	for (i = 0; i < 200; ++i) {
-		GPIO_write(LED_WHITE, 1);
-		GPIO_write(LED_BLUE, 0);
-		usleep(200000);
-		GPIO_write(LED_BLUE, 1);
-		GPIO_write(LED_WHITE, 0);
+	for (int i = 0; i < 50; ++i) {
+		scan_leds();
 		usleep(200000);
 	}
 #endif
 
-	GPIO_pwm_write(LED_PWM, 0);
-	GPIO_write(LED_BLUE, 0);
-	GPIO_write(LED_WHITE, 0);
+	GPIO_pwm_write(LED_PWM_PIN, 0);
+
+	GPIO_write(LED_1_PIN, 0);
+	GPIO_write(LED_2_PIN, 0);
+	GPIO_write(LED_3_PIN, 0);
+	GPIO_write(LED_4_PIN, 0);
+
 	GPIO_teardown();
 	return 0;
 }

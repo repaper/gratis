@@ -32,7 +32,9 @@ RM = rm -f
 UNAME_r := $(shell uname -r)
 IS_ARCH := $(if $(findstring ARCH,${UNAME_r}),YES,NO)
 
-VPATH = .:${PLATFORM}:${EPD_DIR}
+LINUX_MAJOR_VERSION := $(shell uname -r |cut -d '.' -f 1)
+
+VPATH = .:${PLATFORM}/linux-${LINUX_MAJOR_VERSION}:${PLATFORM}:${EPD_DIR}
 
 .PHONY: all
 all: gpio_test epd_test epd_fuse epd_test_screen
@@ -130,7 +132,7 @@ epd_test_screen: ${SCREEN_OBJECTS}
 
 
 # dependencies
-gpio_test.o: gpio_test.h gpio.h
+gpio_test.o: gpio.h ${EPD_IO}
 epd_test.o: gpio.h ${EPD_IO} spi.h epd.h
 epd_test_screen.o: gpio.h ${EPD_IO} spi.h epd.h
 epd_fuse.o: gpio.h ${EPD_IO} spi.h epd.h
