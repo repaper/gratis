@@ -39,9 +39,9 @@
 
 
 #if defined(ENERGIA)
-#   include "Energia.h"
+#include <Energia.h>
 #else
-#   include <Arduino.h>
+#include <Arduino.h>
 #endif
 
 #include <inttypes.h>
@@ -126,14 +126,14 @@ const int Pin_EPD_FLASH_CS  = 18; // P3_0 = MSP432, P2_2 = F5529, MSP430 = P2_7;
 const int Pin_SW2           = PUSH2; // PUSH2 = MSP432, PUSH2 = F5529, MSP430 = PUSH2;
 const int Pin_RED_LED       = RED_LED; // RED_LED = MSP432, RED_LED = F5529, MSP430 = RED_LED;
 
-#   if defined(__MSP430G2553__)
+#if defined(__MSP430G2553__)
 // MSP430G2553 LaunchPad IO layout
 
 #if EPD_PWM_REQUIRED
 const int Pin_PWM           = 9; // P6_5 = MSP432, P4_2_PWM = F5529, MSP430 = P2_1;
 #endif
 
-#   elif defined(__MSP430F5529__)
+#elif defined(__MSP430F5529__)
 
 // __MSP430F5529__
 // MSP430F5529 LaunchPad IO layout
@@ -149,19 +149,19 @@ const int Pin_PWM           = 9; // P6_5 = MSP432, P4_2_PWM = F5529, MSP430 = P2
 const int Pin_PWM           = P4_2_PWM; // = F5529, MSP430 = P2_1;
 #endif
 
-#   elif defined(__LM4F120H5QR__)
+#elif defined(__LM4F120H5QR__)
 
 #if EPD_PWM_REQUIRED
 const int Pin_PWM           = 9; // P6_5 = MSP432, P4_2_PWM = F5529, MSP430 = P2_1;
 #endif
 
-#   elif defined(__CC3200R1M1RGC__)
+#elif defined(__CC3200R1M1RGC__)
 
 #if EPD_PWM_REQUIRED
 const int Pin_PWM           = 9; // P6_5 = MSP432, P4_2_PWM = F5529, MSP430 = P2_1;
 #endif
 
-#   elif defined(__MSP432P401R__)
+#elif defined(__MSP432P401R__)
 // MSP432P401R LaunchPad IO layout
 // Pin_PWM requires a dedicated timer task
 //
@@ -169,9 +169,9 @@ const int Pin_PWM           = 9; // P6_5 = MSP432, P4_2_PWM = F5529, MSP430 = P2
 #error No PWM on pin 9 for MSP432
 #endif
 
-#   else
-#       error LaunchPad for Energia not supported
-#   endif
+#else
+#error LaunchPad for Energia not supported
+#endif
 
 #else
 
@@ -213,8 +213,7 @@ EPD_Class EPD(EPD_SIZE,
 
 
 // I/O setup
-void setup()
-{
+void setup() {
 	pinMode(Pin_RED_LED, OUTPUT);
 	pinMode(Pin_SW2, INPUT);
 	pinMode(Pin_TEMPERATURE, INPUT);
@@ -241,33 +240,31 @@ void setup()
 	digitalWrite(Pin_EPD_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
-    delay(500);
-    
+	delay(500);
+
 #if defined(__AVR__)
 	// wait for USB CDC serial port to connect.  Arduino Leonardo only
-    while (!Serial);
+	while (!Serial) {
+	}
 	delay(20);  // allows terminal time to sync
 #endif
-    
+
 	Serial.println();
 	Serial.println();
 	Serial.println("Demo version: " DEMO_VERSION);
 	Serial.println("Display size: " MAKE_STRING(EPD_SIZE));
 	Serial.println("Film: V" MAKE_STRING(EPD_FILM_VERSION));
 	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
-    Serial.println();
-    
-    Serial.println("Image 1: " IMAGE_1_FILE);
-    Serial.println("Image 2: " IMAGE_2_FILE);
+	Serial.println();
+
+	Serial.println("Image 1: " IMAGE_1_FILE);
+	Serial.println("Image 2: " IMAGE_2_FILE);
 	Serial.println();
 
 	EPD_FLASH.begin(Pin_EPD_FLASH_CS);
-    if (EPD_FLASH.available())
-    {
+	if (EPD_FLASH.available()) {
 		Serial.println("EPD FLASH chip detected OK");
-    }
-    else
-    {
+	} else {
 		uint8_t maufacturer;
 		uint16_t device;
 		EPD_FLASH.info(&maufacturer, &device);
@@ -287,19 +284,17 @@ static int state = 0;
 
 
 // main loop
-void loop()
-{
+void loop() {
 	int temperature = S5813A.read();
 	Serial.print("Temperature = ");
-    Serial.print(temperature, DEC);
-    Serial.println(" Celsius");
+	Serial.print(temperature, DEC);
+	Serial.println(" Celsius");
 
 	EPD.begin(); // power up the EPD panel
 	EPD.setFactor(temperature); // adjust for current temperature
 
 	int delay_counts = 50;
-    switch(state)
-    {
+	switch(state) {
 	default:
 	case 0:         // clear the screen
 		EPD.clear();
@@ -343,8 +338,7 @@ void loop()
 	EPD.end();   // power down the EPD panel
 
 	// flash LED for 5 seconds
-    for (int x = 0; x < delay_counts; ++x)
-    {
+	for (int x = 0; x < delay_counts; ++x) {
 		digitalWrite(Pin_RED_LED, LED_ON);
 		delay(50);
 		digitalWrite(Pin_RED_LED, LED_OFF);

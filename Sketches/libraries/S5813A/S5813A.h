@@ -20,13 +20,12 @@
 #define EPD_S5813A_H 1
 
 #if defined(ENERGIA)
-#   include "Energia.h"
+#include <Energia.h>
 #else
-#   include <Arduino.h>
+#include <Arduino.h>
 #endif
 
-// TODO: Why is begin allowed to change the temperature pin(?)
-// Except for that could make temperature_pin a const
+
 class S5813A_Class {
 private:
 	uint8_t temperature_pin;
@@ -40,6 +39,7 @@ public:
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
+	// allow external program to configure actual analog pin to use
 	void begin(uint8_t input_pin);
 	void end(void);
 

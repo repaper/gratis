@@ -16,7 +16,11 @@
 // . Added #include Energia
 // . Changed uV to mV to avoid overflows
 
-//#include <Arduino.h>
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
+#include <Arduino.h>
+#endif
 
 #include "S5813A.h"
 
@@ -147,8 +151,7 @@ void S5813A_Class::end(void) {
 // return sensor output voltage in uV
 // not the ADC value, but the value that should be measured on the
 // sensor output pin
-long S5813A_Class::readVoltage(void)
-{
+long S5813A_Class::readVoltage(void) {
 	long vADC = analogRead(this->temperature_pin);
 /*
     Serial.print("analogRead=");
@@ -161,8 +164,7 @@ long S5813A_Class::readVoltage(void)
 
 
 // return temperature as integer in Celsius
-int S5813A_Class::read(void)
-{
+int S5813A_Class::read(void) {
     long vADC = this->readVoltage();
     int result = Tstart_C + (1.0 * vADC - Vstart_mV) / Vslope_mV;
 /*

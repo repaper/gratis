@@ -16,7 +16,11 @@
 // . Added #include Energia
 // . Changed CS for EPD_FLASH_CS to avoid conflicts with Energia
 
-//#include <Arduino.h>
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
+#include <Arduino.h>
+#endif
 
 #include <SPI.h>
 

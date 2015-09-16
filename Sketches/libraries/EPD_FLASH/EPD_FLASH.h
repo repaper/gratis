@@ -20,9 +20,9 @@
 #define EPD_FLASH_H 1
 
 #if defined(ENERGIA)
-#   include "Energia.h"
+#include <Energia.h>
 #else
-#   include <Arduino.h>
+#include <Arduino.h>
 #endif
 
 
