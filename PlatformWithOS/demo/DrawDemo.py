@@ -1,4 +1,4 @@
-# Copyright 2013-2015 Pervasive Displays, Inc.
+# Copyright 2013 Pervasive Displays, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
 
 import sys
 from PIL import Image
-from PIL import ImageDraw
+from PIL import ImageDraw, ImageFont
 from EPD import EPD
+from time import sleep
+
 
 WHITE = 1
 BLACK = 0
+font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSansBoldOblique.ttf", 36)
 
 def main(argv):
     """main program - draw and display a test image"""
 
     epd = EPD()
 
-    print('panel = {p:s} {w:d} x {h:d}  version={v:s} COG={g:d} FILM={f:d}'.format(p=epd.panel, w=epd.width, h=epd.height, v=epd.version, g=epd.cog, f=epd.film))
+    print('panel = {p:s} {w:d} x {h:d}  version={v:s} COG={g:d}'.format(p=epd.panel, w=epd.width, h=epd.height, v=epd.version, g=epd.cog))
 
     epd.clear()
 
@@ -49,18 +52,21 @@ def demo(epd):
 
     # lines
     draw.line([(10,20),(100,20)], fill=BLACK)
+    draw.line([(10,21),(100,21)], fill=BLACK)
     draw.line([(10,90),(100,60)], fill=BLACK)
+    draw.line([(10,91),(100,61)], fill=BLACK)
 
-    # filled circle, elipse
+    # filled circle, ellipse
     draw.ellipse((120, 10, 150, 40), fill=BLACK, outline=BLACK)
-    draw.ellipse((120, 60, 170, 90), fill=WHITE, outline=BLACK)
+    draw.ellipse((120, 50, 230, 110), fill=WHITE, outline=BLACK)
 
     # text
-    draw.text((30, 30), 'hello world', fill=BLACK)
+    draw.text((20, 120), 'Hello world!', font=font, fill=BLACK)
 
     # display image on the panel
     epd.display(image)
     epd.update()
+    sleep(3)	
 
 
 # main
