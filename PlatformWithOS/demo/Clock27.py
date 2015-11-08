@@ -29,6 +29,7 @@ addr_temp = 0x49
 
 WHITE = 1
 BLACK = 0
+FULL = False # Flag to indicate full, not partial, update at midnight rollover.
 
 # fonts are in different places on Raspbian/Angstrom so search
 possible_fonts = [
@@ -56,17 +57,20 @@ CLOCK_FONT_SIZE = 80
 
 # date
 
-if (now.month in [1, 2,  9, 11, 12]):
+if (now.month in [1, 10, 11]): # February, November, December
 	DATE_FONT_SIZE  = 25
-	DATE_X = 6
-elif (now.month in [10]):
+	DATE_X = 10
+elif (now.month in [8]): # September
+        DATE_FONT_SIZE  = 24
+        DATE_X = 10
+elif (now.month in [0, 9]): # January, October
 	DATE_FONT_SIZE  = 26
 	DATE_X = 10
-elif (now.month in [3, 4, 8]):
+elif (now.month in [2, 3, 7]): # March, April, August
 	DATE_FONT_SIZE  = 28
         DATE_X = 15
-else: 
-	DATE_FONT_SIZE  = 32
+else: # May, June, July
+	DATE_FONT_SIZE  = 32 
 	DATE_X = 24
 
 DATE_Y=50
@@ -86,7 +90,7 @@ elif (now.weekday() in [3, 5]): # Thursday, Saturday
 	WEEKDAY_X = 30
 
 else:
-	WEEKDAY_FONT_SIZE  = 48 # The rest
+	WEEKDAY_FONT_SIZE  = 48 # Monday, Friday, Sunday
 	WEEKDAY_X = 45
 
 WEEKDAY_Y = 3
@@ -155,7 +159,7 @@ def main(argv):
 
 
 def demo(epd):
-    """simple partial update demo - draw draw a clock"""
+    """simple partial update demo - draw a clock"""
 
     # initially set all white background
     image = Image.new('1', epd.size, WHITE)
@@ -181,9 +185,10 @@ def demo(epd):
             if now.second == 0 or first_start:
                 first_start = False
                 break
-            time.sleep(0.5)
+            time.sleep(0.2) # What is this for?
 
         if now.day != previous_day:
+            FULL = True		
             draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
             draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
             draw.text((WEEKDAY_X, WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
@@ -209,8 +214,9 @@ def demo(epd):
         # display image on the panel
 #	epd.clear()
         epd.display(image)
-        if now.day != previous_day:
+        if FULL == True:
 		epd.update()
+                FULL = False 
 	else:
 		epd.partial_update()
 
