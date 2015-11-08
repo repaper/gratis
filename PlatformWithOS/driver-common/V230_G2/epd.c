@@ -154,7 +154,7 @@ EPD_type *EPD_create(EPD_size size,
 
 	EPD_set_temperature(epd, 25);
 
-	// display size dependant items
+	// display size dependent items
 	{
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xff, 0x00};
 		epd->channel_select = cs;
@@ -456,21 +456,21 @@ void EPD_set_temperature(EPD_type *epd, int temperature) {
 	// stage3: repeat, step, block
 
 	static const compensation_type compensation_144[3] = {
-		{ 2, 6, 42,   4, 392, 392,   2, 6, 42 },  //  0 ... 10 Celcius
-		{ 4, 2, 16,   4, 155, 155,   4, 2, 16 },  // 10 ... 40 Celcius
-		{ 4, 2, 16,   4, 155, 155,   4, 2, 16 }   // 40 ... 50 Celcius
+		{ 2, 6, 42,   4, 392, 392,   2, 6, 42 },  //  0 ... 10 Celsius
+		{ 4, 2, 16,   4, 155, 155,   4, 2, 16 },  // 10 ... 40 Celsius
+		{ 4, 2, 16,   4, 155, 155,   4, 2, 16 }   // 40 ... 50 Celsius
 	};
 
 	static const compensation_type compensation_200[3] = {
-		{ 2, 6, 42,   4, 392, 392,   2, 6, 42 },  //  0 ... 10 Celcius
-		{ 2, 2, 48,   4, 196, 196,   2, 2, 48 },  // 10 ... 40 Celcius
-		{ 4, 2, 48,   4, 196, 196,   4, 2, 48 }   // 40 ... 50 Celcius
+		{ 2, 6, 42,   4, 392, 392,   2, 6, 42 },  //  0 ... 10 Celsius
+		{ 2, 2, 48,   4, 196, 196,   2, 2, 48 },  // 10 ... 40 Celsius
+		{ 4, 2, 48,   4, 196, 196,   4, 2, 48 }   // 40 ... 50 Celsius
 	};
 
 	static const compensation_type compensation_270[3] = {
-		{ 2, 8, 64,   4, 392, 392,   2, 8, 64 },  //  0 ... 10 Celcius
-		{ 2, 4, 32,   4, 196, 196,   2, 4, 32 },  // 10 ... 40 Celcius
-		{ 4, 8, 64,   4, 196, 196,   4, 8, 64 }   // 40 ... 50 Celcius
+		{ 2, 8, 64,   4, 392, 392,   2, 8, 64 },  //  0 ... 10 Celsius
+		{ 2, 4, 32,   4, 196, 196,   2, 4, 32 },  // 10 ... 40 Celsius
+		{ 4, 8, 64,   4, 196, 196,   4, 8, 64 }   // 40 ... 50 Celsius
 	};
 
 	if (temperature < 10) {
