@@ -165,7 +165,7 @@ static struct {
 #define GPIO_VALUE      SYS_CLASS_GPIO "/value"
 
 // GPIO edge / direction
-// states wer in old system - not needed?
+// states were in old system - not needed?
 //#define STATE_rxDisable_pullNone "rxDisable_pullNone"
 //#define STATE_rxEnable_pullNone  "rxEnable_pullNone"
 //#define STATE_rxDisable_pullUp   "rxDisable_pullUp"
@@ -249,13 +249,13 @@ bool GPIO_setup() {
 		return true;
 	}
 
-	// shudown anything that was created
+	// shutdown anything that was created
 	GPIO_teardown();
 	return false;
 }
 
 
-/// revoke access to GPIO and PWM
+// revoke access to GPIO and PWM
 bool GPIO_teardown() {
 
 	// finalise SPI multiplexor
@@ -380,7 +380,7 @@ void GPIO_write(GPIO_pin_type pin, int value) {
 }
 
 
-// only affetct PWM if correct pin is addressed
+// only affect PWM if correct pin is addressed
 void GPIO_pwm_write(int pin, uint32_t value) {
 	if (value > 1023) {
 		value = 1023;
@@ -420,7 +420,7 @@ static bool load_firmware(const char *pin_name) {
 	read(fd, buffer, sizeof(buffer) - 1);  // allow one nul at end
 
 #if defined(CAPE_IIO)
-	// IO multiplexing
+	// I/O multiplexing
 	LOAD_CAPE_FIRMWARE_FILE(CAPE_IIO)
 #endif
 
@@ -557,7 +557,7 @@ static bool GPIO_enable(int pin) {
 	// open a file handle to the value - to speed
 	// up access assumes most read/write go to
 	// this as other items (like direction) are
-	// only changed oocaisionally.
+	// only changed occasionally.
 	char *f = make_formatted_buffer(GPIO_VALUE, pin);
 	gpio_info[pin].fd = open(f, O_RDWR | O_EXCL);
 	free(f);

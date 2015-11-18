@@ -5,7 +5,7 @@ requires Python Imaging Library (PIL)
 If the number does not have a checksum digit (i.e. a 12 digit value)
 it is added automatically to make the code 13 digits long.
 
-Originally downloaded From:
+Originally downloaded from:
 
   http://code.activestate.com/recipes/426069-ean-bar-code-image-generator/
 

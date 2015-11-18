@@ -99,7 +99,7 @@ static void run_command(const char c);
 // ==============
 
 static int display_access(const char *path, int mode) {
-	return 0;  // every thing allowed!
+	return 0;  // everything allowed!
 }
 
 

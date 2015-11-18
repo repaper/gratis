@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at:
 #
-#   http:#www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
@@ -93,7 +93,7 @@ def main(argv):
     listener = StreamMonitor(epd, image, draw, name_font, message_font)
     stream = tweepy.Stream(auth, listener)
     setTerms = argv
-    # stream.sample()   # low bandwith public stream
+    # stream.sample()   # low bandwidth public stream
     stream.filter(track=setTerms)
 
 
@@ -137,12 +137,12 @@ class StreamMonitor(tweepy.StreamListener):
     def on_error(self, error):
         print("error = {e:d}".format(e=error))
         time.sleep(5)
-        # contine reading stream even after error
+        # continue reading stream even after error
         return True
 
     def on_timeout(self):
         print("timeout occurred")
-        # contine reading stream even after timeout
+        # continue reading stream even after timeout
         return True
 
 

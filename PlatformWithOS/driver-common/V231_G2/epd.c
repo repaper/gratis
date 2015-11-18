@@ -151,7 +151,7 @@ EPD_type *EPD_create(EPD_size size,
 	epd->pre_border_byte = false;
 	epd->border_byte = EPD_BORDER_BYTE_ZERO;
 
-	// display size dependant items
+	// display size dependent items
 	{
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xff, 0x00};
 		epd->channel_select = cs;
@@ -516,7 +516,7 @@ void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *n
 // internal functions
 // ==================
 
-// convert a temperature in Celcius to
+// convert a temperature in Celsius to
 // the scale factor for frame_*_repeat methods
 static int temperature_to_factor_10x(int temperature) {
 	if (temperature <= -10) {
