@@ -29,6 +29,8 @@ possible_fonts = [
     '/usr/share/fonts/truetype/freefont/FreeMono.ttf',                # R.Pi
     '/usr/share/fonts/truetype/LiberationMono-Bold.ttf',              # B.B
     '/usr/share/fonts/truetype/DejaVuSansMono-Bold.ttf'               # B.B
+    '/usr/share/fonts/TTF/FreeMonoBold.ttf',                          # Arch
+    '/usr/share/fonts/TTF/DejaVuSans-Bold.ttf'                        # Arch
 ]
 
 
