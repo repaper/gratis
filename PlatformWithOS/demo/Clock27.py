@@ -57,16 +57,16 @@ CLOCK_FONT_SIZE = 80
 
 # date
 
-if (now.month in [1, 10, 11]): # February, November, December
+if (now.month in [2, 11, 12]): # February, November, December
 	DATE_FONT_SIZE  = 25
 	DATE_X = 10
-elif (now.month in [8]): # September
+elif (now.month in [9]): # September
         DATE_FONT_SIZE  = 24
         DATE_X = 10
-elif (now.month in [0, 9]): # January, October
+elif (now.month in [1, 10]): # January, October
 	DATE_FONT_SIZE  = 26
 	DATE_X = 10
-elif (now.month in [2, 3, 7]): # March, April, August
+elif (now.month in [3, 4, 8]): # March, April, August
 	DATE_FONT_SIZE  = 28
         DATE_X = 15
 else: # May, June, July
