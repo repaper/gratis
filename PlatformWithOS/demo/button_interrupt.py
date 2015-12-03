@@ -5,6 +5,7 @@
 import time # Want to sleep 
 import RPi.GPIO as GPIO # Use the python GPIO handler for RPi
 GPIO.setmode(GPIO.BCM) # Use the Broadcom GPIO pin designations
+GPIO.setwarnings(False)
 
 def my_callback(channel): # When a button is pressed, report which channel and flash led
     print("Falling edge detected on port %s" % channel)
