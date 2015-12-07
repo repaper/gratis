@@ -325,7 +325,8 @@ void EPD_begin(EPD_type *epd) {
 	int broken_panel = receive_buffer[1];
 	if (0x00 == (0x80 & broken_panel)) {
 		epd->status = EPD_PANEL_BROKEN;
-		power_off(epd);
+        printf("Panel broken\n");
+	power_off(epd);
 		return;
 	}
 
