@@ -71,9 +71,26 @@ static const struct panel_struct {
 	const int height;
 	const int byte_count;
 } panels[] = {
+#if EPD_1_44_SUPPORT
 	{"1.44", "EPD 1.44 128x96 COG " STR_CHIP " FILM " STR_FILM "\n", EPD_1_44, 128, 96, 128 * 98 / 8},
+#endif
+
+#if EPD_1_9_SUPPORT
+	{"1.9", "EPD 1.9 144x128 COG " STR_CHIP " FILM " STR_FILM "\n", EPD_1_9, 144, 128, 144 * 128 / 8},
+#endif
+
+#if EPD_2_0_SUPPORT
 	{"2.0", "EPD 2.0 200x96 COG " STR_CHIP " FILM " STR_FILM "\n", EPD_2_0, 200, 96, 200 * 96 / 8},
+#endif
+
+#if EPD_2_6_SUPPORT
+	{"2.6", "EPD 2.6 232x128 COG " STR_CHIP " FILM " STR_FILM "\n", EPD_2_6, 232, 128, 232 * 128 / 8},
+#endif
+
+#if EPD_2_7_SUPPORT
 	{"2.7", "EPD 2.7 264x176 COG " STR_CHIP " FILM " STR_FILM "\n", EPD_2_7, 264, 176, 264 * 176 / 8},
+#endif
+
 	{NULL, NULL, 0, 0, 0, 0}  // must be last entry
 };
 
