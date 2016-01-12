@@ -19,7 +19,7 @@
 // . Works on MSP430F5529, LM4F120, TM4C123
 // . Fails on MSP432 and CC3200
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-09-20 10:09:22 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2016-01-12 00:11:21 UTC *****
 
 
 // Simple demo to toggle EPD between two images.
@@ -160,10 +160,13 @@ void setup() {
 	delay(500);
 
 #if defined(__AVR__)
-	// wait for USB CDC serial port to connect.  Arduino Leonardo only
-	while (!Serial) {
-	}
-	delay(20);  // allows terminal time to sync
+	// // indefinite wait for USB CDC serial port to connect.  Arduino Leonardo only
+	// while (!Serial) {
+	// }
+	// additional delay for USB CDC serial port to connect.  Arduino Leonardo only
+	if (!Serial) {       // allows terminal time to sync as long
+		delay(500);  // as the serial monitor is opened before
+	}                    // upload
 #endif
 
 	Serial.println();

@@ -14,7 +14,7 @@
 // governing permissions and limitations under the License.
 
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-09-20 10:09:22 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2016-01-12 00:11:21 UTC *****
 
 
 // simple serial port driven command system to upload data to flash
@@ -112,9 +112,13 @@ void setup() {
 
 	Serial.begin(9600);
 #if defined(__AVR__)
-	// wait for USB CDC serial port to connect.  Arduino Leonardo only
+	// indefinite wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
+	// // additional delay for USB CDC serial port to connect.  Arduino Leonardo only
+	// if (!Serial) {       // allows terminal time to sync as long
+	// 	delay(500);  // as the serial monitor is opened before
+	// }                    // upload
 #endif
 	Serial.println();
 	Serial.println();

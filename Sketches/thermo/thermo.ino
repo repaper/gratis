@@ -115,9 +115,13 @@ void setup() {
 
 	Serial.begin(9600);
 #if defined(__AVR__)
-	// wait for USB CDC serial port to connect.  Arduino Leonardo only
-	while (!Serial) {
-	}
+	// // indefinite wait for USB CDC serial port to connect.  Arduino Leonardo only
+	// while (!Serial) {
+	// }
+	// additional delay for USB CDC serial port to connect.  Arduino Leonardo only
+	if (!Serial) {       // allows terminal time to sync as long
+		delay(500);  // as the serial monitor is opened before
+	}                    // upload
 #endif
 	Serial.println();
 	Serial.println();

@@ -18,11 +18,24 @@ These are example programs that will compile and run on the following platforms
 1. TI LaunchPad with M430G2553 using the [Energia](https://github.com/energia) IDE
 2. Arduino Leonardo using the [Arduino](http://arduino.cc) IDE
 
-Note:
-* Arduino with the embedded USB controller ('Un' suffix) will
-  wait for the serial monitor to be opened before doing any display.
-  This is because the serial port is emulated in the USB controller and there
-  is a wait loop before the first serial print.
+### Notes for Arduinos with the embedded USB controller
+
+* Arduinos with the embedded USB controller ('Un' suffix) do not have
+  a real serial port, it is emulated using firmware and uses the USB
+  interface.
+
+* Arduino Loenardo uses one of these chips.
+
+* The Command program needs the serial to accept commands so it will
+  wait indefinitely for the serial monitor to be opened before doing
+  any display. (the additional delay code is commented out)
+
+* The Demo, Flash Loader and Thermo programs do no need serial port to
+  accept commands, it is display only.  The additional delay is used
+  and the indefinite wait is commented out.  Therefore on a Leonardo
+  to see the initial messages open the serial monitor *before*
+  uploading.  If the serial monitor is not open these programs will
+  now automatically start.
 
 
 ## PlatformWithOS
