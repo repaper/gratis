@@ -66,7 +66,8 @@ installed.
 #### Raspberry Pi: Build and run using:
 
 ~~~~~
-sudo modprobe spi-bcm2708
+##sudo modprobe spi-bcm2708 ## deprecated SPI driver
+sudo modprobe spi-bcm2835
 make rpi-epd_test
 sudo ./driver-common/epd_test
 ~~~~~
