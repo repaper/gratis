@@ -1,4 +1,26 @@
 # gratis
+## Branch notes
+
+This branch implements a proper partial update following the algorithm outlined
+in the discussion of issue #13 on the repaper/gratis github repository.
+
+The original code in epd_fuse.c and V231G2/epd.c under PlatformWithOS did a full 4 cycle display update
+including COG power on and COG power down sequence.
+This resulted in the update taking more than 3 seconds with the display frist showing the updated image,
+then the original image followed finally by the updated image.
+This made things like a clock, counters and 'game of life' look very bad.
+
+Following changes as outlined in issue #13:
+* in epd_fuse.c run_command do not call EPD_end() at the end of the 'P' command (only if partial update is supported by the display)
+* in epd.c introduce COG_on status variable in EPD_struct.
+* in epd.c EPD_begin() return immediately when COG_on is true
+* in epd.C EPR_begin() set COG_on to true at the end of the function.
+* in epd.c EPD_end() set COG_on to false at the end of the function.
+* in epd.c EPD_partial_image() only call the last stage (EPD_normal).
+
+With these changes you can get a proper partial display update frequency < 1 Hz.
+
+## Original README below
 
 Updated 2015-08-01 by Rei Vilo
 
