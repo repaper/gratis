@@ -607,7 +607,11 @@ static void run_command(const char c) {
 #else
 #error "unsupported EPD_image() function"
 #endif
+
+#ifndef EPD_PARTIAL_AVAILABLE
+		// Do not switch off COG when doing a partial update.
 		EPD_end(epd);
+#endif
 
 		memcpy(current_buffer, display_buffer, sizeof(display_buffer));
 		break;

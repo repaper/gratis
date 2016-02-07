@@ -104,6 +104,8 @@ struct EPD_struct {
 
 	timer_t timer;
 	SPI_type *spi;
+
+	bool COG_on;
 };
 
 
@@ -249,6 +251,9 @@ EPD_type *EPD_create(EPD_size size,
 	// ensure I/O is all set to ZERO
 	power_off(epd);
 
+	// COG state for partial update
+	epd->COG_on = false;
+
 	return epd;
 }
 
@@ -273,6 +278,9 @@ EPD_error EPD_status(EPD_type *epd) {
 
 // starts an EPD sequence
 void EPD_begin(EPD_type *epd) {
+
+	// Nothing to do when COG still on
+	if (epd->COG_on) return;
 
 	// assume OK
 	epd->status = EPD_OK;
@@ -402,6 +410,8 @@ void EPD_begin(EPD_type *epd) {
 	// output enable to disable
 	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
 	SPI_send(epd->spi, CU8(0x72, 0x04), 2);
+
+	epd->COG_on = true;
 }
 
 
@@ -454,6 +464,8 @@ void EPD_end(EPD_type *epd) {
 	Delay_ms(50);
 
 	power_off(epd);
+
+	epd->COG_on = false;
 }
 
 
@@ -504,11 +516,8 @@ void EPD_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image
 
 // change from old image to new image
 void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image) {
-
-	frame_data_repeat(epd, old_image, new_image, EPD_compensate);
-	frame_data_repeat(epd, old_image, new_image, EPD_white);
-	frame_data_repeat(epd, new_image, old_image, EPD_inverse);
-	frame_data_repeat(epd, new_image, old_image, EPD_normal);
+	// Only need last stage for partial update
+	// See discussion on issue #13 in the repaper/gratis repository on github
 	frame_data_repeat(epd, new_image, old_image, EPD_normal);
 }
 
