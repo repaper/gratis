@@ -517,7 +517,7 @@ void EPD_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image
 // change from old image to new image
 void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *new_image) {
 	// Only need last stage for partial update
-	// See discussion on issue #13 in the repaper/gratis repository on github
+	// See discussion on issue #19 in the repaper/gratis repository on github
 	frame_data_repeat(epd, new_image, old_image, EPD_normal);
 }
 
