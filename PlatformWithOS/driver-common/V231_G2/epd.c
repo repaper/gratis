@@ -280,7 +280,9 @@ EPD_error EPD_status(EPD_type *epd) {
 void EPD_begin(EPD_type *epd) {
 
 	// Nothing to do when COG still on
-	if (epd->COG_on) return;
+	if (epd->COG_on) {
+		return;
+	}
 
 	// assume OK
 	epd->status = EPD_OK;
