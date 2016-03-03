@@ -12,13 +12,20 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Updated 2015-08-01 by Rei Vilo
+// . Added #include Energia
+// . Changed uV to mV to avoid overflows
+
 #if !defined(EPD_S5813A_H)
 #define EPD_S5813A_H 1
 
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
 #include <Arduino.h>
+#endif
 
-// TODO: Why is begin allowed to change the temperature pin(?)
-// Except for that could make temperature_pin a const
+
 class S5813A_Class {
 private:
 	uint8_t temperature_pin;
@@ -32,6 +39,7 @@ public:
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
+	// allow external program to configure actual analog pin to use
 	void begin(uint8_t input_pin);
 	void end(void);
 

@@ -13,8 +13,13 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Updated 2015-08-01 by Rei Vilo
+// . Added #include Energia
+// . For Energia, changed pin names to pin numbers (see comment below)
+// . Works on MSP430F5529, LM4F120, TM4C123
+// . Fails on MSP432 and CC3200
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-07-23 02:50:18 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2016-01-12 00:11:21 UTC *****
 
 
 // Simple demo to toggle EPD between two images.
@@ -33,7 +38,12 @@
 // * back to text display
 
 
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <inttypes.h>
 #include <ctype.h>
 
@@ -44,20 +54,21 @@
 #define SCREEN_SIZE 144
 #include <EPD_PANELS.h>
 #include <S5813A.h>
+#include <EPD_PINOUT.h>
 
 // select two images from:  text_image text-hello cat aphrodite venus saturn
 #define IMAGE_1  text_image
 #define IMAGE_2  cat
 
 // Error message for MSP430
-#if (SCREEN_SIZE == 270) && defined(__MSP430_CPU__)
+#if (SCREEN_SIZE == 270) && defined(__MSP430G2553__)
 #error MSP430: not enough memory
 #endif
 
 // no futher changed below this point
 
 // current version number
-#define DEMO_VERSION "4"
+#define DEMO_VERSION "5"
 
 
 // pre-processor convert to string
@@ -97,41 +108,6 @@ PROGMEM const
 #undef unsigned
 
 
-#if defined(__MSP430_CPU__)
-
-// TI LaunchPad IO layout
-const int Pin_TEMPERATURE = A4;
-const int Pin_PANEL_ON = P2_3;
-const int Pin_BORDER = P2_5;
-const int Pin_DISCHARGE = P2_4;
-#if EPD_PWM_REQUIRED
-const int Pin_PWM = P2_1;
-#endif
-const int Pin_RESET = P2_2;
-const int Pin_BUSY = P2_0;
-const int Pin_EPD_CS = P2_6;
-const int Pin_EPD_FLASH_CS = P2_7;
-const int Pin_SW2 = P1_3;
-const int Pin_RED_LED = P1_0;
-
-#else
-
-// Arduino IO layout
-const int Pin_TEMPERATURE = A0;
-const int Pin_PANEL_ON = 2;
-const int Pin_BORDER = 3;
-const int Pin_DISCHARGE = 4;
-#if EPD_PWM_REQUIRED
-const int Pin_PWM = 5;
-#endif
-const int Pin_RESET = 6;
-const int Pin_BUSY = 7;
-const int Pin_EPD_CS = 8;
-const int Pin_EPD_FLASH_CS = 9;
-const int Pin_SW2 = 12;
-const int Pin_RED_LED = 13;
-
-#endif
 
 
 // LED anode through resistor to I/O pin
@@ -181,19 +157,28 @@ void setup() {
 	digitalWrite(Pin_EPD_FLASH_CS, HIGH);
 
 	Serial.begin(9600);
+	delay(500);
+
 #if defined(__AVR__)
-	// wait for USB CDC serial port to connect.  Arduino Leonardo only
-	while (!Serial) {
-	}
-	delay(20);  // allows terminal time to sync
+	// // indefinite wait for USB CDC serial port to connect.  Arduino Leonardo only
+	// while (!Serial) {
+	// }
+	// additional delay for USB CDC serial port to connect.  Arduino Leonardo only
+	if (!Serial) {       // allows terminal time to sync as long
+		delay(500);  // as the serial monitor is opened before
+	}                    // upload
 #endif
+
 	Serial.println();
 	Serial.println();
 	Serial.println("Demo version: " DEMO_VERSION);
 	Serial.println("Display size: " MAKE_STRING(EPD_SIZE));
 	Serial.println("Film: V" MAKE_STRING(EPD_FILM_VERSION));
 	Serial.println("COG: G" MAKE_STRING(EPD_CHIP_VERSION));
+	Serial.println();
 
+	Serial.println("Image 1: " IMAGE_1_FILE);
+	Serial.println("Image 2: " IMAGE_2_FILE);
 	Serial.println();
 
 	EPD_FLASH.begin(Pin_EPD_FLASH_CS);
@@ -222,10 +207,25 @@ static int state = 0;
 void loop() {
 	int temperature = S5813A.read();
 	Serial.print("Temperature = ");
-	Serial.print(temperature);
-	Serial.println(" Celcius");
+	Serial.print(temperature, DEC);
+	Serial.println(" Celsius");
 
 	EPD.begin(); // power up the EPD panel
+	switch (EPD.error()) {
+	case EPD_OK:
+		Serial.println("EPD: ok");
+		break;
+	case EPD_UNSUPPORTED_COG:
+		Serial.println("EPD: unsuppported COG");
+		break;
+	case EPD_PANEL_BROKEN:
+		Serial.println("EPD: panel broken");
+		break;
+	case EPD_DC_FAILED:
+		Serial.println("EPD: DC failed");
+		break;
+	}
+
 	EPD.setFactor(temperature); // adjust for current temperature
 
 	int delay_counts = 50;

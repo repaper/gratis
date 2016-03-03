@@ -18,7 +18,7 @@
 //
 // also see: http://elinux.org/RPi_Low-level_peripherals
 //
-// Other items are difficult to determine accurately Google "Gert Doms" for some samples
+// Other items are difficult to determine accurately. Google search "Gert Doms" for some samples
 
 
 #include <stdint.h>
@@ -293,7 +293,7 @@ close_mem:
 }
 
 
-/// revoke access to GPIO and PWM
+// revoke access to GPIO and PWM
 bool GPIO_teardown() {
 //	delete_map(timer_map);
 	delete_map(clock_map);

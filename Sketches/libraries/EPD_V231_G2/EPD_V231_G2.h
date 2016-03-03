@@ -12,10 +12,18 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Updated 2015-08-01 by Rei Vilo
+// . Added #include Energia
+
 #if !defined(EPD_V231_G2_H)
 #define EPD_V231_G2_H 1
 
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <SPI.h>
 
 #if defined(__AVR__)

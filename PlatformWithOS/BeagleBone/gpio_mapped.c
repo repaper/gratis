@@ -130,7 +130,7 @@ bool GPIO_setup() {
 		return false;
 	}
 
-	// memory map entry to access the variou peripheral registers
+	// memory map entry to access the various peripheral registers
 
 	if (!create_rw_map(&gpio_map[0], mem_fd, GPIO0_REGISTERS)) {
 		warn("failed to mmap gpio0");
@@ -169,7 +169,7 @@ fail:
 }
 
 
-/// revoke access to GPIO and PWM
+// revoke access to GPIO and PWM
 bool GPIO_teardown() {
 	for (size_t i = 0; i < SIZE_OF_ARRAY(gpio_map); ++i) {
 		delete_map(gpio_map[i]);
@@ -271,7 +271,7 @@ void GPIO_write(GPIO_pin_type pin, int value) {
 }
 
 
-// only affetct PWM if correct pin is addressed
+// only affect PWM if correct pin is addressed
 void GPIO_pwm_write(int pin, uint32_t value) {
 	if (value > 1023) {
 		value = 1023;
@@ -422,7 +422,7 @@ static bool load_firmware(const char *pin_name) {
 	memset(buffer, 0, sizeof(buffer));
 	read(fd, buffer, sizeof(buffer) - 1);  // allow one nul at end
 
-	// IO multiplexing
+	// I/O multiplexing
 	if (NULL == strstr(buffer, CAPE_IIO)) {
 		lseek(fd, 0, SEEK_SET);
 		write(fd, CAPE_IIO "\n", CONST_STRLEN(CAPE_IIO "\n"));
@@ -476,8 +476,8 @@ static bool PWM_enable(int channel, const char *pin_name) {
 		return false;  // failed
 	}
 
-	// wait a bit for the pwm device to appear
-	// is this long enough or should the whole code below be in a retry loop
+	// wait a bit for the pwm device to appear.
+	// is this long enough or should the whole code below be in a retry loop?
 	usleep(10000);
 
 	char *config = malloc(CONST_STRLEN(OCP_PWM_PREFIX)
@@ -513,7 +513,7 @@ static bool PWM_enable(int channel, const char *pin_name) {
 			strcat(pwm[channel].name, dp->d_name);
 			strcat(pwm[channel].name, DUTY);
 
-			// wait up to 5 seconds for the pwm driver to appear
+			// wait up to 5 seconds for the pwm driver to appear.
 			// is the device tree populated in the background?
 			for (int i = 0; i < 500; ++i) {
 				pwm[channel].fd = open(pwm[channel].name, O_RDWR);

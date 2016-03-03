@@ -12,8 +12,12 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <limits.h>
 
 #include <SPI.h>
@@ -265,7 +269,6 @@ void EPD_Class::begin(void) {
 		this->power_off();
 		return;
 	}
-
 	// output enable to disable
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x70, 0x02), 2);
 	SPI_send(this->EPD_Pin_EPD_CS, CU8(0x72, 0x40), 2);
@@ -706,16 +709,21 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 }
 
 
-
 static void SPI_on(void) {
 	SPI.end();
 	SPI.begin();
 	SPI.setBitOrder(MSBFIRST);
+#if defined(__MSP432P401R__)
+	SPI.setDataMode(SPI_MODE3);
+	SPI.setClockDivider(SPI_CLOCK_DIV2);
+#else
 	SPI.setDataMode(SPI_MODE0);
 	SPI.setClockDivider(SPI_CLOCK_DIV2);
+#endif
 	SPI_put(0x00);
 	SPI_put(0x00);
 	Delay_us(10);
+//	spi_is_on = true;
 }
 
 
@@ -749,23 +757,37 @@ static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 	digitalWrite(cs_pin, HIGH);
 }
 
-// FIXME: What is the purpose of rbuffer?  It is set, but never used.
+#define DEBUG_SPI_READ 0
 static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 	// CS low
 	digitalWrite(cs_pin, LOW);
 
-	uint8_t rbuffer[4];
+#if DEBUG_SPI_READ
+	uint8_t rbuffer[16];
+#endif
 	uint8_t result = 0;
 
 	// send all data
 	for (uint16_t i = 0; i < length; ++i) {
 		result = SPI.transfer(*buffer++);
-		if (i < 4) {
+#if DEBUG_SPI_READ
+		if (i < sizeof(rbuffer)) {
 			rbuffer[i] = result;
 		}
+#endif
 	}
 
 	// CS high
 	digitalWrite(cs_pin, HIGH);
+
+#if DEBUG_SPI_READ
+	Serial.print("SPI read:");
+	for (uint16_t i = 0; i < sizeof(rbuffer) && i < length; ++i) {
+		Serial.print(" ");
+		Serial.print(rbuffer[i], HEX);
+	}
+	Serial.println();
+#endif
+
 	return result;
 }

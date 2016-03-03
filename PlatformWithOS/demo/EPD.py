@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at:
 #
-#   http:#www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
@@ -123,9 +123,9 @@ to use:
 
     def display(self, image):
 
-        # attempt grayscale conversion, ath then to single bit
-        # better to do this before callin this if the image is to
-        # be dispayed several times
+        # attempt grayscale conversion, and then to single bit.
+        # better to do this before calling this if the image is to
+        # be displayed several times
         if image.mode != "1":
             image = ImageOps.grayscale(image).convert("1", dither=Image.FLOYDSTEINBERG)
 
@@ -136,7 +136,7 @@ to use:
             raise EPDError('image size mismatch')
 
         with open(os.path.join(self._epd_path, 'LE', 'display_inverse'), 'r+b') as f:
-            f.write(image.tostring())
+            f.write(image.tobytes())
 
         if self.auto:
             self.update()

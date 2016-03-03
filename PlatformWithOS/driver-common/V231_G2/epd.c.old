@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <err.h>
@@ -34,11 +35,15 @@
 #define digitalRead(pin) GPIO_read(pin)
 #define digitalWrite(pin, value) GPIO_write(pin, value)
 
+// values for border byte
+#define BORDER_BYTE_BLACK 0xff
+#define BORDER_BYTE_WHITE 0xaa
+#define BORDER_BYTE_NULL  0x00
+
 
 // inline arrays
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
 #define CU8(...) (ARRAY(const uint8_t, __VA_ARGS__))
-
 
 // types
 typedef enum {           // Image pixel -> Display pixel
@@ -48,42 +53,51 @@ typedef enum {           // Image pixel -> Display pixel
 	EPD_normal       // B -> B, W -> W (New Image)
 } EPD_stage;
 
+typedef enum {
+	EPD_BORDER_BYTE_NONE,  // no border byte requred
+	EPD_BORDER_BYTE_ZERO,  // border byte == 0x00 requred
+	EPD_BORDER_BYTE_SET,   // border byte needs to be set
+} EPD_border_byte;
 
 // function prototypes
+
 static void power_off(EPD_type *epd);
-static void PWM_start(int pin);
-static void PWM_stop(int pin);
+
 static int temperature_to_factor_10x(int temperature);
 static void frame_fixed(EPD_type *epd, uint8_t fixed_value, EPD_stage stage);
 static void frame_data(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage);
 static void frame_fixed_repeat(EPD_type *epd, uint8_t fixed_value, EPD_stage stage);
 static void frame_data_repeat(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage);
-static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage);
+static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage);
+static void nothing_frame(EPD_type *epd);
+static void dummy_line(EPD_type *epd);
+static void border_dummy_line(EPD_type *epd);
+
 
 // panel configuration
 struct EPD_struct {
 	int EPD_Pin_PANEL_ON;
 	int EPD_Pin_BORDER;
 	int EPD_Pin_DISCHARGE;
-	int EPD_Pin_PWM;
 	int EPD_Pin_RESET;
 	int EPD_Pin_BUSY;
 
 	EPD_size size;
-	int stage_time;
+	int base_stage_time;
 	int factored_stage_time;
 	int lines_per_display;
 	int dots_per_line;
 	int bytes_per_line;
 	int bytes_per_scan;
-	bool filler;
+	bool middle_scan;
+
+	bool pre_border_byte;
+	EPD_border_byte border_byte;
 
 	EPD_error status;
 
 	const uint8_t *channel_select;
 	size_t channel_select_length;
-	const uint8_t *gate_source;
-	size_t gate_source_length;
 
 	uint8_t *line_buffer;
 	size_t line_buffer_size;
@@ -97,7 +111,6 @@ EPD_type *EPD_create(EPD_size size,
 		     int panel_on_pin,
 		     int border_pin,
 		     int discharge_pin,
-		     int pwm_pin,
 		     int reset_pin,
 		     int busy_pin,
 		     SPI_type *spi) {
@@ -125,27 +138,24 @@ EPD_type *EPD_create(EPD_size size,
 	epd->EPD_Pin_PANEL_ON = panel_on_pin;
 	epd->EPD_Pin_BORDER = border_pin;
 	epd->EPD_Pin_DISCHARGE = discharge_pin;
-	epd->EPD_Pin_PWM = pwm_pin;
 	epd->EPD_Pin_RESET = reset_pin;
 	epd->EPD_Pin_BUSY = busy_pin;
 
 	epd->size = size;
-	epd->stage_time = 480; // milliseconds
+	epd->base_stage_time = 480; // milliseconds
 	epd->lines_per_display = 96;
 	epd->dots_per_line = 128;
 	epd->bytes_per_line = 128 / 8;
 	epd->bytes_per_scan = 96 / 4;
-	epd->filler = false;
+	epd->middle_scan = true; // => data-scan-data ELSE: scan-data-scan
+	epd->pre_border_byte = false;
+	epd->border_byte = EPD_BORDER_BYTE_ZERO;
 
-
-	// display size dependent items
+	// display size dependant items
 	{
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xff, 0x00};
-		static uint8_t gs[] = {0x72, 0x03};
 		epd->channel_select = cs;
 		epd->channel_select_length = sizeof(cs);
-		epd->gate_source = gs;
-		epd->gate_source_length = sizeof(gs);
 	}
 
 	// set up size structure
@@ -154,50 +164,87 @@ EPD_type *EPD_create(EPD_size size,
 	case EPD_1_44:  // default so no change
 		break;
 
+	case EPD_1_9: {
+		epd->lines_per_display = 128;
+		epd->dots_per_line = 144;
+		epd->bytes_per_line = 144 / 8;
+		epd->middle_scan = false;
+		epd->bytes_per_scan = 128 / 4 / 2; // scan/2 - data - scan/2
+		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x03, 0xfc, 0x00, 0x00, 0xff};
+		epd->channel_select = cs;
+		epd->channel_select_length = sizeof(cs);
+		epd->pre_border_byte = false;
+		epd->border_byte = EPD_BORDER_BYTE_SET;
+		break;
+	}
+
 	case EPD_2_0: {
 		epd->lines_per_display = 96;
 		epd->dots_per_line = 200;
 		epd->bytes_per_line = 200 / 8;
 		epd->bytes_per_scan = 96 / 4;
-		epd->filler = true;
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0xe0, 0x00};
-		static uint8_t gs[] = {0x72, 0x03};
 		epd->channel_select = cs;
 		epd->channel_select_length = sizeof(cs);
-		epd->gate_source = gs;
-		epd->gate_source_length = sizeof(gs);
+		epd->pre_border_byte = true;
+		epd->border_byte = EPD_BORDER_BYTE_NONE;
+		break;
+	}
+
+	case EPD_2_6: {
+		epd->base_stage_time = 630; // milliseconds
+		epd->lines_per_display = 128;
+		epd->dots_per_line = 232;
+		epd->bytes_per_line = 232 / 8;
+		epd->middle_scan = false;
+		epd->bytes_per_scan = 128 / 4 / 2; // scan/2 - data - scan/2
+		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x1f, 0xe0, 0x00, 0x00, 0x00, 0xff};
+		epd->channel_select = cs;
+		epd->channel_select_length = sizeof(cs);
+		epd->pre_border_byte = false;
+		epd->border_byte = EPD_BORDER_BYTE_SET;
 		break;
 	}
 
 	case EPD_2_7: {
-		epd->stage_time = 630; // milliseconds
+		epd->base_stage_time = 630; // milliseconds
 		epd->lines_per_display = 176;
 		epd->dots_per_line = 264;
 		epd->bytes_per_line = 264 / 8;
 		epd->bytes_per_scan = 176 / 4;
-		epd->filler = true;
 		static uint8_t cs[] = {0x72, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xfe, 0x00, 0x00};
-		static uint8_t gs[] = {0x72, 0x00};
 		epd->channel_select = cs;
 		epd->channel_select_length = sizeof(cs);
-		epd->gate_source = gs;
-		epd->gate_source_length = sizeof(gs);
+		epd->pre_border_byte = true;
+		epd->border_byte = EPD_BORDER_BYTE_NONE;
 		break;
 	}
 	}
 
-	epd->factored_stage_time = epd->stage_time;
+	// an initial default temperature
+	epd->factored_stage_time = epd->base_stage_time;
+	EPD_set_temperature(epd, 25);
 
 	// buffer for frame line
-	epd->line_buffer_size = 2 * epd->bytes_per_line + epd->bytes_per_scan
-		+ 3; // command byte, border byte and filler byte
+	if (epd->middle_scan) {
+		epd->line_buffer_size = 2 * epd->bytes_per_line
+			+ epd->bytes_per_scan
+			+ 3; // command byte, pre_border_byte, border byte
+	} else {
+		epd->line_buffer_size = epd->bytes_per_line
+			+ 2 * epd->bytes_per_scan
+			+ 3; // command byte, pre_border_byte, border byte
+	}
 
-	epd->line_buffer = malloc(epd->line_buffer_size);
+	epd->line_buffer = malloc(epd->line_buffer_size + 4096);
 	if (NULL == epd->line_buffer) {
 		free(epd);
 		warn("falled to allocate EPD line buffer");
 		return NULL;
 	}
+
+	// ensure zero
+	memset(epd->line_buffer, 0x00, epd->line_buffer_size);
 
 	// ensure I/O is all set to ZERO
 	power_off(epd);
@@ -223,6 +270,7 @@ EPD_error EPD_status(EPD_type *epd) {
 	return epd->status;
 }
 
+
 // starts an EPD sequence
 void EPD_begin(EPD_type *epd) {
 
@@ -237,8 +285,7 @@ void EPD_begin(EPD_type *epd) {
 
 	SPI_on(epd->spi);
 
-	PWM_start(epd->EPD_Pin_PWM);
-	Delay_ms(25);
+	Delay_ms(5);
 	digitalWrite(epd->EPD_Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
 
@@ -257,186 +304,154 @@ void EPD_begin(EPD_type *epd) {
 		Delay_us(10);
 	}
 
+	// read the COG ID
+	uint8_t receive_buffer[2];
+	SPI_read(epd->spi, CU8(0x71, 0x00), receive_buffer, sizeof(receive_buffer));
+	SPI_read(epd->spi, CU8(0x71, 0x00), receive_buffer, sizeof(receive_buffer));
+	int cog_id = receive_buffer[1];
+	if (0x02 != (0x0f & cog_id)) {
+		epd->status = EPD_UNSUPPORTED_COG;
+		power_off(epd);
+		return;
+	}
+
+	// Disable OE
+	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x40), 2);
+
+	// check breakage
+	SPI_send(epd->spi, CU8(0x70, 0x0f), 2);
+	SPI_read(epd->spi, CU8(0x73, 0x00), receive_buffer, sizeof(receive_buffer));
+	int broken_panel = receive_buffer[1];
+	if (0x00 == (0x80 & broken_panel)) {
+		epd->status = EPD_PANEL_BROKEN;
+		power_off(epd);
+		return;
+	}
+
+	// power saving mode
+	SPI_send(epd->spi, CU8(0x70, 0x0b), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x02), 2);
+
 	// channel select
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x01), 2);
-	Delay_us(10);
 	SPI_send(epd->spi, epd->channel_select, epd->channel_select_length);
 
-	// DC/DC frequency
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x06), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0xff), 2);
-
 	// high power mode osc
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x07), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x9d), 2);
+	SPI_send(epd->spi, CU8(0x72, 0xd1), 2);
 
-
-	// disable ADC
-	Delay_us(10);
+	// power setting
 	SPI_send(epd->spi, CU8(0x70, 0x08), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x02), 2);
 
 	// Vcom level
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x09), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0xd0, 0x00), 3);
+	SPI_send(epd->spi, CU8(0x72, 0xc2), 2);
 
-	// gate and source voltage levels
-	Delay_us(10);
+	// power setting
 	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, epd->gate_source, epd->gate_source_length);
-
-	Delay_ms(5);  //???
+	SPI_send(epd->spi, CU8(0x72, 0x03), 2);
 
 	// driver latch on
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x03), 2);
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
 
 	// driver latch off
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x03), 2);
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
 
 	Delay_ms(5);
 
-	// charge pump positive voltage on
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
+	bool dc_ok = false;
 
-	// final delay before PWM off
-	Delay_ms(30);
-	PWM_stop(epd->EPD_Pin_PWM);
+	for (int i = 0; i < 4; ++i) {
+		// charge pump positive voltage on - VGH/VDL on
+		SPI_send(epd->spi, CU8(0x70, 0x05), 2);
+		SPI_send(epd->spi, CU8(0x72, 0x01), 2);
 
-	// charge pump negative voltage on
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x03), 2);
+		Delay_ms(240);
 
-	Delay_ms(30);
+		// charge pump negative voltage on - VGL/VDL on
+		SPI_send(epd->spi, CU8(0x70, 0x05), 2);
+		SPI_send(epd->spi, CU8(0x72, 0x03), 2);
 
-	// Vcom driver on
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x0f), 2);
+		Delay_ms(40);
 
-	Delay_ms(30);
+		// charge pump Vcom on - Vcom driver on
+		SPI_send(epd->spi, CU8(0x70, 0x05), 2);
+		SPI_send(epd->spi, CU8(0x72, 0x0f), 2);
+
+		Delay_ms(40);
+
+		// check DC/DC
+		SPI_send(epd->spi, CU8(0x70, 0x0f), 2);
+		SPI_read(epd->spi, CU8(0x73, 0x00), receive_buffer, sizeof(receive_buffer));
+		int dc_state = receive_buffer[1];
+		if (0x40 == (0x40 & dc_state)) {
+			dc_ok = true;
+			break;
+		}
+	}
+	if (!dc_ok) {
+		epd->status = EPD_DC_FAILED;
+		power_off(epd);
+		return;
+	}
 
 	// output enable to disable
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x24), 2);
-
-	SPI_off(epd->spi);
+	SPI_send(epd->spi, CU8(0x72, 0x04), 2);
 }
 
 
 void EPD_end(EPD_type *epd) {
 
-	// dummy frame
-	frame_fixed(epd, 0x55, EPD_normal);
+	nothing_frame(epd);
 
-	// dummy line and border
-	if (EPD_1_44 == epd->size) {
-		// only for 1.44" EPD
-		line(epd, 0x7fffu, 0, 0x55, NULL, EPD_normal);
-
-		Delay_ms(250);
-
-	} else {
-		// all other display sizes
-		line(epd, 0x7fffu, 0, 0x55, NULL, EPD_normal);
-
+	if (EPD_2_7 == epd->size) {
+		dummy_line(epd);
+		// only pulse border pin for 2.70" EPD
 		Delay_ms(25);
-
 		digitalWrite(epd->EPD_Pin_BORDER, LOW);
-		Delay_ms(250);
+		Delay_ms(200);
 		digitalWrite(epd->EPD_Pin_BORDER, HIGH);
+	} else {
+		border_dummy_line(epd);
+		Delay_ms(200);
 	}
 
-	SPI_on(epd->spi);
+	// ??? - not described in datasheet
+	SPI_send(epd->spi, CU8(0x70, 0x0b), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
 
 	// latch reset turn on
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x03), 2);
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
 
-	// output enable off
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x05), 2);
-
-	// Vcom power off
-	Delay_us(10);
+	// power off charge pump Vcom
 	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x0e), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x03), 2);
 
-	// power off negative charge pump
-	Delay_us(10);
+	// power off charge pump neg voltage
 	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x02), 2);
-
-	// discharge
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x0c), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
 
 	Delay_ms(120);
 
-	// all charge pumps off
-	Delay_us(10);
+	// discharge internal
+	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x80), 2);
+
+	// turn off all charge pumps
 	SPI_send(epd->spi, CU8(0x70, 0x05), 2);
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
 
 	// turn of osc
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x07), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x0d), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x01), 2);
 
-	// discharge internal - 1
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x50), 2);
-
-	Delay_ms(40);
-
-	// discharge internal - 2
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0xA0), 2);
-
-	Delay_ms(40);
-
-	// discharge internal - 3
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x00), 2);
-	Delay_us(10);
+	Delay_ms(50);
 
 	power_off(epd);
 }
@@ -452,7 +467,6 @@ static void power_off(EPD_type *epd) {
 	// ensure SPI MOSI and CLOCK are Low before CS Low
 	SPI_off(epd->spi);
 
-	// discharge pulse
 	digitalWrite(epd->EPD_Pin_DISCHARGE, HIGH);
 	Delay_ms(150);
 	digitalWrite(epd->EPD_Pin_DISCHARGE, LOW);
@@ -460,8 +474,9 @@ static void power_off(EPD_type *epd) {
 
 
 void EPD_set_temperature(EPD_type *epd, int temperature) {
-	epd->factored_stage_time = epd->stage_time * temperature_to_factor_10x(temperature) / 10;
+	epd->factored_stage_time = epd->base_stage_time * temperature_to_factor_10x(temperature) / 10;
 }
+
 
 // clear display (anything -> white)
 void EPD_clear(EPD_type *epd) {
@@ -494,13 +509,14 @@ void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *n
 	frame_data_repeat(epd, old_image, new_image, EPD_white);
 	frame_data_repeat(epd, new_image, old_image, EPD_inverse);
 	frame_data_repeat(epd, new_image, old_image, EPD_normal);
+	frame_data_repeat(epd, new_image, old_image, EPD_normal);
 }
 
 
 // internal functions
 // ==================
 
-// convert a temperature in Celsius to
+// convert a temperature in Celcius to
 // the scale factor for frame_*_repeat methods
 static int temperature_to_factor_10x(int temperature) {
 	if (temperature <= -10) {
@@ -532,7 +548,7 @@ static int temperature_to_factor_10x(int temperature) {
 
 static void frame_fixed(EPD_type *epd, uint8_t fixed_value, EPD_stage stage) {
 	for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
-		line(epd, l, NULL, fixed_value, NULL, stage);
+		one_line(epd, l, NULL, fixed_value, NULL, stage);
 	}
 }
 
@@ -540,12 +556,12 @@ static void frame_fixed(EPD_type *epd, uint8_t fixed_value, EPD_stage stage) {
 static void frame_data(EPD_type *epd, const uint8_t *image, const uint8_t *mask, EPD_stage stage) {
 	if (NULL == mask) {
 		for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
-			line(epd, l, &image[l * epd->bytes_per_line], 0, NULL, stage);
+			one_line(epd, l, &image[l * epd->bytes_per_line], 0, NULL, stage);
 		}
 	} else {
 		for (uint8_t l = 0; l < epd->lines_per_display ; ++l) {
 			size_t n = l * epd->bytes_per_line;
-			line(epd, l, &image[n], 0, &mask[n], stage);
+			one_line(epd, l, &image[n], 0, &mask[n], stage);
 		}
 	}
 }
@@ -578,6 +594,7 @@ static void frame_data_repeat(EPD_type *epd, const uint8_t *image, const uint8_t
 	its.it_interval.tv_sec = 0;
 	its.it_interval.tv_nsec = 0;
 
+	int n = 0;
 	if (-1 == timer_settime(epd->timer, 0, &its, NULL)) {
 		err(1, "timer_settime failed");
 	}
@@ -586,42 +603,38 @@ static void frame_data_repeat(EPD_type *epd, const uint8_t *image, const uint8_t
 		if (-1 == timer_gettime(epd->timer, &its)) {
 			err(1, "timer_gettime failed");
 		}
+		++n;
 	} while (its.it_value.tv_sec > 0 || its.it_value.tv_nsec > 0);
 }
 
 
-static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
 
-	SPI_on(epd->spi);
-
-	// charge pump voltage levels
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x04), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, epd->gate_source, epd->gate_source_length);
-
-	// send data
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x70, 0x0a), 2);
-	Delay_us(10);
-
-	// CS low
-	uint8_t *p = epd->line_buffer;
-
-	*p++ = 0x72;
-
-	// border byte only necessary for 1.44" EPD
-	if (EPD_1_44 == epd->size) {
-		*p++ = 0x00;
+static void nothing_frame(EPD_type *epd) {
+	for (int line = 0; line < epd->lines_per_display; ++line) {
+		one_line(epd, 0x7fffu, NULL, 0x00, NULL, EPD_compensate);
 	}
+}
 
-	// even pixels
-	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
+
+static void dummy_line(EPD_type *epd) {
+	one_line(epd, 0x7fffu, NULL, 0x00, NULL, EPD_compensate);
+}
+
+
+static void border_dummy_line(EPD_type *epd) {
+	one_line(epd, 0x7fffu, NULL, 0x00, NULL, EPD_normal);
+}
+
+
+// pixels on display are numbered from 1 so even is actually bits 1,3,5,...
+static void even_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
+
+	for (uint16_t b = 0; b < epd->bytes_per_line; ++b) {
 		if (NULL != data) {
-			uint8_t pixels = data[b - 1] & 0xaa;
+			uint8_t pixels = data[b] & 0xaa;
 			uint8_t pixel_mask = 0xff;
 			if (NULL != mask) {
-				pixel_mask = (mask[b - 1] ^ pixels) & 0xaa;
+				pixel_mask = (mask[b] ^ pixels) & 0xaa;
 				pixel_mask |= pixel_mask >> 1;
 			}
 			switch(stage) {
@@ -638,28 +651,27 @@ static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixe
 				pixels = 0xaa | (pixels >> 1);
 				break;
 			}
-			*p++ = (pixels & pixel_mask) | (~pixel_mask & 0x55);
+			pixels = (pixels & pixel_mask) | (~pixel_mask & 0x55);
+			uint8_t p1 = (pixels >> 6) & 0x03;
+			uint8_t p2 = (pixels >> 4) & 0x03;
+			uint8_t p3 = (pixels >> 2) & 0x03;
+			uint8_t p4 = (pixels >> 0) & 0x03;
+			pixels = (p1 << 0) | (p2 << 2) | (p3 << 4) | (p4 << 6);
+			*(*pp)++ = pixels;
 		} else {
-			*p++ = fixed_value;
+			*(*pp)++ = fixed_value;
 		}
 	}
+}
 
-	// scan line
-	for (uint16_t b = 0; b < epd->bytes_per_scan; ++b) {
-		if (line / 4 == b) {
-			*p++ = 0xc0 >> (2 * (line & 0x03));
-		} else {
-			*p++ = 0x00;
-		}
-	}
-
-	// odd pixels
-	for (uint16_t b = 0; b < epd->bytes_per_line; ++b) {
+// pixels on display are numbered from 1 so odd is actually bits 0,2,4,...
+static void odd_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
+	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
 		if (NULL != data) {
-			uint8_t pixels = data[b] & 0x55;
+			uint8_t pixels = data[b - 1] & 0x55;
 			uint8_t pixel_mask = 0xff;
 			if (NULL != mask) {
-				pixel_mask = (mask[b] ^ pixels) & 0x55;
+				pixel_mask = (mask[b - 1] ^ pixels) & 0x55;
 				pixel_mask |= pixel_mask << 1;
 			}
 			switch(stage) {
@@ -677,39 +689,142 @@ static void line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixe
 				break;
 			}
 			pixels = (pixels & pixel_mask) | (~pixel_mask & 0x55);
-
-			uint8_t p1 = (pixels >> 6) & 0x03;
-			uint8_t p2 = (pixels >> 4) & 0x03;
-			uint8_t p3 = (pixels >> 2) & 0x03;
-			uint8_t p4 = (pixels >> 0) & 0x03;
-			pixels = (p1 << 0) | (p2 << 2) | (p3 << 4) | (p4 << 6);
-			*p++ = pixels;
+			*(*pp)++ = pixels;
 		} else {
-			*p++ = fixed_value;
+			*(*pp)++ = fixed_value;
+		}
+	}
+}
+
+// interleave bits: (byte)76543210 -> (16 bit).7.6.5.4.3.2.1
+static inline uint16_t interleave_bits(uint16_t value) {
+	value = (value | (value << 4)) & 0x0f0f;
+	value = (value | (value << 2)) & 0x3333;
+	value = (value | (value << 1)) & 0x5555;
+	return value;
+}
+
+// pixels on display are numbered from 1
+static void all_pixels(EPD_type *epd, uint8_t **pp, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
+	for (uint16_t b = epd->bytes_per_line; b > 0; --b) {
+		if (NULL != data) {
+			uint16_t pixels = interleave_bits(data[b - 1]);
+
+			uint16_t pixel_mask = 0xffff;
+			if (NULL != mask) {
+				uint16_t pixel_mask = interleave_bits(mask[b - 1]);
+				pixel_mask = (pixel_mask ^ pixels) & 0x5555;
+				pixel_mask |= pixel_mask << 1;
+			}
+			switch(stage) {
+			case EPD_compensate:  // B -> W, W -> B (Current Image)
+				pixels = 0xaaaa | (pixels ^ 0x5555);
+				break;
+			case EPD_white:       // B -> N, W -> W (Current Image)
+				pixels = 0x5555 + (pixels ^ 0x5555);
+				break;
+			case EPD_inverse:     // B -> N, W -> B (New Image)
+				pixels = 0x5555 | ((pixels ^ 0x5555) << 1);
+				break;
+			case EPD_normal:       // B -> B, W -> W (New Image)
+				pixels = 0xaaaa | pixels;
+				break;
+			}
+			pixels = (pixels & pixel_mask) | (~pixel_mask & 0x5555);
+			*(*pp)++ = pixels >> 8;
+			*(*pp)++ = pixels;
+		} else {
+			*(*pp)++ = fixed_value;
+			*(*pp)++ = fixed_value;
+		}
+	}
+}
+
+// output one line of scan and data bytes to the display
+static void one_line(EPD_type *epd, uint16_t line, const uint8_t *data, uint8_t fixed_value, const uint8_t *mask, EPD_stage stage) {
+
+	SPI_on(epd->spi);
+
+	// send data
+	SPI_send(epd->spi, CU8(0x70, 0x0a), 2);
+
+	// CS low
+	uint8_t *p = epd->line_buffer;
+
+	*p++ = 0x72;
+
+	if (epd->pre_border_byte) {
+		*p++ = 0x00;
+	}
+
+	if (epd->middle_scan) {
+		// data bytes
+		odd_pixels(epd, &p, data, fixed_value, mask, stage);
+
+		// scan line
+		for (uint16_t b = epd->bytes_per_scan; b > 0; --b) {
+			if (line / 4 == b - 1) {
+				*p++ = 0x03 << (2 * (line & 0x03));
+			} else {
+				*p++ = 0x00;
+			}
+		}
+
+		// data bytes
+		even_pixels(epd, &p, data, fixed_value, mask, stage);
+
+	} else {
+		// even scan line, but as lines on display are numbered from 1, line: 1,3,5,...
+		for (uint16_t b = 0; b < epd->bytes_per_scan; ++b) {
+			if (0 != (line & 0x01) && line / 8 == b) {
+				*p++ = 0xc0 >> (line & 0x06);
+			} else {
+				*p++ = 0x00;
+			}
+		}
+
+		// data bytes
+		all_pixels(epd, &p, data, fixed_value, mask, stage);
+
+		// odd scan line, but as lines on display are numbered from 1, line: 0,2,4,6,...
+		for (uint16_t b = epd->bytes_per_scan; b > 0; --b) {
+			if (0 == (line & 0x01) && line / 8 == b - 1) {
+				*p++ = 0x03 << (line & 0x06);
+			} else {
+				*p++ = 0x00;
+			}
 		}
 	}
 
-	if (epd->filler) {
+	// post data border byte
+	switch (epd->border_byte) {
+	case EPD_BORDER_BYTE_NONE:  // no border byte requred
+		break;
+
+	case EPD_BORDER_BYTE_ZERO:  // border byte == 0x00 requred
 		*p++ = 0x00;
+		break;
+
+	case EPD_BORDER_BYTE_SET:   // border byte needs to be set
+		switch(stage) {
+		case EPD_compensate:
+		case EPD_white:
+		case EPD_inverse:
+			*p++ = 0x00;
+			break;
+		case EPD_normal:
+			*p++ = 0xaa;
+			break;
+		}
+		break;
 	}
 	// send the accumulated line buffer
 	SPI_send(epd->spi, epd->line_buffer, p - epd->line_buffer);
 
 	// output data to panel
-	Delay_us(10);
 	SPI_send(epd->spi, CU8(0x70, 0x02), 2);
-	Delay_us(10);
-	SPI_send(epd->spi, CU8(0x72, 0x2f), 2);
+	SPI_send(epd->spi, CU8(0x72, 0x07), 2);
 
+	//Delay_ms(1);
 	SPI_off(epd->spi);
-}
-
-
-static void PWM_start(int pin) {
-	GPIO_pwm_write(pin, 511);
-}
-
-
-static void PWM_stop(int pin) {
-	GPIO_pwm_write(pin, 0);
 }

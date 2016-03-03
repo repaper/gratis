@@ -14,13 +14,18 @@
 // governing permissions and limitations under the License.
 
 
-// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2015-07-23 02:50:18 UTC *****
+// Notice: ***** Generated file: DO _NOT_ MODIFY, Created on: 2016-01-12 00:11:21 UTC *****
 
 
 // simple serial port driven command system to upload data to flash
 // and display images.
 
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
 #include <Arduino.h>
+#endif
+
 #include <inttypes.h>
 #include <ctype.h>
 
@@ -31,49 +36,11 @@
 #define SCREEN_SIZE 144
 #include <EPD_PANELS.h>
 #include <S5813A.h>
+#include <EPD_PINOUT.h>
 
 
 // version number
-#define COMMAND_VERSION "4"
-
-
-// definition of I/O pins LaunchPad and Arduino are different
-
-#if defined(__MSP430_CPU__)
-
-// TI LaunchPad IO layout
-const int Pin_TEMPERATURE = A4;
-const int Pin_PANEL_ON = P2_3;
-const int Pin_BORDER = P2_5;
-const int Pin_DISCHARGE = P2_4;
-#if EPD_PWM_REQUIRED
-const int Pin_PWM = P2_1;
-#endif
-const int Pin_RESET = P2_2;
-const int Pin_BUSY = P2_0;
-const int Pin_EPD_CS = P2_6;
-const int Pin_EPD_FLASH_CS = P2_7;
-const int Pin_SW2 = P1_3;
-const int Pin_RED_LED = P1_0;
-
-#else
-
-// Arduino IO layout
-const int Pin_TEMPERATURE = A0;
-const int Pin_PANEL_ON = 2;
-const int Pin_BORDER = 3;
-const int Pin_DISCHARGE = 4;
-#if EPD_PWM_REQUIRED
-const int Pin_PWM = 5;
-#endif
-const int Pin_RESET = 6;
-const int Pin_BUSY = 7;
-const int Pin_EPD_CS = 8;
-const int Pin_EPD_FLASH_CS = 9;
-const int Pin_SW2 = 12;
-const int Pin_RED_LED = 13;
-
-#endif
+#define COMMAND_VERSION "5"
 
 
 // LED anode through resistor to I/O pin
@@ -145,9 +112,13 @@ void setup() {
 
 	Serial.begin(9600);
 #if defined(__AVR__)
-	// wait for USB CDC serial port to connect.  Arduino Leonardo only
+	// indefinite wait for USB CDC serial port to connect.  Arduino Leonardo only
 	while (!Serial) {
 	}
+	// // additional delay for USB CDC serial port to connect.  Arduino Leonardo only
+	// if (!Serial) {       // allows terminal time to sync as long
+	// 	delay(500);  // as the serial monitor is opened before
+	// }                    // upload
 #endif
 	Serial.println();
 	Serial.println();

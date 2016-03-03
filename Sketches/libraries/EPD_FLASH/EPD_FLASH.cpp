@@ -12,8 +12,15 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
+// Updated 2015-08-01 by Rei Vilo
+// . Added #include Energia
+// . Changed CS for EPD_FLASH_CS to avoid conflicts with Energia
 
+#if defined(ENERGIA)
+#include <Energia.h>
+#else
 #include <Arduino.h>
+#endif
 
 #include <SPI.h>
 
