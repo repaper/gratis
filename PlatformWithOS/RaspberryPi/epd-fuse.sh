@@ -31,12 +31,7 @@ case $1 in
   (start)
     log_daemon_msg "Starting EPD" "epd_fuse"
     mkdir -p "${EPD_MOUNTPOINT}"
-<<<<<<< HEAD
     modprobe spi_bcm2835
-=======
-    #modprobe spi-bcm2708 ## deprecated SPI driver
-    modprobe spi-bcm2835
->>>>>>> refs/remotes/repaper/master
     "${DAEMON}" --panel="${EPD_SIZE}" ${EPD_OPTS} "${EPD_MOUNTPOINT}"
     log_end_msg "$?"
     ;;
