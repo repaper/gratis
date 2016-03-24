@@ -68,9 +68,22 @@ installed.
 ~~~~~
 ##sudo modprobe spi-bcm2708 ## deprecated SPI driver
 sudo modprobe spi-bcm2835
+ls -l /dev/spi*    ### if no SPI devices present see note below
 make rpi-epd_test
 sudo ./driver-common/epd_test
 ~~~~~
+
+Note: on some version of the image the SPI may be disabled: check the
+file `/boot/config.txt` for the line:
+
+~~~~~
+dtparam=spi=on
+~~~~~
+
+If this was commented out then remove the comment `#` character, save
+the file and reboot. Now the SPI devices should show up after the modprobe
+above:
+
 
 #### BeagleBone Black: Build and run using:
 
