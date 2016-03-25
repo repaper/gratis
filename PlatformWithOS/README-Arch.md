@@ -151,6 +151,19 @@ Login as the newly created `repaper` user and clone the repaper repository:
 git clone https://github.com/repaper/gratis.git
 ~~~~~
 
+## Note for RaspberryPI
+
+Note: the SPI may be initially disabled; check that the file:
+`/boot/config.txt` contains the line:
+
+~~~~~
+device_tree_param=spi=on
+~~~~~
+
+If this line is commented with the `#` character, uncomment, save file
+and reboot.
+
+
 ## Special GPIO section for Beaglebone Black
 
 This is to install the cape manager firmware files that allow the
