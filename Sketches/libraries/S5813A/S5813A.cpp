@@ -16,6 +16,9 @@
 // . Added #include Energia
 // . Changed uV to mV to avoid overflows
 
+// Updated 18-04-2016 by Chiara Ruggeri (chiara@arduino.org)
+// . Added Arduino Due / Arduino M0 / Arduino Tian compatibility
+
 #if defined(ENERGIA)
 #include <Energia.h>
 #else
@@ -85,11 +88,33 @@
 #define ADC_MAXIMUM_mV   1460L
 #define ADC_COUNTS       4096L
 
-#else
 
 // Arduino defaults
 // ----------------
 
+#elif defined(ARDUINO_ARCH_SAMD)
+//  Arduino M0 / Arduino M0 Pro / Arduino Tian runs at 3.3V
+#define PIN_TEMPERATURE  A0
+
+#define ANALOG_REFERENCE DEFAULT
+
+// ADC maximum voltage at counts
+#define ADC_MAXIMUM_uV   3300000L
+#define ADC_MAXIMUM_mV   3300L
+#define ADC_COUNTS       1024L
+
+#elif defined(ARDUINO_ARCH_SAM)
+// Arduino Due runs at 3.3V
+#define PIN_TEMPERATURE  A0
+
+#define ANALOG_REFERENCE DEFAULT
+
+// ADC maximum voltage at counts
+#define ADC_MAXIMUM_uV   3300000L
+#define ADC_MAXIMUM_mV   3300L
+#define ADC_COUNTS       1024L
+
+#else
 // Arduino Leonardo / Atmel MEGA32U4 runs at 5V
 #define PIN_TEMPERATURE  A0
 
