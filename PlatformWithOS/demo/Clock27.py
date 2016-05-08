@@ -47,22 +47,43 @@ for f in possible_fonts:
 if '' == FONT_FILE:
     raise 'no font file found'
 
-CLOCK_FONT_SIZE = 100
-DATE_FONT_SIZE  = 42
-WEEKDAY_FONT_SIZE  = 42
+class Settings27(object):
+    # fonts
+    CLOCK_FONT_SIZE = 100
+    DATE_FONT_SIZE  = 42
+    WEEKDAY_FONT_SIZE  = 42
 
-# time
-X_OFFSET = 5
-Y_OFFSET = 3
-COLON_SIZE = 5
-COLON_GAP = 10
+    # time
+    X_OFFSET = 5
+    Y_OFFSET = 3
+    COLON_SIZE = 5
+    COLON_GAP = 10
 
-# date
-DATE_X = 10
-DATE_Y = 90
+    # date
+    DATE_X = 10
+    DATE_Y = 90
 
-WEEKDAY_X = 10
-WEEKDAY_Y = 130
+    WEEKDAY_X = 10
+    WEEKDAY_Y = 130
+
+class Settings20(object):
+    # fonts
+    CLOCK_FONT_SIZE = 46
+    DATE_FONT_SIZE  = 30
+    WEEKDAY_FONT_SIZE  = 30
+
+    # time
+    X_OFFSET = 25
+    Y_OFFSET = 3
+    COLON_SIZE = 3
+    COLON_GAP = 5
+
+    # date
+    DATE_X = 10
+    DATE_Y = 40
+
+    WEEKDAY_X = 10
+    WEEKDAY_Y = 65
 
 DAYS = [
     "MONDAY",
@@ -77,21 +98,26 @@ DAYS = [
 def main(argv):
     """main program - draw HH:MM clock on 2.70" size panel"""
 
+    global settings
     epd = EPD()
 
     print('panel = {p:s} {w:d} x {h:d}  version={v:s} COG={g:d} FILM={f:d}'.format(p=epd.panel, w=epd.width, h=epd.height, v=epd.version, g=epd.cog, f=epd.film))
 
-    if 'EPD 2.7' != epd.panel:
+    if 'EPD 2.7' == epd.panel:
+        settings = Settings27()
+    elif 'EPD 2.0' == epd.panel:
+        settings = Settings20()
+    else:
         print('incorrect panel size')
         sys.exit(1)
 
     epd.clear()
 
-    demo(epd)
+    demo(epd, settings)
 
 
-def demo(epd):
-    """simple partial update demo - draw draw a clock"""
+def demo(epd, settings):
+    """draw a clock"""
 
     # initially set all white background
     image = Image.new('1', epd.size, WHITE)
@@ -100,9 +126,9 @@ def demo(epd):
     draw = ImageDraw.Draw(image)
     width, height = image.size
 
-    clock_font = ImageFont.truetype(FONT_FILE, CLOCK_FONT_SIZE)
-    date_font = ImageFont.truetype(FONT_FILE, DATE_FONT_SIZE)
-    weekday_font = ImageFont.truetype(FONT_FILE, WEEKDAY_FONT_SIZE)
+    clock_font = ImageFont.truetype(FONT_FILE, settings.CLOCK_FONT_SIZE)
+    date_font = ImageFont.truetype(FONT_FILE, settings.DATE_FONT_SIZE)
+    weekday_font = ImageFont.truetype(FONT_FILE, settings.WEEKDAY_FONT_SIZE)
 
     # clear the display buffer
     draw.rectangle((0, 0, width, height), fill=WHITE, outline=WHITE)
@@ -121,24 +147,24 @@ def demo(epd):
         if now.day != previous_day:
             draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
             draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
-            draw.text((DATE_X, DATE_Y), '{y:04d}-{m:02d}-{d:02d}'.format(y=now.year, m=now.month, d=now.day), fill=BLACK, font=date_font)
-            draw.text((WEEKDAY_X, WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
+            draw.text((settings.DATE_X, settings.DATE_Y), '{y:04d}-{m:02d}-{d:02d}'.format(y=now.year, m=now.month, d=now.day), fill=BLACK, font=date_font)
+            draw.text((settings.WEEKDAY_X, settings.WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
             previous_day = now.day
         else:
-            draw.rectangle((X_OFFSET, Y_OFFSET, width - X_OFFSET, DATE_Y - 1), fill=WHITE, outline=WHITE)
+            draw.rectangle((settings.X_OFFSET, settings.Y_OFFSET, width - settings.X_OFFSET, settings.DATE_Y - 1), fill=WHITE, outline=WHITE)
 
-        #draw.text((X_OFFSET, Y_OFFSET), '{h:02d}:{m:02d}'.format(h=now.hour, m=now.minute), fill=BLACK, font=clock_font)
+        #draw.text((settings.X_OFFSET, settings.Y_OFFSET), '{h:02d}:{m:02d}'.format(h=now.hour, m=now.minute), fill=BLACK, font=clock_font)
 
-        draw.text((X_OFFSET, Y_OFFSET), '{h:02d}'.format(h=now.hour), fill=BLACK, font=clock_font)
+        draw.text((settings.X_OFFSET, settings.Y_OFFSET), '{h:02d}'.format(h=now.hour), fill=BLACK, font=clock_font)
 
-        colon_x1 = width / 2 - COLON_SIZE
-        colon_x2 = width / 2 + COLON_SIZE
-        colon_y1 = CLOCK_FONT_SIZE / 2 + Y_OFFSET - COLON_SIZE
-        colon_y2 = CLOCK_FONT_SIZE / 2 + Y_OFFSET + COLON_SIZE
-        draw.rectangle((colon_x1, colon_y1 - COLON_GAP, colon_x2, colon_y2 - COLON_GAP), fill=BLACK, outline=BLACK)
-        draw.rectangle((colon_x1, colon_y1 + COLON_GAP, colon_x2, colon_y2 + COLON_GAP), fill=BLACK, outline=BLACK)
+        colon_x1 = width / 2 - settings.COLON_SIZE
+        colon_x2 = width / 2 + settings.COLON_SIZE
+        colon_y1 = settings.CLOCK_FONT_SIZE / 2 + settings.Y_OFFSET - settings.COLON_SIZE
+        colon_y2 = settings.CLOCK_FONT_SIZE / 2 + settings.Y_OFFSET + settings.COLON_SIZE
+        draw.rectangle((colon_x1, colon_y1 - settings.COLON_GAP, colon_x2, colon_y2 - settings.COLON_GAP), fill=BLACK, outline=BLACK)
+        draw.rectangle((colon_x1, colon_y1 + settings.COLON_GAP, colon_x2, colon_y2 + settings.COLON_GAP), fill=BLACK, outline=BLACK)
 
-        draw.text((X_OFFSET + width / 2, Y_OFFSET), '{m:02d}'.format(m=now.minute), fill=BLACK, font=clock_font)
+        draw.text((settings.X_OFFSET + width / 2, settings.Y_OFFSET), '{m:02d}'.format(m=now.minute), fill=BLACK, font=clock_font)
 
         # display image on the panel
         epd.display(image)
