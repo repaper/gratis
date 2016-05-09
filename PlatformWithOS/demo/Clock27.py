@@ -130,33 +130,26 @@ def demo(epd, settings):
     date_font = ImageFont.truetype(FONT_FILE, settings.DATE_FONT_SIZE)
     weekday_font = ImageFont.truetype(FONT_FILE, settings.WEEKDAY_FONT_SIZE)
 
-    # clear the display buffer
-    draw.rectangle((0, 0, width, height), fill=WHITE, outline=WHITE)
-    previous_day = 0
-
-    first_start = True
+    # initial time
+    now = datetime.today()
 
     while True:
-        while True:
-            now = datetime.today()
-            if now.second == 0 or first_start:
-                first_start = False
-                break
-            time.sleep(0.5)
+        # clear the display buffer
+        draw.rectangle((0, 0, width, height), fill=WHITE, outline=WHITE)
 
-        if now.day != previous_day:
-            draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
-            draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
-            draw.text((settings.DATE_X, settings.DATE_Y), '{y:04d}-{m:02d}-{d:02d}'.format(y=now.year, m=now.month, d=now.day), fill=BLACK, font=date_font)
-            draw.text((settings.WEEKDAY_X, settings.WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
-            previous_day = now.day
-        else:
-            draw.rectangle((settings.X_OFFSET, settings.Y_OFFSET, width - settings.X_OFFSET, settings.DATE_Y - 1), fill=WHITE, outline=WHITE)
+        # border
+        draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
+        draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
 
-        #draw.text((settings.X_OFFSET, settings.Y_OFFSET), '{h:02d}:{m:02d}'.format(h=now.hour, m=now.minute), fill=BLACK, font=clock_font)
+        # date
+        draw.text((settings.DATE_X, settings.DATE_Y), '{y:04d}-{m:02d}-{d:02d}'.format(y=now.year, m=now.month, d=now.day), fill=BLACK, font=date_font)
+        # day
+        draw.text((settings.WEEKDAY_X, settings.WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
 
+        # hours
         draw.text((settings.X_OFFSET, settings.Y_OFFSET), '{h:02d}'.format(h=now.hour), fill=BLACK, font=clock_font)
 
+        # colon
         colon_x1 = width / 2 - settings.COLON_SIZE
         colon_x2 = width / 2 + settings.COLON_SIZE
         colon_y1 = settings.CLOCK_FONT_SIZE / 2 + settings.Y_OFFSET - settings.COLON_SIZE
@@ -164,11 +157,20 @@ def demo(epd, settings):
         draw.rectangle((colon_x1, colon_y1 - settings.COLON_GAP, colon_x2, colon_y2 - settings.COLON_GAP), fill=BLACK, outline=BLACK)
         draw.rectangle((colon_x1, colon_y1 + settings.COLON_GAP, colon_x2, colon_y2 + settings.COLON_GAP), fill=BLACK, outline=BLACK)
 
+        # minutes
         draw.text((settings.X_OFFSET + width / 2, settings.Y_OFFSET), '{m:02d}'.format(m=now.minute), fill=BLACK, font=clock_font)
 
         # display image on the panel
         epd.display(image)
         epd.update()
+
+        # wait for next minute
+        while True:
+            now = datetime.today()
+            if now.second == 0:
+                break
+            time.sleep(0.5)
+
 
 # main
 if "__main__" == __name__:
