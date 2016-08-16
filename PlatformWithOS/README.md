@@ -49,11 +49,11 @@ LED_WHITE    P1_21   P9_23    Fashes  off/on
 LED_PWM      P1_12   P9_14    Brightens and dims
 
 
-Build and run using:
+Build and run using (within gratis toplevel directory):
 
 ~~~~~
 make rpi-gpio_test  # bb-gpio_test
-sudo ./driver-common/gpio_test
+sudo PlatformWithOS/driver-common/gpio_test
 ~~~~~
 
 
@@ -70,7 +70,7 @@ installed.
 sudo modprobe spi-bcm2835
 ls -l /dev/spi*    ### if no SPI devices present see note below
 make rpi-epd_test
-sudo ./driver-common/epd_test
+sudo PlatformWithOS/driver-common/epd_test
 ~~~~~
 
 Note: on some version of the image the SPI may be disabled: check the
@@ -89,7 +89,7 @@ above:
 
 ~~~~~
 make bb-epd_test
-sudo ./driver-common/epd_test
+sudo PlatformWithOS/driver-common/epd_test
 ~~~~~
 
 
@@ -132,11 +132,11 @@ Build and run using:
 make rpi-epd_fuse          # bb-epd_fuse
 sudo modprobe spi-bcm2708  # not on BeagleBone Black (note below)
 sudo mkdir /tmp/epd
-sudo ./driver-common/epd_fuse --panel=2.0 -o allow_other -o default_permissions /tmp/epd
+sudo PlatformWithOS/driver-common/epd_fuse --panel=2.0 -o allow_other -o default_permissions /tmp/epd
 cat /tmp/epd/version
 cat /tmp/epd/panel
 echo C > /tmp/epd/command
-./driver-common/xbm2bin < cat_2_0.xbm > /tmp/epd/display
+PlatformWithOS/driver-common/xbm2bin < cat_2_0.xbm > /tmp/epd/display
 echo U > /tmp/epd/command
 # try displaying other images
 # to shut down:
@@ -180,7 +180,7 @@ sudo opkg install python-imaging
 Draw some lines, graphics and text
 
 ~~~~~
-python demo/DrawDemo.py
+python PlatformWithOS/demo/DrawDemo.py
 ~~~~~
 
 
@@ -202,8 +202,8 @@ if the aspect ration of the original image is not the same as the
 display.
 
 ~~~~~
-python demo/ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/cat*
-python demo/ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/d*.png
+python PlatformWithOS/demo/ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/cat*
+python PlatformWithOS/demo/ImageDemo.py /usr/share/scratch/Media/Costumes/Animals/d*.png
 ~~~~~
 
 ## Twitter Demo
@@ -236,7 +236,7 @@ sudo pip install tweepy
 cp tweepy_auth.py-SAMPLE tweepy_auth.py
 # *** edit the config
 # run the demo (this watches for linux)
-python demo/TwitterDemo.py linux
+python PlatformWithOS/demo/TwitterDemo.py linux
 ~~~~~
 
 
@@ -248,7 +248,7 @@ second number is the number of frames to display before the program
 exits.
 
 ~~~~~
-python demo/PartialDemo.py 3 20
+python PlatformWithOS/demo/PartialDemo.py 3 20
 ~~~~~
 
 
@@ -262,7 +262,7 @@ will make the counter appear to go through a sequence like:
 Use *Ctrl-C* to stop this program.
 
 ~~~~~
-python demo/CounterDemo.py 3 20
+python PlatformWithOS/demo/CounterDemo.py 3 20
 ~~~~~
 
 
