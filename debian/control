@@ -1,0 +1,54 @@
+Source: epd-fuse
+Section: otherosfs
+Priority: optional
+Maintainer: EngSaS - Joachim Langenbach <info@engsas.de>
+Build-Depends: debhelper (>= 9), lsb-release, dh-python, dh-systemd (>= 1.5), python-all, python3-all, python-all-dbg, python3-all-dbg, python-setuptools, python3-setuptools, python-support (>= 0.90), python-pil
+Standards-Version: 3.9.5
+Homepage: https://github.com/repaper/gratis
+#Vcs-Git: git://anonscm.debian.org/collab-maint/epd-fuse.git
+#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/epd-fuse.git;a=summary
+X-Python-Version: >= 2.6
+X-Python3-Version: >= 3.2
+
+Package: epd-fuse-v230-g2
+Architecture: any
+Provides: epd-fuse
+Depends: ${shlibs:Depends}, ${misc:Depends}, libfuse-dev
+Description: EPD driver for repaper display
+ This is the EPD driver for the repaper display with PANEL_VERSION V230_G2
+
+Package: python-epd
+Section: python
+Architecture: any
+Depends: ${python:Depends}, ${misc:Depends}, ${shlibs:Depends}, epd-fuse
+Description: Python module for the repaper display epd-fuse driver
+ It provides an API to use the repaper displays with epd-fuse driver
+ within your python projects
+
+Package: python3-epd
+Section: python
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, ${shlibs:Depends}, epd-fuse
+Description: Python module for the repaper display epd-fuse driver (Python 3)
+ It provides an API to use the repaper displays with epd-fuse driver 
+ within your python projects
+
+#Package: python-epd-dbg
+#Section: debug
+#Priority: extra
+#Architecture: any  
+#Depends: ${python:Depends}, ${misc:Depends}, ${shlibs:Depends}, python-epd (= ${binary:Version})
+#Recommends: python-dbg, python-pil-dbg
+#Description: Python module for the repaper display epd-fuse driver (debug extension)
+# It provides an API to use the repaper displays with epd-fuse driver
+# within your python projects
+
+#Package: python3-epd-dbg
+#Section: debug
+#Priority: extra
+#Architecture: any
+#Depends: ${python3:Depends}, ${misc:Depends}, ${shlibs:Depends}, python3-epd (= ${binary:Version})
+#Recommends: python3-dbg, python3-pil-dbg
+#Description: Python module for the repaper display epd-fuse driver (debug extension)
+# It provides an API to use the repaper displays with epd-fuse driver 
+# within your python projects

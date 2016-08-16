@@ -1,0 +1,74 @@
+Index: epd-fuse-0.1/Makefile
+===================================================================
+--- epd-fuse-0.1.orig/Makefile
++++ epd-fuse-0.1/Makefile
+@@ -2,6 +2,7 @@
+ 
+ DESTDIR ?= ""
+ PREFIX ?= /usr/local
++SERVICE ?= initd
+ 
+ PANEL_VERSION ?= NOT-SET
+ EPD_IO ?= epd_io.h
+@@ -77,10 +78,10 @@ version-check:
+ 
+ .PHONY: rpi raspberrypi
+ rpi raspberrypi: version-check
+-	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common
++	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) SERVICE=$(SERVICE) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common
+ 
+ rpi-%: version-check
+-	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common $*
++	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) SERVICE=$(SERVICE) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common $*
+ 
+ 
+ # BeagleBone Black targets
+Index: epd-fuse-0.1/driver-common/Makefile
+===================================================================
+--- epd-fuse-0.1.orig/driver-common/Makefile
++++ epd-fuse-0.1/driver-common/Makefile
+@@ -2,6 +2,7 @@
+ 
+ DESTIR ?= ""
+ PREFIX ?= /usr/local
++SERVICE ?= initd
+ 
+ include ../directories.mk
+ 
+@@ -57,7 +58,7 @@ install: check-compiled
+ 	install --group=root --mode=750 --owner=root epd_fuse "${DESTDIR}${SBINDIR}"
+ 	test ! -d "${DESTDIR}${SYSCONFDIR}/default" && mkdir -p "${DESTDIR}${SYSCONFDIR}/default"
+ 	[ -e "${DESTDIR}${SYSCONFDIR}/default/epd-fuse" ] || install --group=root --mode=644 --owner=root epd-fuse.default "${DESTDIR}${SYSCONFDIR}/default/epd-fuse"
+-ifeq (YES,${IS_ARCH})
++ifeq (systemd,${SERVICE})
+ 	test ! -d "${DESTDIR}${LIBDIR}/systemd/system" && mkdir -p "${DESTDIR}${LIBDIR}/systemd/system"
+ 	install --group=root --mode=644 --owner=root epd-fuse.service "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
+ else # otherwise Debian
+@@ -77,10 +78,7 @@ endif
+ remove:
+ 	[ -x "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" ] && "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" stop
+ 	rm -f "${DESTDIR}${SBINDIR}/epd_fuse"
+-ifeq (YES,${IS_ARCH})
+-	-systemctl stop epd-fuse
+-	-systemctl disable epd-fuse
+-	-systemctl daemon-reload
++ifeq (systemd,${SERVICE})
+ 	rm -f "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
+ else # otherwise Debian
+ 	rm -f "${DESTDIR}${SYSCONFDIR}/init/epd-fuse.conf"
+Index: epd-fuse-0.1/driver-common/epd-fuse.service
+===================================================================
+--- epd-fuse-0.1.orig/driver-common/epd-fuse.service
++++ epd-fuse-0.1/driver-common/epd-fuse.service
+@@ -10,9 +10,9 @@ SyslogLevel=err
+ # make sure panel size matches installed EPD panel
+ Environment=EPD_MOUNTPOINT=/dev/epd EPD_SIZE=2.0 "EPD_OPTS=-o allow_other -o default_permissions"
+ EnvironmentFile=/etc/default/epd-fuse
+-ExecStartPre=/usr/bin/mkdir -p ${EPD_MOUNTPOINT}
++ExecStartPre=/bin/mkdir -p ${EPD_MOUNTPOINT}
+ ExecStart=/usr/sbin/epd_fuse --panel=${EPD_SIZE} $EPD_OPTS ${EPD_MOUNTPOINT}
+-ExecStop=/usr/bin/umount /dev/epd
++ExecStop=/bin/umount ${EPD_MOUNTPOINT}
+ KillSignal=SIGQUIT
+ KillMode=mixed
+ 
