@@ -78,10 +78,10 @@ version-check:
 
 .PHONY: rpi raspberrypi
 rpi raspberrypi: version-check
-	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) SERVICE=$(SERVICE) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common
+	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) SERVICE=$(SERVICE) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C PlatformWithOS/driver-common
 
 rpi-%: version-check
-	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) SERVICE=$(SERVICE) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common $*
+	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) SERVICE=$(SERVICE) PLATFORM=../RaspberryPi PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C PlatformWithOS/driver-common $*
 
 
 # BeagleBone Black targets
@@ -89,7 +89,7 @@ rpi-%: version-check
 
 .PHONY: bb beaglebone
 bb beaglebone: version-check
-	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) PLATFORM=../BeagleBone PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common
+	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) PLATFORM=../BeagleBone PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C PlatformWithOS/driver-common
 
 bb-%: version-check
-	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) PLATFORM=../BeagleBone PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C driver-common $*
+	$(MAKE) DESTDIR=$(DESTDIR) PREFIX=$(PREFIX) PLATFORM=../BeagleBone PANEL_VERSION="${PANEL_VERSION}" EPD_IO="${EPD_IO}" -C PlatformWithOS/driver-common $*
