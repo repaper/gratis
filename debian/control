@@ -2,8 +2,8 @@ Source: epd-fuse
 Section: otherosfs
 Priority: optional
 Maintainer: EngSaS - Joachim Langenbach <info@engsas.de>
-Build-Depends: debhelper (>= 9), lsb-release, dh-python, dh-systemd (>= 1.5), python-all, python3-all, python-all-dbg, python3-all-dbg, python-setuptools, python3-setuptools, python-support (>= 0.90), python-pil
-Standards-Version: 3.9.5
+Build-Depends: debhelper (>= 9), lsb-release, dh-python, dh-systemd (>= 1.5), python-all, python3-all, python-all-dbg, python3-all-dbg, python-setuptools, python3-setuptools, python-pil
+Standards-Version: 3.9.6
 Homepage: https://github.com/repaper/gratis
 #Vcs-Git: git://anonscm.debian.org/collab-maint/epd-fuse.git
 #Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/epd-fuse.git;a=summary
