@@ -6,7 +6,6 @@ PANEL_VERSION := V230_G2
 DESTDIR := $(CURDIR)/debian/epd-fuse-v230-g2
 PREFIX := /usr
 RELEASE := $(shell lsb_release -rs)
-SOURCEDIR := $(CURDIR)/PlatformWithOS
 
 SERVICE = initd
 ifeq "8.0" "$(word 1, $(sort 8.0 $(RELEASE)))"
@@ -14,16 +13,13 @@ ifeq "8.0" "$(word 1, $(sort 8.0 $(RELEASE)))"
 endif
 
 %:
-	cd $(SOURCEDIR)
 	dh $@ --with systemd,python2,python3 --buildsystem=pybuild
 
 override_dh_auto_build:
-	cd $(SOURCEDIR)
 	dh_auto_build
 	$(MAKE) PANEL_VERSION=$(PANEL_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) SERVICE=$(SERVICE) rpi-epd_fuse
 
 override_dh_auto_install:
-	cd $(SOURCEDIR)
 	dh_auto_install
 	$(MAKE) PANEL_VERSION=$(PANEL_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR) SERVICE=$(SERVICE) rpi-install
 
