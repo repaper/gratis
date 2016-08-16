@@ -1,4 +1,4 @@
-epd-fuse (0.1-1) unstable; urgency=low
+epd-fuse (0.1) unstable; urgency=low
 
   * Added auto switch to systemd for debian jessie (8.0) or initd for
     version before jessie
