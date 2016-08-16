@@ -1,6 +1,10 @@
 # Makefile
 
-PREFIX ?= /usr
+DESTIR ?= ""
+PREFIX ?= /usr/local
+SERVICE ?= initd
+
+include ../directories.mk
 
 PLATFORM ?= ../RasberryPi
 PANEL_VERSION ?= v231_g2
@@ -50,46 +54,45 @@ check-compiled:
 # install binary driver ans associated config/startup or service files
 .PHONY: install
 install: check-compiled
-	install --group=root --mode=750 --owner=root epd_fuse "${PREFIX}/sbin"
-	[ -e /etc/default/epd-fuse ] || install --group=root --mode=644 --owner=root epd-fuse.default /etc/default/epd-fuse
-ifeq (YES,${IS_ARCH})
-	install --group=root --mode=644 --owner=root epd-fuse.service "${PREFIX}/lib/systemd/system/epd-fuse.service"
-	-systemctl daemon-reload
-	-systemctl enable epd-fuse
+	test ! -d "${DESTDIR}${SBINDIR}" && mkdir -p "${DESTDIR}${SBINDIR}"
+	install --group=root --mode=750 --owner=root epd_fuse "${DESTDIR}${SBINDIR}"
+	test ! -d "${DESTDIR}${SYSCONFDIR}/default" && mkdir -p "${DESTDIR}${SYSCONFDIR}/default"
+	[ -e "${DESTDIR}${SYSCONFDIR}/default/epd-fuse" ] || install --group=root --mode=644 --owner=root epd-fuse.default "${DESTDIR}${SYSCONFDIR}/default/epd-fuse"
+ifeq (systemd,${SERVICE})
+	test ! -d "${DESTDIR}${LIBDIR}/systemd/system" && mkdir -p "${DESTDIR}${LIBDIR}/systemd/system"
+	install --group=root --mode=644 --owner=root epd-fuse.service "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
 else # otherwise Debian
 	if [ -e "${EPD_FUSE_CONF}" ] ; \
 	then \
-	  install --group=root --mode=644 --owner=root "${EPD_FUSE_CONF}" /etc/init ; \
+	  test ! -d "${DESTDIR}${SYSCONFDIR}/init" && mkdir -p "${DESTDIR}${SYSCONFDIR}/init" ; \
+	  install --group=root --mode=644 --owner=root "${EPD_FUSE_CONF}" "${DESTDIR}${SYSCONFDIR}/init" ; \
 	fi
 	if [ -e "${EPD_FUSE_SH}" ] ; \
 	then \
-	  install --group=root --mode=755 --owner=root "${EPD_FUSE_SH}" /etc/init.d/epd-fuse ; \
-	  update-rc.d epd-fuse defaults ; \
+	  test ! -d "${DESTDIR}${SYSCONFDIR}/init.d" && mkdir -p "${DESTDIR}${SYSCONFDIR}/init.d" ; \
+	  install --group=root --mode=755 --owner=root "${EPD_FUSE_SH}" "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" ; \
 	fi
 endif
 
 .PHONY: remove
 remove:
-	[ -x /etc/init.d/epd-fuse ] && /etc/init.d/epd-fuse stop
-	rm -f "${PREFIX}/sbin/epd_fuse"
-ifeq (YES,${IS_ARCH})
-	-systemctl stop epd-fuse
-	-systemctl disable epd-fuse
-	-systemctl daemon-reload
-	rm -f "${PREFIX}/lib/systemd/system/epd-fuse.service"
+	[ -x "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" ] && "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" stop
+	rm -f "${DESTDIR}${SBINDIR}/epd_fuse"
+ifeq (systemd,${SERVICE})
+	rm -f "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
 else # otherwise Debian
-	rm -f /etc/init/epd-fuse.conf
-	rm -f /etc/init.d/epd-fuse
+	rm -f "${DESTDIR}${SYSCONFDIR}/init/epd-fuse.conf"
+	rm -f "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse"
 	update-rc.d epd-fuse remove
 endif
 	[ -d /dev/epd ] && rmdir /dev/epd
-	echo NOT Removing: /etc/default/epd-fuse
+	echo NOT Removing: "${DESTDIR}${SYSCONFDIR}/default/epd-fuse"
 
 .PHONY: test-fuse
 test-fuse:
-	-sudo /etc/init.d/epd-fuse stop
+	-sudo ${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse stop
 	-sleep 1
-	-sudo /etc/init.d/epd-fuse start
+	-sudo ${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse start
 	-cat /dev/epd/panel
 	-echo C > /dev/epd/command
 	-sleep 1
@@ -98,7 +101,7 @@ test-fuse:
 	-sleep 3
 	-./xbm2bin < cat_2_0.xbm > /dev/epd/display
 	-echo U > /dev/epd/command
-	-sudo /etc/init.d/epd-fuse stop
+	-sudo ${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse stop
 
 
 # low-level driver
