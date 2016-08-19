@@ -17,7 +17,9 @@
 
 #include <EPD_PANELS.h>
 
-#if defined(ENERGIA)
+#if defined(CORE_TEENSY)
+#include <EPD_PINOUT_Teensy.h>
+#elif defined(ENERGIA)
 #include <EPD_PINOUT_Energia.h>
 #else
 #include <EPD_PINOUT_Arduino.h>

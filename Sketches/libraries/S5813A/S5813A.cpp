@@ -103,8 +103,8 @@
 #define ADC_MAXIMUM_mV   3300L
 #define ADC_COUNTS       1024L
 
-#elif defined(ARDUINO_ARCH_SAM)
-// Arduino Due runs at 3.3V
+#elif defined(ARDUINO_ARCH_SAM) || defined(CORE_TEENSY)
+// Arduino Due and Teensy run at 3.3V
 #define PIN_TEMPERATURE  A0
 
 #define ANALOG_REFERENCE DEFAULT
