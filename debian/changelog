@@ -1,0 +1,13 @@
+epd-fuse (0.1) unstable; urgency=low
+
+  * Added auto switch to systemd for debian jessie (8.0) or initd for
+    version before jessie
+  * Added Apache 2.0 as license and also added copyright information
+  * epd-fuse-* provides virtual package epd-fuse and python-epd depends
+    on that virtual package
+  * Changed to build v230_G2 driver
+  * removed VXXX_GX suffix from source package, as it is independent
+  * Added the python EPD file as python-epd module package
+  * Initial release
+
+ -- EngSaS - Joachim Langenbach <info@engsas.de>  Tue, 16 Aug 2016 17:56:56 +0200
