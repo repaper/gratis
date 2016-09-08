@@ -1,7 +1,8 @@
 epd-fuse (0.1.1) unstable; urgency=low
 
   * Switched python packages to architecture all instead of any
-  * Added libfuse-dev as build dependency
+  * Added libfuse-dev as build dependencies
+  * Added dpkg-config to build dependencies
  
  -- EngSaS - Joachim Langenbach <info@engsas.de>  Thu, 08 Sep 2016 16:44:00 +0200
 
