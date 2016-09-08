@@ -32,6 +32,7 @@ LDFLAGS += ${FUSE_LDFLAGS}
 LDFLAGS += -lrt
 
 RM = rm -f
+MKDIR = mkdir -p
 
 UNAME_r := $(shell uname -r)
 IS_ARCH := $(if $(findstring ARCH,${UNAME_r}),YES,NO)
@@ -53,23 +54,18 @@ check-compiled:
 
 # install binary driver ans associated config/startup or service files
 .PHONY: install
-install: check-compiled
-	test ! -d "${DESTDIR}${SBINDIR}" && mkdir -p "${DESTDIR}${SBINDIR}"
+install: check-compiled | $(DESTDIR)$(SBINDIR) ${DESTDIR}${SYSCONFDIR}/default servicedirectories
 	install --group=root --mode=750 --owner=root epd_fuse "${DESTDIR}${SBINDIR}"
-	test ! -d "${DESTDIR}${SYSCONFDIR}/default" && mkdir -p "${DESTDIR}${SYSCONFDIR}/default"
 	[ -e "${DESTDIR}${SYSCONFDIR}/default/epd-fuse" ] || install --group=root --mode=644 --owner=root epd-fuse.default "${DESTDIR}${SYSCONFDIR}/default/epd-fuse"
 ifeq (systemd,${SERVICE})
-	test ! -d "${DESTDIR}${LIBDIR}/systemd/system" && mkdir -p "${DESTDIR}${LIBDIR}/systemd/system"
 	install --group=root --mode=644 --owner=root epd-fuse.service "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
 else # otherwise Debian
 	if [ -e "${EPD_FUSE_CONF}" ] ; \
 	then \
-	  test ! -d "${DESTDIR}${SYSCONFDIR}/init" && mkdir -p "${DESTDIR}${SYSCONFDIR}/init" ; \
 	  install --group=root --mode=644 --owner=root "${EPD_FUSE_CONF}" "${DESTDIR}${SYSCONFDIR}/init" ; \
 	fi
 	if [ -e "${EPD_FUSE_SH}" ] ; \
 	then \
-	  test ! -d "${DESTDIR}${SYSCONFDIR}/init.d" && mkdir -p "${DESTDIR}${SYSCONFDIR}/init.d" ; \
 	  install --group=root --mode=755 --owner=root "${EPD_FUSE_SH}" "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" ; \
 	fi
 endif
@@ -103,6 +99,31 @@ test-fuse:
 	-echo U > /dev/epd/command
 	-sudo ${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse stop
 
+
+#.PHONY: directories
+#directories:
+#	${DESTDIR}${SBINDIR}
+#	${DESTDIR}${SYSCONFDIR}/default
+#ifeq (systemd,${SERVICE})
+#	${DESTDIR}${LIBDIR}/systemd/system
+#else
+#	${DESTDIR}${SYSCONFDIR}/init
+#	${DESTDIR}${SYSCONFDIR}/init.d
+#endif
+
+$(DESTDIR)$(SBINDIR):
+	$(MKDIR) $(DESTDIR)$(SBINDIR)
+
+${DESTDIR}${SYSCONFDIR}/default:
+	${MKDIR} ${DESTDIR}${SYSCONFDIR}/default
+
+servicedirectories:
+ifeq (systemd,${SERVICE})
+	$(MKDIR) ${DESTDIR}${LIBDIR}/systemd/system
+else
+	$(MKDIR) ${DESTDIR}${SYSCONFDIR}/init
+	$(MKDIR) ${DESTDIR}${SYSCONFDIR}/init.d
+endif
 
 # low-level driver
 DRIVER_OBJECTS = gpio.o spi.o epd.o
