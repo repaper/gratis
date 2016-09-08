@@ -100,17 +100,6 @@ test-fuse:
 	-sudo ${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse stop
 
 
-#.PHONY: directories
-#directories:
-#	${DESTDIR}${SBINDIR}
-#	${DESTDIR}${SYSCONFDIR}/default
-#ifeq (systemd,${SERVICE})
-#	${DESTDIR}${LIBDIR}/systemd/system
-#else
-#	${DESTDIR}${SYSCONFDIR}/init
-#	${DESTDIR}${SYSCONFDIR}/init.d
-#endif
-
 $(DESTDIR)$(SBINDIR):
 	$(MKDIR) $(DESTDIR)$(SBINDIR)
 
