@@ -19,7 +19,7 @@ Description: EPD driver for repaper display
 
 Package: python-epd
 Section: python
-Architecture: any
+Architecture: all
 Depends: ${python:Depends}, ${misc:Depends}, ${shlibs:Depends}, epd-fuse
 Description: Python module for the repaper display epd-fuse driver
  It provides an API to use the repaper displays with epd-fuse driver
@@ -27,7 +27,7 @@ Description: Python module for the repaper display epd-fuse driver
 
 Package: python3-epd
 Section: python
-Architecture: any
+Architecture: all
 Depends: ${python3:Depends}, ${misc:Depends}, ${shlibs:Depends}, epd-fuse
 Description: Python module for the repaper display epd-fuse driver (Python 3)
  It provides an API to use the repaper displays with epd-fuse driver 
@@ -36,7 +36,7 @@ Description: Python module for the repaper display epd-fuse driver (Python 3)
 #Package: python-epd-dbg
 #Section: debug
 #Priority: extra
-#Architecture: any  
+#Architecture: all  
 #Depends: ${python:Depends}, ${misc:Depends}, ${shlibs:Depends}, python-epd (= ${binary:Version})
 #Recommends: python-dbg, python-pil-dbg
 #Description: Python module for the repaper display epd-fuse driver (debug extension)
@@ -46,7 +46,7 @@ Description: Python module for the repaper display epd-fuse driver (Python 3)
 #Package: python3-epd-dbg
 #Section: debug
 #Priority: extra
-#Architecture: any
+#Architecture: all
 #Depends: ${python3:Depends}, ${misc:Depends}, ${shlibs:Depends}, python3-epd (= ${binary:Version})
 #Recommends: python3-dbg, python3-pil-dbg
 #Description: Python module for the repaper display epd-fuse driver (debug extension)
