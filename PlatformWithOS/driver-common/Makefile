@@ -54,22 +54,22 @@ check-compiled:
 # install binary driver ans associated config/startup or service files
 .PHONY: install
 install: check-compiled
-	test ! -d "${DESTDIR}${SBINDIR}" && mkdir -p "${DESTDIR}${SBINDIR}"
+	[ ! -d "${DESTDIR}${SBINDIR}" ] && mkdir -p "${DESTDIR}${SBINDIR}" || true
 	install --group=root --mode=750 --owner=root epd_fuse "${DESTDIR}${SBINDIR}"
-	test ! -d "${DESTDIR}${SYSCONFDIR}/default" && mkdir -p "${DESTDIR}${SYSCONFDIR}/default"
+	[ ! -d "${DESTDIR}${SYSCONFDIR}/default" ] && mkdir -p "${DESTDIR}${SYSCONFDIR}/default" || true
 	[ -e "${DESTDIR}${SYSCONFDIR}/default/epd-fuse" ] || install --group=root --mode=644 --owner=root epd-fuse.default "${DESTDIR}${SYSCONFDIR}/default/epd-fuse"
 ifeq (systemd,${SERVICE})
-	test ! -d "${DESTDIR}${LIBDIR}/systemd/system" && mkdir -p "${DESTDIR}${LIBDIR}/systemd/system"
+	[ ! -d "${DESTDIR}${LIBDIR}/systemd/system" ] && mkdir -p "${DESTDIR}${LIBDIR}/systemd/system" || true
 	install --group=root --mode=644 --owner=root epd-fuse.service "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
 else # otherwise Debian
 	if [ -e "${EPD_FUSE_CONF}" ] ; \
 	then \
-	  test ! -d "${DESTDIR}${SYSCONFDIR}/init" && mkdir -p "${DESTDIR}${SYSCONFDIR}/init" ; \
+	  [ ! -d "${DESTDIR}${SYSCONFDIR}/init" ] && mkdir -p "${DESTDIR}${SYSCONFDIR}/init" || true ; \
 	  install --group=root --mode=644 --owner=root "${EPD_FUSE_CONF}" "${DESTDIR}${SYSCONFDIR}/init" ; \
 	fi
 	if [ -e "${EPD_FUSE_SH}" ] ; \
 	then \
-	  test ! -d "${DESTDIR}${SYSCONFDIR}/init.d" && mkdir -p "${DESTDIR}${SYSCONFDIR}/init.d" ; \
+	  [ ! -d "${DESTDIR}${SYSCONFDIR}/init.d" ] && mkdir -p "${DESTDIR}${SYSCONFDIR}/init.d" || true ; \
 	  install --group=root --mode=755 --owner=root "${EPD_FUSE_SH}" "${DESTDIR}${SYSCONFDIR}/init.d/epd-fuse" ; \
 	fi
 endif
