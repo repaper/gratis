@@ -351,12 +351,12 @@ void GPIO_mode(GPIO_pin_type pin, GPIO_mode_type mode) {
 }
 
 
-int GPIO_read(int pin) {
-	if (pin < 0 || pin > 63) {
+int GPIO_read(GPIO_pin_type pin) {
+	if ((unsigned)(pin) > 63) {
 		return 0;
 	}
 	uint32_t offset = GPLEV0;
-	if (pin >= 32) {
+	if ((unsigned)(pin) >= 32) {
 		offset = GPLEV1;
 		pin -= 32;
 	}
@@ -369,11 +369,11 @@ int GPIO_read(int pin) {
 
 
 void GPIO_write(GPIO_pin_type pin, int value) {
-	if (pin < 0 || pin > 63) {
+	if ((unsigned)(pin) > 63) {
 		return;
 	}
 	uint32_t offset = (value != 0) ? GPSET0 : GPCLR0;
-	if (pin >= 32) {
+	if ((unsigned)(pin) >= 32) {
 		offset = (value != 0) ? GPSET1 : GPCLR1;
 		pin -= 32;
 	}
@@ -383,7 +383,7 @@ void GPIO_write(GPIO_pin_type pin, int value) {
 
 
 // only affetct PWM if correct pin is addressed
-void GPIO_pwm_write(int pin, uint32_t value) {
+void GPIO_pwm_write(GPIO_pin_type pin, uint32_t value) {
 	if (GPIO_P1_12 == pin) {
 		pwm_map[DAT1] = value;
 	}

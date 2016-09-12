@@ -73,13 +73,13 @@ bool GPIO_teardown();
 void GPIO_mode(GPIO_pin_type pin, GPIO_mode_type mode);
 
 // return a value (0/1) for a given input pin
-int GPIO_read(int pin);
+int GPIO_read(GPIO_pin_type pin);
 
 // set or clear a given output pin
 void GPIO_write(GPIO_pin_type pin, int value);
 
 // set the PWM ration 0..1023 for hardware PWM pin (GPIO_P1_12)
-void GPIO_pwm_write(int pin, uint32_t value);
+void GPIO_pwm_write(GPIO_pin_type pin, uint32_t value);
 
 
 #endif
