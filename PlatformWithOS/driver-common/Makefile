@@ -33,9 +33,6 @@ LDFLAGS += -lrt
 
 RM = rm -f
 
-UNAME_r := $(shell uname -r)
-IS_ARCH := $(if $(findstring ARCH,${UNAME_r}),YES,NO)
-
 LINUX_MAJOR_VERSION := $(shell uname -r |cut -d '.' -f 1)
 
 VPATH = .:${PLATFORM}/linux-${LINUX_MAJOR_VERSION}:${PLATFORM}:${EPD_DIR}
