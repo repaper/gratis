@@ -1,8 +1,9 @@
 # Makefile
 
 DESTDIR ?= ""
-PREFIX ?= /usr/local
-SERVICE ?= initd
+PREFIX ?= /usr
+#SERVICE ?= initd
+SERVICE ?= systemd
 
 PANEL_VERSION ?= NOT-SET
 EPD_IO ?= epd_io.h
@@ -26,12 +27,12 @@ help:
 	@echo
 	@echo Raspberry Pi:
 	@echo '   $(MAKE) rpi            = build all targets'
-	@echo '   $(MAKE) rpi-install    = install fuse driver in PREFIX'
+	@echo '   $(MAKE) rpi-install    = install fuse driver in PREFIX=${PREFIX} SERVICE=${SERVICE}'
 	@echo '   $(MAKE) rpi-T          = build only target T'
 	@echo
 	@echo BeagleBone
 	@echo '   $(MAKE) bb             = build all targets'
-	@echo '   $(MAKE) bb-install     = install fuse driver in PREFIX'
+	@echo '   $(MAKE) bb-install     = install fuse driver in PREFIX=${PREFIX} SERVICE=${SERVICE}'
 	@echo '   $(MAKE) bb-T           = build only target T'
 	@echo
 	@echo Where T is one of:
@@ -39,8 +40,10 @@ help:
 	@echo '    epd_test gpio_test epd_fuse'
 	@echo
 	@echo Notes:
-	@echo 1. the default install PREFIX=/usr
-	@echo 2. if not root must use sudo when installing
+	@echo 1. the default install: PREFIX=${PREFIX}
+	@echo 2. the default startup: SERVICE=${SERVICE}
+	@echo '   use SERVICE=initd or SERVICE=systemd as appropriate'
+	@echo 3. if not root must use sudo when installing
 	@echo
 
 .PHONY: all

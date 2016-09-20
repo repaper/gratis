@@ -53,7 +53,7 @@ pacman -S git base-devel fuse
 Install python2 imaging libraries (PIL) and some fonts
 
 ~~~~~
-pacman -S python-imaging ttf-dejavu
+pacman -S python2-pillow ttf-dejavu
 # Clock27.py uses:
 pacman -S ttf-freefont
 ~~~~~
@@ -61,7 +61,7 @@ pacman -S ttf-freefont
 All above/below on a single install: (for convenience)
 
 ~~~~~
-pacman -S mg zsh curl rsync ntp git base-devel fuse python-imaging ttf-dejavu ttf-freefont tmux
+pacman -S mg zsh curl rsync ntp git base-devel fuse python2-pillow ttf-dejavu ttf-freefont tmux
 ~~~~~
 
 
