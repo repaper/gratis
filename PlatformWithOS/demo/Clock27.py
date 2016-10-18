@@ -58,40 +58,40 @@ CLOCK_FONT_SIZE = 80
 # date
 
 if (now.month in [2, 11, 12]): # February, November, December
-	DATE_FONT_SIZE  = 25
-	DATE_X = 10
+    DATE_FONT_SIZE  = 25
+    DATE_X = 10
 elif (now.month in [9]): # September
-        DATE_FONT_SIZE  = 24
-        DATE_X = 10
+    DATE_FONT_SIZE  = 24
+    DATE_X = 10
 elif (now.month in [1, 10]): # January, October
-	DATE_FONT_SIZE  = 26
-	DATE_X = 10
+    DATE_FONT_SIZE  = 26
+    DATE_X = 10
 elif (now.month in [3, 4, 8]): # March, April, August
-	DATE_FONT_SIZE  = 28
-        DATE_X = 15
+    DATE_FONT_SIZE  = 28
+    DATE_X = 15
 else: # May, June, July
-	DATE_FONT_SIZE  = 32 
-	DATE_X = 24
+    DATE_FONT_SIZE  = 32 
+    DATE_X = 24
 
 DATE_Y=50
 
 # day of week
 
 if (now.weekday() in [1]): # Tuesday
-	WEEKDAY_FONT_SIZE  = 44
-	WEEKDAY_X = 40
+    WEEKDAY_FONT_SIZE  = 44
+    WEEKDAY_X = 40
 
 elif (now.weekday() in [2]): # Wednesday
-	WEEKDAY_FONT_SIZE  = 44
-	WEEKDAY_X = 13
+    WEEKDAY_FONT_SIZE  = 44
+    WEEKDAY_X = 13
 
 elif (now.weekday() in [3, 5]): # Thursday, Saturday
-	WEEKDAY_FONT_SIZE  = 44
-	WEEKDAY_X = 30
+    WEEKDAY_FONT_SIZE  = 44
+    WEEKDAY_X = 30
 
 else:
-	WEEKDAY_FONT_SIZE  = 48 # Monday, Friday, Sunday
-	WEEKDAY_X = 45
+    WEEKDAY_FONT_SIZE  = 48 # Monday, Friday, Sunday
+    WEEKDAY_X = 45
 
 WEEKDAY_Y = 3
 
@@ -118,28 +118,28 @@ DAYS = [
 ]
 
 MONTHS = [
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
 ]
 
 def get_temp():
-#	results = bus.read_i2c_block_data(addr_temp,0)
-#	Temp = results[0] << 8 | results[1]
-#	Temp = Temp >> 5
-	output = subprocess.check_output(["cat", "/dev/epd/temperature"])
-	Temp = int(output)*10
-	Temp = float(Temp/10)
-	return Temp
+#   results = bus.read_i2c_block_data(addr_temp,0)
+#   Temp = results[0] << 8 | results[1]
+#   Temp = Temp >> 5
+    output = subprocess.check_output(["cat", "/dev/epd/temperature"])
+    Temp = int(output)*10
+    Temp = float(Temp/10)
+    return Temp
 
 
 def main(argv):
@@ -186,9 +186,10 @@ def demo(epd):
                 first_start = False
                 break
             time.sleep(0.2) # What is this for?
-
-        if now.day != previous_day:
-            FULL = True		
+        FULL = False
+        now = datetime.today()
+        if now.minute % 5 == 0:
+            FULL = True     
             draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
             draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
             draw.text((WEEKDAY_X, WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
@@ -196,11 +197,11 @@ def demo(epd):
             previous_day = now.day
         else:
             draw.rectangle((TEMP_X, TEMP_Y, width - 3, height - 3), fill=WHITE, outline=WHITE)
-	   # print (width - X_OFFSET), "  ", (height - Y_OFFSET)	
-	   # draw.rectangle((0,86,264,176), fill=WHITE, outline=WHITE)
+       # print (width - X_OFFSET), "  ", (height - Y_OFFSET)    
+       # draw.rectangle((0,86,264,176), fill=WHITE, outline=WHITE)
 #        draw.text((X_OFFSET, Y_OFFSET), '{h:02d}:{m:02d}'.format(h=now.hour, m=now.minute), fill=BLACK, font=clock_font)
-	temp_str = "Temperature is " + str(get_temp()) + chr(176) + "C"
-	draw.text((TEMP_X, TEMP_Y), temp_str, fill=BLACK, font=temp_font)
+        temp_str = "Temperature is " + str(get_temp()) + chr(176) + "C"
+        draw.text((TEMP_X, TEMP_Y), temp_str, fill=BLACK, font=temp_font)
         draw.text((X_OFFSET, Y_OFFSET), '{h:02d}'.format(h=now.hour), fill=BLACK, font=clock_font)
 
         colon_x1 = width / 2 - COLON_SIZE
@@ -212,13 +213,13 @@ def demo(epd):
         draw.text((X_OFFSET + width / 2, Y_OFFSET), '{m:02d}'.format(m=now.minute), fill=BLACK, font=clock_font)
 
         # display image on the panel
-#	epd.clear()
+#   epd.clear()
         epd.display(image)
         if FULL == True:
-		epd.update()
-                FULL = False 
-	else:
-		epd.partial_update()
+            epd.update()
+            FULL = False 
+        else:
+            epd.partial_update()
 
 # main
 if "__main__" == __name__:
