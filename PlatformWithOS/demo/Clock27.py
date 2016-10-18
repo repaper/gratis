@@ -190,16 +190,17 @@ def demo(epd):
         now = datetime.today()
         if now.minute % 5 == 0:
             FULL = True     
-            draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
-            draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
-            draw.text((WEEKDAY_X, WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
-            draw.text((DATE_X, DATE_Y), '{d:02d} {m:s} {y:04d}'.format(y=now.year, m=MONTHS[now.month-1], d=now.day), fill=BLACK, font=date_font)
-            previous_day = now.day
+#            previous_day = now.day
         else:
             draw.rectangle((TEMP_X, TEMP_Y, width - 3, height - 3), fill=WHITE, outline=WHITE)
        # print (width - X_OFFSET), "  ", (height - Y_OFFSET)    
        # draw.rectangle((0,86,264,176), fill=WHITE, outline=WHITE)
 #        draw.text((X_OFFSET, Y_OFFSET), '{h:02d}:{m:02d}'.format(h=now.hour, m=now.minute), fill=BLACK, font=clock_font)
+        draw.rectangle((1, 1, width - 1, height - 1), fill=WHITE, outline=BLACK)
+        draw.rectangle((2, 2, width - 2, height - 2), fill=WHITE, outline=BLACK)
+        draw.text((WEEKDAY_X, WEEKDAY_Y), '{w:s}'.format(w=DAYS[now.weekday()]), fill=BLACK, font=weekday_font)
+        draw.text((DATE_X, DATE_Y), '{d:02d} {m:s} {y:04d}'.format(y=now.year, m=MONTHS[now.month-1], d=now.day), fill=BLACK, font=date_font)
+
         temp_str = "Temperature is " + str(get_temp()) + chr(176) + "C"
         draw.text((TEMP_X, TEMP_Y), temp_str, fill=BLACK, font=temp_font)
         draw.text((X_OFFSET, Y_OFFSET), '{h:02d}'.format(h=now.hour), fill=BLACK, font=clock_font)
