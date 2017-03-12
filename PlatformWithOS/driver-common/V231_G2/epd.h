@@ -46,7 +46,8 @@ typedef enum {           // error codes
 	EPD_OK,
 	EPD_UNSUPPORTED_COG,
 	EPD_PANEL_BROKEN,
-	EPD_DC_FAILED
+	EPD_DC_FAILED,
+	EPD_UNDEFINED
 } EPD_error;
 
 typedef struct EPD_struct EPD_type;
