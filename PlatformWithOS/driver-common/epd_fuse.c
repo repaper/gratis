@@ -95,11 +95,11 @@ static const struct panel_struct {
 };
 
 static const char *error_texts[] = {
-  "OK",               // EPD_OK
-  "Unsupported COG",  // EPD_UNSUPPORTED_COG
-  "Panel broken",     // EPD_PANEL_BROKEN
-  "DC Failed",        // EPD_DC_FAILED
-  "Undefined"         // EPD_UNDEFINED
+  "OK\n",               // EPD_OK
+  "Unsupported COG\n",  // EPD_UNSUPPORTED_COG
+  "Panel broken\n",     // EPD_PANEL_BROKEN
+  "DC Failed\n",        // EPD_DC_FAILED
+  "Undefined\n"         // EPD_UNDEFINED
 };
 
 // need to sync size with above (max of all sizes)

@@ -1,5 +1,5 @@
 # gratis
-## Branch notes
+## Partial Update implementation notes, February 2016
 
 This branch implements a proper partial update following the algorithm outlined
 in the discussion of issue #19 on the repaper/gratis github repository.
@@ -24,7 +24,7 @@ For a YouTube video showing the difference between before and after the fix see 
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=dciaFRKtetU" target="_blank"><img src="http://img.youtube.com/vi/dciaFRKtetU/0.jpg" alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
-## Original README below
+## Notes for Energia support, August 2015
 
 Updated 2015-08-01 by Rei Vilo
 
