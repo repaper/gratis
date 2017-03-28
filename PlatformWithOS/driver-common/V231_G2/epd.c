@@ -134,6 +134,7 @@ EPD_type *EPD_create(EPD_size size,
 		return NULL;
 	}
 
+	epd->status = EPD_UNDEFINED;
 	epd->spi = spi;
 	epd->timer = timer;
 
