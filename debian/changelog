@@ -1,3 +1,9 @@
+epd-fuse (0.1.2) unstable; urgency=low
+
+  * Improved systemd service file handling
+
+ -- EngSaS - Joachim Langenbach <info@engsas.de>  Fri, 21 Apr 2017 13:50:00 +0200
+
 epd-fuse (0.1.1) unstable; urgency=low
 
   * Switched python packages to architecture all instead of any
