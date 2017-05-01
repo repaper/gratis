@@ -1,4 +1,15 @@
 # gratis
+## Finer granularity for the stage time temperature dependency (May 2017)
+
+The code for this change is copied from https://github.com/campag/gratis.
+All credit for the code changes (PlatformWithOS/driver-common/V231_G2/epd.c) goes to David Lowe.
+The original code changes the stage time at only a few discrete temperatures.
+THe changed code does it with a much finer (almost continuous) granularity.
+See the two figures below.
+![new vs old stage time temperature dependency](fig1.png)
+The second figure is a zoom on the temperature range 15 - 65 degree C.
+![new vs old stage time, zoom](fig2.png)
+
 ## Partial Update implementation notes, February 2016
 
 This branch implements a proper partial update following the algorithm outlined
@@ -18,7 +29,7 @@ Following changes as outlined in issue #13:
 * in epd.c EPD_end() set COG_on to false at the end of the function.
 * in epd.c EPD_partial_image() only call the last stage (EPD_normal).
 
-With these changes you can get a proper partial display update frequency < 1 Hz.
+With these changes you can get a proper partial display update frequency > 1 Hz.
 
 For a YouTube video showing the difference between before and after the fix see https://youtu.be/dciaFRKtetU
 

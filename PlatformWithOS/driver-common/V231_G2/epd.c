@@ -22,6 +22,7 @@
 #include <err.h>
 #include <time.h>
 #include <signal.h>
+#include <math.h>
 
 #include "gpio.h"
 #include "spi.h"
@@ -30,6 +31,7 @@
 // delays - more consistent naming
 #define Delay_ms(ms) usleep(1000 * (ms))
 #define Delay_us(us) usleep(us)
+#define T_FACT_MUL (100)
 #define LOW 0
 #define HIGH 1
 #define digitalRead(pin) GPIO_read(pin)
@@ -489,7 +491,7 @@ static void power_off(EPD_type *epd) {
 
 
 void EPD_set_temperature(EPD_type *epd, int temperature) {
-	epd->factored_stage_time = epd->base_stage_time * temperature_to_factor_10x(temperature) / 10;
+	epd->factored_stage_time = epd->base_stage_time * temperature_to_factor_mul(temperature) / T_FACT_MUL;
 }
 
 
@@ -530,23 +532,14 @@ void EPD_partial_image(EPD_type *epd, const uint8_t *old_image, const uint8_t *n
 
 // convert a temperature in Celsius to
 // the scale factor for frame_*_repeat methods
-static int temperature_to_factor_10x(int temperature) {
-	if (temperature <= -10) {
-		return 170;
-	} else if (temperature <= -5) {
-		return 120;
-	} else if (temperature <= 5) {
-		return 80;
-	} else if (temperature <= 10) {
-		return 40;
-	} else if (temperature <= 15) {
-		return 30;
-	} else if (temperature <= 20) {
-		return 20;
-	} else if (temperature <= 40) {
-		return 10;
+static int temperature_to_factor_mul(int temperature) {
+	if (temperature > 60) {
+		temperature = 60;
 	}
-	return 7;
+	else if (temperature < -20) {
+		temperature = -20;
+	}
+	return (int) (T_FACT_MUL * 6.2321 * exp(-0.071 * temperature));
 }
 
 
