@@ -2,9 +2,10 @@
 ## Fast Update notes, July 2017
 
 The update rate for Partial Update is determined by the temperature dependent stage time.
-For 25 degrees C a typiccal max update rate for the 2.7" display is about 1.5 Hz.
+For 25 degrees C a typical max update rate for the 2.7" display is about 1.5 Hz.
+
 The stage time decreases as the measured temperature increases.
-For some applications a faster update rate is useful.
+For some applications a faster update rate can be useful.
 This can be achieved by setting the stage time directly bypassing the normal temperature
 dependent setting of the stage time.
 This is the same mechanism as used in the Pervasive Displays Windows application for the
