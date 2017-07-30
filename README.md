@@ -1,7 +1,29 @@
 # gratis
-## Partial Update implementation notes, February 2016
+## Fast Update notes, July 2017
 
-This branch implements a proper partial update following the algorithm outlined
+The update rate for Partial Update is determined by the temperature dependent stage time.
+For 25 degrees C a typiccal max update rate for the 2.7" display is about 1.5 Hz.
+The stage time decreases as the measured temperature increases.
+For some applications a faster update rate is useful.
+This can be achieved by setting the stage time directly bypassing the normal temperature
+dependent setting of the stage time.
+This is the same mechanism as used in the Pervasive Displays Windows application for the
+TI Launchpad and the EXT2 development board (http://www.pervasivedisplays.com/kits/ext2_kit).
+  
+Decreasing the stage time increases the max update rate. If the stage time gets too small
+some ghosting (left overs from the previous image) will occur.
+Depending on the application some ghosting may be acceptable.
+
+This implementation uses the 'F' command to do a Fast Update using the stage time as set in
+/dev/epd/f_stage_time. 
+
+A video demonstrating the normal Partial Update and Fast Update for various stage times is
+available on YouTube.
+[![Fast Update Demo](https://img.youtube.com/vi/neGKnfJFHx4/0.jpg)](https://www.youtube.com/watch?v=neGKnfJFHx4)
+
+## Partial Update notes, February 2016
+
+This partial update implementation follows the algorithm outlined
 in the discussion of issue #19 on the repaper/gratis github repository.
 
 The original code in epd_fuse.c and V231G2/epd.c under PlatformWithOS did a full 4 cycle display update

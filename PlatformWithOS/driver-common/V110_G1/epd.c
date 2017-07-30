@@ -463,6 +463,10 @@ void EPD_set_temperature(EPD_type *epd, int temperature) {
 	epd->factored_stage_time = epd->stage_time * temperature_to_factor_10x(temperature) / 10;
 }
 
+void EPD_set_factored_stage_time(EPD_type *epd, int pu_stagetime) {
+        epd->factored_stage_time = pu_stagetime;
+}
+
 // clear display (anything -> white)
 void EPD_clear(EPD_type *epd) {
 	frame_fixed_repeat(epd, 0xff, EPD_compensate);
