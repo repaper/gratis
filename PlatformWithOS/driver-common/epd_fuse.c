@@ -49,7 +49,7 @@ static const char *display_path          = "/display";          // the next imag
 static const char *display_inverted_path = "/display_inverse";  // the next image to display
 static const char *command_path          = "/command";          // any write transfers display -> EPD and updates current
 static const char *temperature_path      = "/temperature";      // read/write temperature compensation setting
-
+static const char *error_path            = "/error";            // error text
 static const char *spi_device = SPI_DEVICE;        // default SPI device path
 static const uint32_t spi_bps = SPI_BPS;           // default SPI device speed
 
@@ -94,6 +94,13 @@ static const struct panel_struct {
 	{NULL, NULL, 0, 0, 0, 0}  // must be last entry
 };
 
+static const char *error_texts[] = {
+  "OK\n",               // EPD_OK
+  "Unsupported COG\n",  // EPD_UNSUPPORTED_COG
+  "Panel broken\n",     // EPD_PANEL_BROKEN
+  "DC Failed\n",        // EPD_DC_FAILED
+  "Undefined\n"         // EPD_UNDEFINED
+};
 
 // need to sync size with above (max of all sizes)
 // this will be the next display
@@ -177,6 +184,11 @@ static int display_getattr(const char *path, struct stat *stbuf) {
 		stbuf->st_nlink = 1;
 		stbuf->st_size = 4;
 
+	} else if (strcmp(path, error_path) == 0) {
+		stbuf->st_mode = S_IFREG | 0444;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = (epd ? strlen(error_texts[EPD_status(epd)]) : 0);
+
 	} else {
 		return display_subdir_getattr(path, stbuf);
 	}
@@ -201,6 +213,7 @@ static int display_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		filler(buf, command_path + 1, NULL, 0);
 		filler(buf, temperature_path + 1, NULL, 0);
 		filler(buf, version_path + 1, NULL, 0);
+		filler(buf, error_path + 1, NULL, 0);
 		return 0;
 	} else if (strcmp(path, "/BE") == 0 ||
 		   strcmp(path, "/LE") == 0) {
@@ -223,7 +236,8 @@ static int display_open(const char *path, struct fuse_file_info *fi) {
 	    strcmp(path, temperature_path) == 0) {
 		write_allowed = true;
 	} else if (strcmp(path, panel_path) == 0 ||
-		   strcmp(path, version_path) == 0) {
+		   strcmp(path, version_path) == 0 ||
+		   strcmp(path, error_path) == 0) {
 		write_allowed = false;
 	} else {
 		if (strncmp(path, "/BE/", 4) == 0) {
@@ -348,6 +362,9 @@ static int display_read(const char *path, char *buffer, size_t size, off_t offse
 		char t_buffer[16];
 		int length = snprintf(t_buffer, sizeof(t_buffer), "%3d\n", t);
 		return buffer_read(buffer, size, offset, t_buffer, length, false, false);
+	} else if (strcmp(path, error_path) == 0) {
+		const char *t_buf = error_texts[EPD_status(epd)];
+		return buffer_read(buffer, size, offset, t_buf, strlen(t_buf), false, false);
 	}
 
 	// test big/little endian

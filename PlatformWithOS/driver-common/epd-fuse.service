@@ -10,9 +10,9 @@ SyslogLevel=err
 # make sure panel size matches installed EPD panel
 Environment=EPD_MOUNTPOINT=/dev/epd EPD_SIZE=2.0 "EPD_OPTS=-o allow_other -o default_permissions"
 EnvironmentFile=/etc/default/epd-fuse
-ExecStartPre=/usr/bin/mkdir -p ${EPD_MOUNTPOINT}
+ExecStartPre=/usr/bin/env mkdir -p ${EPD_MOUNTPOINT}
 ExecStart=/usr/sbin/epd_fuse --panel=${EPD_SIZE} $EPD_OPTS ${EPD_MOUNTPOINT}
-ExecStop=/usr/bin/umount /dev/epd
+ExecStop=/usr/bin/env umount /dev/epd
 KillSignal=SIGQUIT
 KillMode=mixed
 

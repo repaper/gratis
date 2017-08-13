@@ -398,49 +398,26 @@ void GPIO_pwm_write(GPIO_pin_type pin, uint32_t value) {
 
 bool get_cpu_io_base_address(uint32_t *base) {
 
-	int info_fd = open(cpu_info_file, O_RDONLY);
+	char buffer[8];
+	const char *ranges_file = "/proc/device-tree/soc/ranges";
+	int info_fd = open(ranges_file, O_RDONLY);
 
 	if (info_fd < 0) {
-		warn("cannot open: %s", cpu_info_file);
+		warn("cannot open: %s", ranges_file);
 		return false;
 	}
 
-	char buffer[8192];  // cpuinfo is not very big (on Rpi B2: "cat /proc/cpuinfo | wc -c" -> 1112 bytes)
-	memset(buffer, 0, sizeof(buffer)); // ensure nul('\0') terminated
-
-	ssize_t n = read(info_fd, buffer, sizeof(buffer) - 1);
+	ssize_t n = read(info_fd, buffer, sizeof(buffer) );
 	close(info_fd);
 
-	if (n < 0) {
+	if (n != 8) {
+		warn("cannot read base address: %s", ranges_file);
 		return false;
 	}
 
-	// locate the key
-	char *p = strstr(buffer, cpu_info_key);
-	if (NULL == p) {
-		return false;
-	}
+	*base =  (buffer[4] << 24) + (buffer[5] << 16) + (buffer[6] << 8) + (buffer[7] << 0);
 
-	p += strlen(cpu_info_key);
-
-	while (isspace(*p) || ':' == *p) {
-		++p;
-	}
-	char *p1 = p;
-	while (isalnum(*p1)) {
-		++p1;
-	}
-
-	for (int i = 0; i < SIZE_OF_ARRAY(chips); ++i) {
-		size_t l = p1 - p;
-		if (strlen(chips[i].name) == l && 0 == strncmp(chips[i].name, p, l)) {
-			*base = chips[i].base;
-			return true;
-		}
-	}
-
-	// failed
-	return false;
+	return true;
 }
 
 // setup a map to a peripheral offset
