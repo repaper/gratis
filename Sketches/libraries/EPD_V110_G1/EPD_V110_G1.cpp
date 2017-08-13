@@ -1,5 +1,8 @@
 // Copyright 2013-2015 Pervasive Displays, Inc.
 //
+// Teensy 3.1/3.2 and ESP32 adaptions:
+//   Copyright 2016-2017 Wolfgang Astleitner (mrwastl@serdisplib.sf.net)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at:
@@ -28,9 +31,15 @@
 #define ARRAY(type, ...) ((type[]){__VA_ARGS__})
 #define CU8(...) (ARRAY(const uint8_t, __VA_ARGS__))
 
+#ifndef ESP32
+	#define SPI_OBJECT  SPI
+#else
+	#include "EPD_PINOUT_ESP32.h"
+	#define SPI_OBJECT  esp32_spi
+#endif
 
-static void PWM_start(int pin);
-static void PWM_stop(int pin);
+static void PWM_start(int pin_chan);
+static void PWM_stop(int pin_chan);
 
 static void SPI_on(void);
 static void SPI_off(void);
@@ -47,7 +56,11 @@ EPD_Class::EPD_Class(EPD_size _size,
 		     uint8_t pwm_pin,
 		     uint8_t reset_pin,
 		     uint8_t busy_pin,
-		     uint8_t chip_select_pin) :
+		     uint8_t chip_select_pin
+#ifdef ESP32
+		    ,uint8_t pwm_channel
+#endif
+	) :
 	EPD_Pin_PANEL_ON(panel_on_pin),
 	EPD_Pin_BORDER(border_pin),
 	EPD_Pin_DISCHARGE(discharge_pin),
@@ -55,6 +68,9 @@ EPD_Class::EPD_Class(EPD_size _size,
 	EPD_Pin_RESET(reset_pin),
 	EPD_Pin_BUSY(busy_pin),
 	EPD_Pin_EPD_CS(chip_select_pin),
+#ifdef ESP32
+	EPD_Channel_PWM(pwm_channel),
+#endif
 	size(_size) {
 
 	this->base_stage_time = 480; // milliseconds
@@ -111,6 +127,15 @@ EPD_Class::EPD_Class(EPD_size _size,
 	}
 
 	this->factored_stage_time = this->base_stage_time;
+  
+#if defined (ESP32)
+	// inialise ledcWrite()
+	pinMode(pwm_pin, OUTPUT);
+	ledcAttachPin(pwm_pin, pwm_channel);
+	ledcSetup(pwm_channel, /*10000*/ 488.28, 8);
+	// set SPI frequency (defined in EPD_PINOUT_ESP32.h)
+	SPI_OBJECT.setFrequency(ESP32_SPI_Frequency);
+#endif
 }
 
 
@@ -125,7 +150,11 @@ void EPD_Class::begin(void) {
 
 	SPI_on();
 
+#ifndef ESP32
 	PWM_start(this->EPD_Pin_PWM);
+#else
+	PWM_start(this->EPD_Channel_PWM);
+#endif
 	Delay_ms(25);                       // Allow time for PWM to start
 	digitalWrite(this->EPD_Pin_PANEL_ON, HIGH);
 	Delay_ms(10);
@@ -206,7 +235,11 @@ void EPD_Class::begin(void) {
 
 	// final delay before PWM off
 	Delay_ms(30);
+#ifndef ESP32
 	PWM_stop(this->EPD_Pin_PWM);
+#else
+	PWM_stop(this->EPD_Channel_PWM);
+#endif
 
 	// charge pump negative voltage on
 	Delay_us(10);
@@ -590,11 +623,15 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 
 
 static void SPI_on(void) {
-	SPI.end();
-	SPI.begin();
-	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE2);
-	SPI.setClockDivider(SPI_CLOCK_DIV2);
+	SPI_OBJECT.end();
+#ifndef ESP32
+	SPI_OBJECT.begin();
+#else
+	SPI_OBJECT.begin(Pin_SPI_SCK, Pin_SPI_MISO, Pin_SPI_MOSI);
+#endif
+	SPI_OBJECT.setBitOrder(MSBFIRST);
+	SPI_OBJECT.setDataMode(SPI_MODE2);
+	SPI_OBJECT.setClockDivider(SPI_CLOCK_DIV2);
 	SPI_put(0x00);
 	SPI_put(0x00);
 	Delay_us(10);
@@ -604,17 +641,17 @@ static void SPI_on(void) {
 static void SPI_off(void) {
 	// SPI.begin();
 	// SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
+	SPI_OBJECT.setDataMode(SPI_MODE0);
 	// SPI.setClockDivider(SPI_CLOCK_DIV2);
 	SPI_put(0x00);
 	SPI_put(0x00);
 	Delay_us(10);
-	SPI.end();
+	SPI_OBJECT.end();
 }
 
 
 static void SPI_put(uint8_t c) {
-	SPI.transfer(c);
+	SPI_OBJECT.transfer(c);
 }
 
 
@@ -642,11 +679,19 @@ static void SPI_send(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) {
 }
 
 
-static void PWM_start(int pin) {
-	analogWrite(pin, 128);  // 50% duty cycle
+static void PWM_start(int pin_chan) {
+#if defined (ESP32)
+	ledcWrite(pin_chan, 128);  // 50% duty cycle
+#else
+	analogWrite(pin_chan, 128);  // 50% duty cycle
+#endif
 }
 
 
-static void PWM_stop(int pin) {
-	analogWrite(pin, 0);
+static void PWM_stop(int pin_chan) {
+#if defined (ESP32)
+	ledcWrite(pin_chan, 0);
+#else
+	analogWrite(pin_chan, 0);
+#endif
 }

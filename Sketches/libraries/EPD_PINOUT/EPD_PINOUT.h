@@ -1,4 +1,5 @@
 // Copyright 2013-2015 Pervasive Displays, Inc.
+// Copyright 2016-2017 Wolfgang Astleitner (mrwastl@users.sourceforge.net)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +20,8 @@
 
 #if defined(CORE_TEENSY)
 #include <EPD_PINOUT_Teensy.h>
+#elif defined(ESP32)
+#include <EPD_PINOUT_ESP32.h>
 #elif defined(ENERGIA)
 #include <EPD_PINOUT_Energia.h>
 #else

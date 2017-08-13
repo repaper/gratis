@@ -1,5 +1,5 @@
 // Copyright 2013-2015 Pervasive Displays, Inc.
-// Copyright 2016 Wolfgang Astleitner (mrwastl@users.sourceforge.net)
+// Copyright 2016-2017 Wolfgang Astleitner (mrwastl@users.sourceforge.net)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 // pinout is taken from:
 //   https://forum.pjrc.com/threads/25793-2-7-inch-ePaper-on-Teensy-does-not-compile-Adafruit_GFX#post53636
 
-// Teensy 3.x IO layout
+// Teensy 3.1/3.2 IO layout
 const int Pin_TEMPERATURE = A0;
 const int Pin_PANEL_ON = 2;
 const int Pin_BORDER = 3;
