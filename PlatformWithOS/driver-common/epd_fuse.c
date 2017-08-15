@@ -49,6 +49,8 @@ static const char *display_path          = "/display";          // the next imag
 static const char *display_inverted_path = "/display_inverse";  // the next image to display
 static const char *command_path          = "/command";          // any write transfers display -> EPD and updates current
 static const char *temperature_path      = "/temperature";      // read/write temperature compensation setting
+static const char *pu_stagetime_path     = "/pu_stagetime";     // stagetime to use for 'F' command,
+                                                                // bypassing temperature compensation.
 static const char *error_path            = "/error";            // error text
 static const char *spi_device = SPI_DEVICE;        // default SPI device path
 static const uint32_t spi_bps = SPI_BPS;           // default SPI device speed
@@ -56,6 +58,7 @@ static const uint32_t spi_bps = SPI_BPS;           // default SPI device speed
 // expect that external process changes this just before update command
 // by sending text string e.g. shell:  echo 19 > /dev/epd/temperature
 static int temperature = 25;                       // for external temperature compensation
+static int pu_stagetime = 500;                     // stagetime to use in 'F' command
 
 #define MAKE_STRING_HELPER(s) #s
 #define MAKE_STRING(s) MAKE_STRING_HELPER(s)
@@ -184,6 +187,11 @@ static int display_getattr(const char *path, struct stat *stbuf) {
 		stbuf->st_nlink = 1;
 		stbuf->st_size = 4;
 
+	} else if (strcmp(path, pu_stagetime_path) == 0) {
+		stbuf->st_mode = S_IFREG | 0666;
+		stbuf->st_nlink = 1;
+		stbuf->st_size = 5;
+
 	} else if (strcmp(path, error_path) == 0) {
 		stbuf->st_mode = S_IFREG | 0444;
 		stbuf->st_nlink = 1;
@@ -212,6 +220,7 @@ static int display_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		filler(buf, panel_path + 1, NULL, 0);
 		filler(buf, command_path + 1, NULL, 0);
 		filler(buf, temperature_path + 1, NULL, 0);
+		filler(buf, pu_stagetime_path + 1, NULL, 0);
 		filler(buf, version_path + 1, NULL, 0);
 		filler(buf, error_path + 1, NULL, 0);
 		return 0;
@@ -233,7 +242,8 @@ static int display_open(const char *path, struct fuse_file_info *fi) {
 
 	// read-write items
 	if (strcmp(path, command_path) == 0 ||
-	    strcmp(path, temperature_path) == 0) {
+	    strcmp(path, temperature_path) == 0 ||
+	    strcmp(path, pu_stagetime_path) == 0) {
 		write_allowed = true;
 	} else if (strcmp(path, panel_path) == 0 ||
 		   strcmp(path, version_path) == 0 ||
@@ -286,7 +296,8 @@ static int display_create(const char *path, mode_t mode, struct fuse_file_info *
 	(void) fi;
 
 	if (strcmp(path, command_path) == 0 ||
-	    strcmp(path, temperature_path) == 0) {
+	    strcmp(path, temperature_path) == 0 ||
+	    strcmp(path, pu_stagetime_path) == 0) {
 		return 0;
 	}
 
@@ -308,7 +319,8 @@ static int display_create(const char *path, mode_t mode, struct fuse_file_info *
 static int display_truncate(const char *path, off_t offset) {
 	(void) offset;
 	if (strcmp(path, command_path) == 0 ||
-	    strcmp(path, temperature_path) == 0) {
+	    strcmp(path, temperature_path) == 0 ||
+	    strcmp(path, pu_stagetime_path) == 0) {
 		return 0;
 	}
 
@@ -362,6 +374,16 @@ static int display_read(const char *path, char *buffer, size_t size, off_t offse
 		char t_buffer[16];
 		int length = snprintf(t_buffer, sizeof(t_buffer), "%3d\n", t);
 		return buffer_read(buffer, size, offset, t_buffer, length, false, false);
+	} else if (strcmp(path, pu_stagetime_path) == 0) {
+		int s = pu_stagetime;
+		if (s < 50) {
+			s = 50;
+		} else if (s > 2000) {
+			s = 2000;
+		}
+		char s_buffer[16];
+		int length = snprintf(s_buffer, sizeof(s_buffer), "%4d\n", s);
+		return buffer_read(buffer, size, offset, s_buffer, length, false, false);
 	} else if (strcmp(path, error_path) == 0) {
 		const char *t_buf = error_texts[EPD_status(epd)];
 		return buffer_read(buffer, size, offset, t_buf, strlen(t_buf), false, false);
@@ -408,6 +430,15 @@ static int display_write(const char *path, const char *buffer, size_t size, off_
 			long int n = strtol(buffer, &end, 0);
 			if (buffer != end && n >= -99 && n <= 99) {
 				temperature = (int)n;
+			}
+		}
+		return size;
+	} else if (strcmp(path, pu_stagetime_path) == 0) {
+		if (size > 0) {
+			char *end = NULL;
+			long int s = strtol(buffer, &end, 0);
+			if (buffer != end && s >= 50 && s <= 2000) {
+				pu_stagetime = (int)s;
 			}
 		}
 		return size;
@@ -607,7 +638,15 @@ static void run_command(const char c) {
 		break;
 
 	case 'P':  // partial update with contents of display
-		EPD_set_temperature(epd, temperature);
+	case 'F':  // partial update bypassing temperature compensation for stagetime
+		if (c == 'P') {
+			EPD_set_temperature(epd, temperature);
+		}
+#if EPD_PARTIAL_AVAILABLE
+		else {
+			EPD_set_factored_stage_time(epd, pu_stagetime);
+		}
+#endif 
 		EPD_begin(epd);
 		if (EPD_OK != EPD_status(epd)) {
 			warn("EPD_begin failed");

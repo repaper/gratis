@@ -104,6 +104,7 @@ panel        Read Only    String describing the panel and giving its pixel width
 current      Read Only    Binary image that  matches the currently displayed image (big endian)
 display      Read Write   Image being assembled for next display (big endian)
 temperature  Read Write   Set this to the current temperature in Celsius
+f_stage_time Read Write   Set stage time in milliseconds for 'F' command
 command      Write Only   Execute display operation
 BE           Directory    Big endian version of current and display
 LE           Directory    Little endian version of current and display
@@ -112,6 +113,8 @@ Command   Byte   Description
 --------  -----  --------------------------------
 'C'       0x43   Clear the EPD, set `current` to all zeros, `display` is not affected
 'U'       0x5A   Erase `current` from EPD, output `display` to EPD, copy display to `current`
+'P'       0x50   Do partial update of display by only updating the changed parts
+'F'       0x46   Same as partial update, but use user defined stage time
 
 Notes:
 

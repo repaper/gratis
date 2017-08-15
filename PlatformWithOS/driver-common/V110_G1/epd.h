@@ -66,6 +66,9 @@ void EPD_destroy(EPD_type *epd);
 // set the temperature compensation (call before begin)
 void EPD_set_temperature(EPD_type *epd, int temperature);
 
+// set factored_stage_time directly ('F' command)
+void EPD_set_factored_stage_time(EPD_type *epd, int pu_stagetime);
+
 // sequence start/end
 void EPD_begin(EPD_type *epd);
 void EPD_end(EPD_type *epd);
