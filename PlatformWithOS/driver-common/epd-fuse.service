@@ -1,6 +1,6 @@
 [Unit]
 Description=A Fuse driver for the Repaper.org EPD
-After=network.target
+After=network.target dev-serial1.device
 
 [Service]
 Type=forking
