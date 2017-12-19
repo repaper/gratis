@@ -58,6 +58,8 @@ install: check-compiled
 ifeq (systemd,${SERVICE})
 	[ ! -d "${DESTDIR}${LIBDIR}/systemd/system" ] && mkdir -p "${DESTDIR}${LIBDIR}/systemd/system" || true
 	install --group=root --mode=644 --owner=root epd-fuse.service "${DESTDIR}${LIBDIR}/systemd/system/epd-fuse.service"
+	[ ! -d "${DESTDIR}${SYSCONFDIR}/udev/rules.d" ] && mkdir -p "${DESTDIR}${SYSCONFDIR}/udev/rules.d" || true
+	install --group=root --mode=644 --owner=root 98-spidev.rules "${DESTDIR}${SYSCONFDIR}/udev/rules.d/98-spidev.rules"
 else # otherwise Debian
 	if [ -e "${EPD_FUSE_CONF}" ] ; \
 	then \
