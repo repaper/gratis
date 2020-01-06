@@ -7,7 +7,7 @@ SERVICE ?= initd
 include ../directories.mk
 
 PLATFORM ?= ../RasberryPi
-PANEL_VERSION ?= v231_g2
+PANEL_VERSION ?= V231_G2
 EPD_IO ?= epd_io.h
 
 FUSE_CFLAGS := $(shell pkg-config fuse --cflags)
@@ -25,11 +25,17 @@ CFLAGS += ${FUSE_CFLAGS}
 CFLAGS += -Wall -Werror -std=gnu99
 CFLAGS += -I${PLATFORM}
 CFLAGS += -I${EPD_DIR}
+ifeq ($(PLATFORM),../RaspberryPi)
+CFLAGS += -I/opt/vc/include
+endif
 CFLAGS += -I.
 CFLAGS += -DEPD_IO='"${EPD_IO}"'
 
 LDFLAGS += ${FUSE_LDFLAGS}
 LDFLAGS += -lrt
+ifeq ($(PLATFORM),../RaspberryPi)
+LDFLAGS += -L/opt/vc/lib -lbcm_host
+endif
 
 RM = rm -f
 
