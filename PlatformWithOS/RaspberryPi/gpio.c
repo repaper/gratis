@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <err.h>
 
+#include <bcm_host.h>
 #include "gpio.h"
 
 // register addresses in Rasberry PI
@@ -233,7 +234,6 @@ volatile uint32_t *clock_map;
 
 
 // local function prototypes;
-static bool get_cpu_io_base_address(uint32_t *base);
 static bool create_rw_map(volatile uint32_t **map, int fd, uint32_t base_address, uint32_t offset);
 static bool delete_map(volatile uint32_t *address);
 
@@ -243,10 +243,7 @@ bool GPIO_setup() {
 
 	uint32_t base_address = 0;
 
-	if (!get_cpu_io_base_address(&base_address)) {
-		warn("cannot get the GPIO base address");
-		return false;
-	}
+	base_address = bcm_host_get_peripheral_address();
 
 	const char *memory_device = "/dev/mem";
 
@@ -396,29 +393,6 @@ void GPIO_pwm_write(GPIO_pin_type pin, uint32_t value) {
 // map page size
 #define MAP_SIZE 4096
 
-bool get_cpu_io_base_address(uint32_t *base) {
-
-	char buffer[8];
-	const char *ranges_file = "/proc/device-tree/soc/ranges";
-	int info_fd = open(ranges_file, O_RDONLY);
-
-	if (info_fd < 0) {
-		warn("cannot open: %s", ranges_file);
-		return false;
-	}
-
-	ssize_t n = read(info_fd, buffer, sizeof(buffer) );
-	close(info_fd);
-
-	if (n != 8) {
-		warn("cannot read base address: %s", ranges_file);
-		return false;
-	}
-
-	*base =  (buffer[4] << 24) + (buffer[5] << 16) + (buffer[6] << 8) + (buffer[7] << 0);
-
-	return true;
-}
 
 // setup a map to a peripheral offset
 // false => error
