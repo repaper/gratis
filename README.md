@@ -1,4 +1,33 @@
 # gratis
+
+## Notes for mrwastl/gratis-branch
+
+This branch adds basic support for Teensy 3.1/3.2 and ESP32.
+
+### Teensy 3.1/3.2
+Default IO layout is defined in EPD_PINOUT/EPD_PINOUT_Teensy.h.
+
+Pin numbers can be assigned individually when calling the constructor.
+
+### ESP32
+Default IO layout is defined in EPD_PINOUT/EPD_PINOUT_ESP32.h.
+
+Pin numbers and PWM channel ID (EPD_V110_G1 only) can be assigned individually when calling the constructor.
+
+SPI channel ID and SPI pin numbers can only be changed in EPD_PINOUT_ESP32.h, a more flexible handling would require
+some API changes.
+
+
+### Tests
+
+As I just own an EPD_V110_G1 module (2.7") I can only test this one. All other combinations are tested if compilation is successful.
+
+
+
+
+
+## Original README of repaper/gratis-branch below
+
 ## Fast Update notes, July 2017
 
 The update rate for Partial Update is determined by the temperature dependent stage time.

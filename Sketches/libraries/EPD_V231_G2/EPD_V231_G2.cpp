@@ -1,5 +1,8 @@
 // Copyright 2013-2015 Pervasive Displays, Inc.
 //
+// Teensy 3.1/3.2 and ESP32 adaptions:
+//   Copyright 2016-2017 Wolfgang Astleitner (mrwastl@serdisplib.sf.net)
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at:
@@ -36,6 +39,13 @@
 #define BORDER_BYTE_BLACK 0xff
 #define BORDER_BYTE_WHITE 0xaa
 #define BORDER_BYTE_NULL  0x00
+
+#ifndef ESP32
+	#define SPI_OBJECT  SPI
+#else
+	#include "EPD_PINOUT_ESP32.h"
+	#define SPI_OBJECT  esp32_spi
+#endif
 
 static void SPI_on(void);
 static void SPI_off(void);
@@ -141,6 +151,10 @@ EPD_Class::EPD_Class(EPD_size _size,
 	this->factored_stage_time = this->base_stage_time; // milliseconds
 	this->setFactor(); // ensure default temperature
 
+#if defined (ESP32)
+	// set SPI frequency (defined in EPD_PINOUT_ESP32.h)
+	SPI_OBJECT.setFrequency(ESP32_SPI_Frequency);
+#endif
 }
 
 
@@ -710,15 +724,19 @@ void EPD_Class::line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bo
 
 
 static void SPI_on(void) {
-	SPI.end();
-	SPI.begin();
-	SPI.setBitOrder(MSBFIRST);
-#if defined(__MSP432P401R__)
-	SPI.setDataMode(SPI_MODE3);
-	SPI.setClockDivider(SPI_CLOCK_DIV2);
+	SPI_OBJECT.end();
+#ifndef ESP32
+	SPI_OBJECT.begin();
 #else
-	SPI.setDataMode(SPI_MODE0);
-	SPI.setClockDivider(SPI_CLOCK_DIV2);
+	SPI_OBJECT.begin(Pin_SPI_SCK, Pin_SPI_MISO, Pin_SPI_MOSI);
+#endif
+	SPI_OBJECT.setBitOrder(MSBFIRST);
+#if defined(__MSP432P401R__)
+	SPI_OBJECT.setDataMode(SPI_MODE3);
+	SPI_OBJECT.setClockDivider(SPI_CLOCK_DIV2);
+#else
+	SPI_OBJECT.setDataMode(SPI_MODE0);
+	SPI_OBJECT.setClockDivider(SPI_CLOCK_DIV2);
 #endif
 	SPI_put(0x00);
 	SPI_put(0x00);
@@ -730,17 +748,17 @@ static void SPI_on(void) {
 static void SPI_off(void) {
 	// SPI.begin();
 	// SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE0);
+	SPI_OBJECT.setDataMode(SPI_MODE0);
 	// SPI.setClockDivider(SPI_CLOCK_DIV2);
 	SPI_put(0x00);
 	SPI_put(0x00);
 	Delay_us(10);
-	SPI.end();
+	SPI_OBJECT.end();
 }
 
 
 static void SPI_put(uint8_t c) {
-	SPI.transfer(c);
+	SPI_OBJECT.transfer(c);
 }
 
 
@@ -769,7 +787,7 @@ static uint8_t SPI_read(uint8_t cs_pin, const uint8_t *buffer, uint16_t length) 
 
 	// send all data
 	for (uint16_t i = 0; i < length; ++i) {
-		result = SPI.transfer(*buffer++);
+		result = SPI_OBJECT.transfer(*buffer++);
 #if DEBUG_SPI_READ
 		if (i < sizeof(rbuffer)) {
 			rbuffer[i] = result;

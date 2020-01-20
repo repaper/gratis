@@ -31,6 +31,14 @@
 #define Delay_us(us) delayMicroseconds(us)
 
 
+#ifndef ESP32
+	#define SPI_OBJECT  SPI
+#else
+	#include "EPD_PINOUT_ESP32.h"
+	#define SPI_OBJECT  esp32_spi
+#endif
+
+
 // FLASH MX25V8005 8Mbit flash chip command set (50MHz max clock)
 enum {
 	EPD_FLASH_WREN = 0x06,
@@ -84,18 +92,22 @@ void EPD_FLASH_Class::end(void) {
 
 // configure the SPI for EPD_FLASH access
 void EPD_FLASH_Class::spi_setup(void) {
-	SPI.begin();
+#ifndef ESP32
+	SPI_OBJECT.begin();
+#else
+	SPI_OBJECT.begin(Pin_SPI_SCK, Pin_SPI_MISO, Pin_SPI_MOSI);
+#endif
 	digitalWrite(this->EPD_FLASH_CS, HIGH);
 
-	SPI.setBitOrder(MSBFIRST);
-	SPI.setDataMode(SPI_MODE3);
-	SPI.setClockDivider(SPI_CLOCK_DIV4);
+	SPI_OBJECT.setBitOrder(MSBFIRST);
+	SPI_OBJECT.setDataMode(SPI_MODE3);
+	SPI_OBJECT.setClockDivider(SPI_CLOCK_DIV4);
 
 	Delay_us(10);
 
-	SPI.transfer(EPD_FLASH_NOP); // flush the SPI buffer
-	SPI.transfer(EPD_FLASH_NOP); // ..
-	SPI.transfer(EPD_FLASH_NOP); // ..
+	SPI_OBJECT.transfer(EPD_FLASH_NOP); // flush the SPI buffer
+	SPI_OBJECT.transfer(EPD_FLASH_NOP); // ..
+	SPI_OBJECT.transfer(EPD_FLASH_NOP); // ..
 	Delay_us(10);
 }
 
@@ -103,8 +115,8 @@ void EPD_FLASH_Class::spi_setup(void) {
 void EPD_FLASH_Class::spi_teardown(void) {
 	Delay_us(10);
 	digitalWrite(this->EPD_FLASH_CS, HIGH);
-	SPI.transfer(EPD_FLASH_NOP); // flush the SPI buffer
-	SPI.end();
+	SPI_OBJECT.transfer(EPD_FLASH_NOP); // flush the SPI buffer
+	SPI_OBJECT.end();
 }
 
 // return true if the chip is supported
@@ -127,10 +139,10 @@ void EPD_FLASH_Class::info(uint8_t *maufacturer, uint16_t *device) {
 	Delay_us(50);
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_RDID);
-	*maufacturer = SPI.transfer(EPD_FLASH_NOP);
-	uint8_t id_high = SPI.transfer(EPD_FLASH_NOP);
-	uint8_t id_low = SPI.transfer(EPD_FLASH_NOP);
+	SPI_OBJECT.transfer(EPD_FLASH_RDID);
+	*maufacturer = SPI_OBJECT.transfer(EPD_FLASH_NOP);
+	uint8_t id_high = SPI_OBJECT.transfer(EPD_FLASH_NOP);
+	uint8_t id_low = SPI_OBJECT.transfer(EPD_FLASH_NOP);
 	*device = (id_high << 8) | id_low;
 	this->spi_teardown();
 }
@@ -141,13 +153,13 @@ void EPD_FLASH_Class::read(void *buffer, uint32_t address, uint16_t length) {
 
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_FAST_READ);
-	SPI.transfer(address >> 16);
-	SPI.transfer(address >> 8);
-	SPI.transfer(address);
-	SPI.transfer(EPD_FLASH_NOP); // read dummy byte
+	SPI_OBJECT.transfer(EPD_FLASH_FAST_READ);
+	SPI_OBJECT.transfer(address >> 16);
+	SPI_OBJECT.transfer(address >> 8);
+	SPI_OBJECT.transfer(address);
+	SPI_OBJECT.transfer(EPD_FLASH_NOP); // read dummy byte
 	for (uint8_t *p = (uint8_t *)buffer; length != 0; --length) {
-		*p++ = SPI.transfer(EPD_FLASH_NOP);
+		*p++ = SPI_OBJECT.transfer(EPD_FLASH_NOP);
 	}
 	this->spi_teardown();
 }
@@ -162,10 +174,10 @@ void EPD_FLASH_Class::wait_for_ready(void) {
 bool EPD_FLASH_Class::is_busy(void) {
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_RDSR);
-	bool busy = 0 != (EPD_FLASH_WIP & SPI.transfer(EPD_FLASH_NOP));
+	SPI_OBJECT.transfer(EPD_FLASH_RDSR);
+	bool busy = 0 != (EPD_FLASH_WIP & SPI_OBJECT.transfer(EPD_FLASH_NOP));
 	digitalWrite(this->EPD_FLASH_CS, HIGH);
-	SPI.transfer(EPD_FLASH_NOP);
+	SPI_OBJECT.transfer(EPD_FLASH_NOP);
 	Delay_us(10);
 	return busy;
 }
@@ -176,7 +188,7 @@ void EPD_FLASH_Class::write_enable(void) {
 
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_WREN);
+	SPI_OBJECT.transfer(EPD_FLASH_WREN);
 	this->spi_teardown();
 }
 
@@ -187,7 +199,7 @@ void EPD_FLASH_Class::write_disable(void) {
 
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_WRDI);
+	SPI_OBJECT.transfer(EPD_FLASH_WRDI);
 	this->spi_teardown();
 }
 
@@ -197,12 +209,12 @@ void EPD_FLASH_Class::write(uint32_t address, const void *buffer, uint16_t lengt
 
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_PP);
-	SPI.transfer(address >> 16);
-	SPI.transfer(address >> 8);
-	SPI.transfer(address);
+	SPI_OBJECT.transfer(EPD_FLASH_PP);
+	SPI_OBJECT.transfer(address >> 16);
+	SPI_OBJECT.transfer(address >> 8);
+	SPI_OBJECT.transfer(address);
 	for (const uint8_t *p = (const uint8_t *)buffer; length != 0; --length) {
-		SPI.transfer(*p++);
+		SPI_OBJECT.transfer(*p++);
 	}
 	this->spi_teardown();
 }
@@ -214,13 +226,13 @@ void EPD_FLASH_Class::write_from_progmem(uint32_t address, PROGMEM const void *b
 
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_PP);
-	SPI.transfer(address >> 16);
-	SPI.transfer(address >> 8);
-	SPI.transfer(address);
+	SPI_OBJECT.transfer(EPD_FLASH_PP);
+	SPI_OBJECT.transfer(address >> 16);
+	SPI_OBJECT.transfer(address >> 8);
+	SPI_OBJECT.transfer(address);
 	for (PROGMEM const uint8_t *p = (PROGMEM const uint8_t *)buffer; length != 0; ++p, --length) {
 		uint8_t the_byte = pgm_read_byte_near(p);
-		SPI.transfer(the_byte);
+		SPI_OBJECT.transfer(the_byte);
 	}
 	this->spi_teardown();
 }
@@ -232,9 +244,9 @@ void EPD_FLASH_Class::sector_erase(uint32_t address) {
 
 	digitalWrite(this->EPD_FLASH_CS, LOW);
 	Delay_us(10);
-	SPI.transfer(EPD_FLASH_SE);
-	SPI.transfer(address >> 16);
-	SPI.transfer(address >> 8);
-	SPI.transfer(address);
+	SPI_OBJECT.transfer(EPD_FLASH_SE);
+	SPI_OBJECT.transfer(address >> 16);
+	SPI_OBJECT.transfer(address >> 8);
+	SPI_OBJECT.transfer(address);
 	this->spi_teardown();
 }
