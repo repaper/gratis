@@ -118,18 +118,17 @@ TEST_OBJECTS = epd_test.o ${DRIVER_OBJECTS}
 # build the fuse driver
 CLEAN_FILES += epd-fuse
 epd_fuse: ${FUSE_OBJECTS}
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${FUSE_OBJECTS}
-
+	${CC} ${CFLAGS} -o "$@" ${FUSE_OBJECTS} ${LDFLAGS}
 
 # build simple GPIO test program
 CLEAN_FILES += gpio_test
 gpio_test: ${GPIO_OBJECTS}
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${GPIO_OBJECTS}
+	${CC} ${CFLAGS} -o "$@" ${GPIO_OBJECTS} ${LDFLAGS}
 
 # build EPD test program
 CLEAN_FILES += epd_test
 epd_test: ${TEST_OBJECTS}
-	${CC} ${CFLAGS} ${LDFLAGS} -o "$@" ${TEST_OBJECTS}
+	${CC} ${CFLAGS} -o "$@" ${TEST_OBJECTS}a ${LDFLAGS}
 
 
 # dependencies
