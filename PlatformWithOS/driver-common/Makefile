@@ -128,7 +128,7 @@ gpio_test: ${GPIO_OBJECTS}
 # build EPD test program
 CLEAN_FILES += epd_test
 epd_test: ${TEST_OBJECTS}
-	${CC} ${CFLAGS} -o "$@" ${TEST_OBJECTS}a ${LDFLAGS}
+	${CC} ${CFLAGS} -o "$@" ${TEST_OBJECTS} ${LDFLAGS}
 
 
 # dependencies
