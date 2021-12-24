@@ -13,19 +13,26 @@
 // express or implied.  See the License for the specific language
 // governing permissions and limitations under the License.
 
-#if !defined(EPD_PINOUT_H)
-#define EPD_PINOUT_H 1
+#if !defined(EPD_PINOUT_TEENSY_H)
+#define EPD_PINOUT_TEENSY_H 1
 
-#include <EPD_PANELS.h>
+// pinout is taken from:
+//   https://forum.pjrc.com/threads/25793-2-7-inch-ePaper-on-Teensy-does-not-compile-Adafruit_GFX#post53636
 
-#if defined(CORE_TEENSY)
-#include <EPD_PINOUT_Teensy.h>
-#elif defined(ESP32)
-#include <EPD_PINOUT_ESP32.h>
-#elif defined(ENERGIA)
-#include <EPD_PINOUT_Energia.h>
-#else
-#include <EPD_PINOUT_Arduino.h>
-#endif
+// Teensy 3.1/3.2 IO layout
+const int Pin_TEMPERATURE = A0;
+const int Pin_PANEL_ON = 2;
+const int Pin_BORDER = 3;
+const int Pin_DISCHARGE = 4;
+const int Pin_PWM = 5;
+const int Pin_RESET = 6;
+const int Pin_BUSY = 7;
+const int Pin_EPD_CS = 8;
+const int Pin_EPD_FLASH_CS = 9;
+
+// the following are defined for completeness but not used or required
+//   for driving the display
+const int Pin_SW2 = 0;
+const int Pin_RED_LED = 1;
 
 #endif

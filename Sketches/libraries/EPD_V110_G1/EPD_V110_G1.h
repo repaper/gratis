@@ -43,7 +43,7 @@
 
 
 // if more SRAM available (8 kBytes)
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(CORE_TEENSY) || defined (ESP32)
 #define EPD_ENABLE_EXTRA_SRAM 1
 #endif
 
@@ -94,6 +94,10 @@ private:
 	bool filler;
 
 	EPD_Class(const EPD_Class &f);  // prevent copy
+
+#ifdef ESP32
+	const uint8_t EPD_Channel_PWM;
+#endif
 
 public:
 	// power up and power down the EPD panel
@@ -174,7 +178,6 @@ public:
 	// single line display - very low-level
 	// also has to handle AVR progmem
 	void line(uint16_t line, const uint8_t *data, uint8_t fixed_value, bool read_progmem, EPD_stage stage);
-
 	// inline static void attachInterrupt();
 	// inline static void detachInterrupt();
 
@@ -185,7 +188,11 @@ public:
 		  uint8_t pwm_pin,
 		  uint8_t reset_pin,
 		  uint8_t busy_pin,
-		  uint8_t chip_select_pin);
+		  uint8_t chip_select_pin
+#ifdef ESP32
+		 ,uint8_t pwm_channel = 0
+#endif
+	);
 
 };
 
